@@ -1,22 +1,39 @@
-"""智能问答API接口"""
+"""智能问答API接口 - 使用 DeepSeek V3"""
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 import json
-import os
 import requests
-import time
+import logging
+
+logger = logging.getLogger(__name__)
+
+# ============================================
+# DeepSeek API 配置（临时配置，生产环境请使用环境变量）
+# ============================================
+DEEPSEEK_API_KEY = 'sk-db2a7aa8e86647bb88a4bd63627bf879'  # 请替换为你的实际 API Key
+DEEPSEEK_API_BASE = 'https://api.deepseek.com'   # API 基础地址
+DEEPSEEK_MODEL = 'deepseek-chat'                 # 模型名称，如需 v3 可改为 'deepseek-chat-v3'
 
 
 @csrf_exempt
 @require_http_methods(["POST"])
 def api_qa_ask(request):
     """
-    智能问答接口
+    智能问答接口 - 使用 DeepSeek V3
     POST /api/qa/ask
     请求体：
         {
             "question": "滩羊的养殖方法"
+        }
+    返回格式：
+        {
+            "code": 0,
+            "msg": "成功",
+            "data": {
+                "answer": "回答内容",
+                "model": "deepseek-v3"
+            }
         }
     """
     try:
@@ -30,47 +47,21 @@ def api_qa_ask(request):
                 'data': None
             }, status=400)
         
-        # 尝试调用大模型API
-        answer = None
-        error_msg = None
+        # 调用 DeepSeek V3 API
+        answer, error_msg = call_deepseek_api(question)
         
-        # 1. 尝试OpenAI API
-        answer = call_openai_api(question)
         if answer:
             return JsonResponse({
                 'code': 0,
                 'msg': '成功',
                 'data': {
                     'answer': answer,
-                    'model': 'openai'
+                    'model': 'deepseek-v3'
                 }
             }, status=200)
         
-        # 2. 尝试百度文心一言API
-        answer = call_baidu_api(question)
-        if answer:
-            return JsonResponse({
-                'code': 0,
-                'msg': '成功',
-                'data': {
-                    'answer': answer,
-                    'model': 'baidu'
-                }
-            }, status=200)
-        
-        # 3. 尝试阿里通义千问API
-        answer = call_ali_api(question)
-        if answer:
-            return JsonResponse({
-                'code': 0,
-                'msg': '成功',
-                'data': {
-                    'answer': answer,
-                    'model': 'ali'
-                }
-            }, status=200)
-        
-        # 4. 如果所有大模型都不可用，使用本地回答
+        # 如果 DeepSeek API 调用失败，使用本地回答作为备用
+        logger.warning(f'DeepSeek API调用失败: {error_msg}，使用本地回答')
         answer = get_local_answer(question)
         return JsonResponse({
             'code': 0,
@@ -88,10 +79,10 @@ def api_qa_ask(request):
             'data': None
         }, status=400)
     except Exception as e:
-        import traceback
-        traceback.print_exc()
+        logger.error(f'智能问答接口异常: {str(e)}', exc_info=True)
         # 发生错误时，使用本地回答作为备用
-        answer = get_local_answer(question if 'question' in locals() else '')
+        question = data.get('question', '') if 'data' in locals() else ''
+        answer = get_local_answer(question)
         return JsonResponse({
             'code': 0,
             'msg': '成功（使用本地回答）',
@@ -102,16 +93,20 @@ def api_qa_ask(request):
         }, status=200)
 
 
-def call_openai_api(question):
-    """调用OpenAI API"""
+def call_deepseek_api(question):
+    """
+    调用 DeepSeek V3 API
+    返回: (answer, error_msg)
+    """
     try:
-        api_key = os.getenv('OPENAI_API_KEY')
-        api_base = os.getenv('OPENAI_API_BASE', 'https://api.openai.com/v1')
+        # 使用文件顶部定义的配置常量
+        api_key = DEEPSEEK_API_KEY
+        api_base = DEEPSEEK_API_BASE
         
-        if not api_key:
-            return None
+        if not api_key or api_key == 'your_deepseek_api_key_here':
+            return None, '请先在代码中配置 DEEPSEEK_API_KEY'
         
-        url = f"{api_base}/chat/completions"
+        url = f"{api_base}/v1/chat/completions"
         headers = {
             'Authorization': f'Bearer {api_key}',
             'Content-Type': 'application/json'
@@ -126,124 +121,55 @@ def call_openai_api(question):
 5. 滩羊的生长周期和特点
 6. 盐池滩羊的特色
 
-请提供专业、准确、友好的回答。如果问题不在你的知识范围内，请礼貌地说明。"""
+请提供专业、准确、友好的回答。回答要简洁明了，重点突出。如果问题不在你的知识范围内，请礼貌地说明。"""
         
         data = {
-            'model': os.getenv('OPENAI_MODEL', 'gpt-3.5-turbo'),
+            'model': DEEPSEEK_MODEL,
             'messages': [
                 {'role': 'system', 'content': system_prompt},
                 {'role': 'user', 'content': question}
             ],
             'temperature': 0.7,
-            'max_tokens': 1000
+            'max_tokens': 1500,  # 增加 token 限制，支持更详细的回答
+            'stream': False
         }
         
-        response = requests.post(url, headers=headers, json=data, timeout=10)
+        response = requests.post(url, headers=headers, json=data, timeout=15)
         
         if response.status_code == 200:
             result = response.json()
             if 'choices' in result and len(result['choices']) > 0:
-                return result['choices'][0]['message']['content']
+                answer = result['choices'][0]['message']['content']
+                return answer, None
+            else:
+                return None, 'API返回格式异常：缺少choices字段'
         
-        return None
+        # 处理错误响应
+        error_detail = response.text
+        try:
+            error_json = response.json()
+            error_detail = error_json.get('error', {}).get('message', error_detail)
+        except:
+            pass
+        
+        return None, f'API调用失败 (状态码: {response.status_code}): {error_detail}'
+        
+    except requests.exceptions.Timeout:
+        return None, 'API请求超时'
+    except requests.exceptions.RequestException as e:
+        return None, f'网络请求异常: {str(e)}'
     except Exception as e:
-        print(f'OpenAI API调用失败: {str(e)}')
-        return None
-
-
-def call_baidu_api(question):
-    """调用百度文心一言API"""
-    try:
-        api_key = os.getenv('BAIDU_API_KEY')
-        secret_key = os.getenv('BAIDU_SECRET_KEY')
-        
-        if not api_key or not secret_key:
-            return None
-        
-        # 获取access_token
-        token_url = f"https://aip.baidubce.com/oauth/2.0/token?grant_type=client_credentials&client_id={api_key}&client_secret={secret_key}"
-        token_response = requests.post(token_url, timeout=5)
-        
-        if token_response.status_code != 200:
-            return None
-        
-        access_token = token_response.json().get('access_token')
-        if not access_token:
-            return None
-        
-        # 调用文心一言API
-        url = f"https://aip.baidubce.com/rpc/2.0/ai_custom/v1/wenxinworkshop/chat/completions?access_token={access_token}"
-        
-        system_prompt = """你是一个专业的滩羊养殖和产品咨询助手。请用中文回答用户关于滩羊的问题。"""
-        
-        data = {
-            'messages': [
-                {'role': 'system', 'content': system_prompt},
-                {'role': 'user', 'content': question}
-            ],
-            'temperature': 0.7,
-            'max_output_tokens': 1000
-        }
-        
-        response = requests.post(url, json=data, timeout=10)
-        
-        if response.status_code == 200:
-            result = response.json()
-            if 'result' in result:
-                return result['result']
-        
-        return None
-    except Exception as e:
-        print(f'百度API调用失败: {str(e)}')
-        return None
-
-
-def call_ali_api(question):
-    """调用阿里通义千问API"""
-    try:
-        api_key = os.getenv('ALI_API_KEY')
-        api_base = os.getenv('ALI_API_BASE', 'https://dashscope.aliyuncs.com/api/v1')
-        
-        if not api_key:
-            return None
-        
-        url = f"{api_base}/services/aigc/text-generation/generation"
-        headers = {
-            'Authorization': f'Bearer {api_key}',
-            'Content-Type': 'application/json'
-        }
-        
-        system_prompt = """你是一个专业的滩羊养殖和产品咨询助手。请用中文回答用户关于滩羊的问题。"""
-        
-        data = {
-            'model': os.getenv('ALI_MODEL', 'qwen-turbo'),
-            'input': {
-                'messages': [
-                    {'role': 'system', 'content': system_prompt},
-                    {'role': 'user', 'content': question}
-                ]
-            },
-            'parameters': {
-                'temperature': 0.7,
-                'max_tokens': 1000
-            }
-        }
-        
-        response = requests.post(url, headers=headers, json=data, timeout=10)
-        
-        if response.status_code == 200:
-            result = response.json()
-            if 'output' in result and 'text' in result['output']:
-                return result['output']['text']
-        
-        return None
-    except Exception as e:
-        print(f'阿里API调用失败: {str(e)}')
-        return None
+        logger.error(f'DeepSeek API调用异常: {str(e)}', exc_info=True)
+        return None, f'调用异常: {str(e)}'
 
 
 def get_local_answer(question):
-    """本地回答（基于关键词匹配）"""
+    """
+    本地回答（基于关键词匹配）- 作为备用方案
+    """
+    if not question:
+        return '感谢您的提问！如果您有其他关于滩羊的问题，欢迎继续提问！'
+    
     q = question.lower()
     
     # 根据关键词匹配回答
@@ -267,4 +193,3 @@ def get_local_answer(question):
     
     else:
         return f'感谢您的提问！关于"{question}"的问题，我建议您：\n\n1. 查看小程序中的相关功能模块（如"生长周期"、"日常饲料"等）\n2. 咨询专业养殖户获取详细指导\n3. 联系客服获取更多帮助\n\n如果您有其他关于滩羊的问题，欢迎继续提问！'
-

@@ -46,4 +46,7 @@ urlpatterns = [
 
     # 生长记录
     path('api/growth/sheep/<int:sheep_id>', views.api_get_sheep_with_growth, name='api_get_sheep_with_growth'),
+
+    # 智能问答
+    path('api/qa/ask', views.api_qa_ask, name='api_qa_ask'),
 ]
