@@ -1,6 +1,6 @@
 // 在文件顶部引入API，避免在函数内部require导致路径解析问题
 // 注意：此页面在 subPackage 中，路径需要从 subPackage root 计算
-// subPackage root 是 pages/feature1，所以需要向上三级到达项目根目录
+// subPackage root 是 pages/adopt，所以需要向上三级到达项目根目录
 const API = require('../../../utils/api.js');
 
 Page({

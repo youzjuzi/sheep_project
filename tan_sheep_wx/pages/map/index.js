@@ -221,7 +221,7 @@ Page({
 
       // 跳转到导航页面，传递终点坐标
       wx.navigateTo({
-        url: `/pages/feature3/navigatePage/navigatePage?end=${selectedFarmer.name}&endLat=${selectedFarmer.latitude}&endLng=${selectedFarmer.longitude}`
+        url: `/pages/map/navigatePage/navigatePage?end=${selectedFarmer.name}&endLat=${selectedFarmer.latitude}&endLng=${selectedFarmer.longitude}`
       });
     },
 
@@ -230,7 +230,7 @@ Page({
      */
     openNavigation: function() {
       wx.navigateTo({
-        url: '/pages/feature3/navigatePage/navigatePage'
+        url: '/pages/map/navigatePage/navigatePage'
       });
     },
 

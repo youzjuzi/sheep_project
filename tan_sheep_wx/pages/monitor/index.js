@@ -129,10 +129,10 @@ Page({
 
     // 根据监控ID跳转到对应页面
     const pageMap = {
-      'monitor1': '/pages/feature6/monitor1/monitor1',
-      'monitor2': '/pages/feature6/monitor2/monitor2',
-      'monitor3': '/pages/feature6/monitor3/monitor3',
-      'monitor4': '/pages/feature6/monitor4/monitor4'
+      'monitor1': '/pages/monitor/monitor1/monitor1',
+      'monitor2': '/pages/monitor/monitor2/monitor2',
+      'monitor3': '/pages/monitor/monitor3/monitor3',
+      'monitor4': '/pages/monitor/monitor4/monitor4'
     };
 
     const url = pageMap[monitorId];

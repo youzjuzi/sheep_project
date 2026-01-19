@@ -15,11 +15,8 @@ urlpatterns = [
     
     # 3. 用户名密码登录
     path('api/auth/login_password', views.api_login, name='api_login_password'),
-    
-    # 4. 用户注册
-    path('api/auth/register', views.api_register, name='api_register'),
 
-    # 3. Token 验证
+    # Token 验证
     path('api/auth/check_token', views.api_check_token, name='api_check_token_new'),
     path('check_token', views.api_check_token, name='api_check_token'),
 

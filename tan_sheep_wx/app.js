@@ -14,8 +14,8 @@ App({
         loginWhiteList: [
             'pages/login/index',
             'pages/index/index',  // 首页允许未登录访问，但某些功能需要登录
-            'pages/feature8/feature8',  // 养殖户列表页面，允许未登录访问
-            'pages/feature8/my3/my3',  // 养殖户详情页面，允许未登录访问
+            'pages/breeder/index',  // 养殖户列表页面，允许未登录访问
+            'pages/breeder/my3/my3',  // 养殖户详情页面，允许未登录访问
             'pages/search/index',  // 搜索页面允许未登录访问
             'pages/category/index',  // 分类页面允许未登录访问
             'pages/goodsdetail/goodsdetail'  // 商品详情页面，允许未登录访问

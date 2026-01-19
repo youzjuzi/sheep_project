@@ -319,13 +319,13 @@ Page({
       url = `/pages/goodsdetail/goodsdetail?id=${id}`;
     } else if (type === 'breeder') {
       // 跳转到养殖户详情页
-      url = `/pages/feature8/my3/my3?id=${id}`;
+      url = `/pages/breeder/my3/my3?id=${id}`;
     } else if (type === 'activity') {
       // 跳转到优惠活动页面
-      url = `/pages/feature4/feature4`;
+      url = `/pages/promotion/index`;
     } else if (type === 'coupon') {
       // 跳转到优惠券页面
-      url = `/pages/feature4/feature4`;
+      url = `/pages/promotion/index`;
     } else {
       // 默认跳转到羊只详情页
       url = `/pages/goodsdetail/goodsdetail?id=${id}`;

@@ -1,0 +1,224 @@
+/* pages/adopt/index.wxss */
+.container {
+    min-height: 100vh;
+    background-color: #F7F8FA;
+    padding-bottom: 40rpx;
+}
+
+/* 头部装饰 */
+.header-banner {
+    width: 100%;
+    height: 150rpx;
+    background: linear-gradient(135deg, #238E23 0%, #2BA02B 100%);
+    position: relative;
+}
+
+/* 筛选卡片 */
+.filter-card {
+    background-color: #FFFFFF;
+    border-radius: 20rpx;
+    margin: -60rpx 30rpx 30rpx;
+    padding: 40rpx 30rpx 120rpx;
+    box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.08);
+    position: relative;
+    z-index: 10;
+}
+
+.card-title {
+    display: flex;
+    align-items: center;
+    margin-bottom: 40rpx;
+    padding-bottom: 30rpx;
+    border-bottom: 1rpx solid #F0F0F0;
+}
+
+.title-icon {
+    font-size: 36rpx;
+    margin-right: 12rpx;
+}
+
+.title-text {
+    font-size: 32rpx;
+    font-weight: bold;
+    color: #333333;
+}
+
+/* 筛选项 */
+.filter-item {
+    margin-bottom: 35rpx;
+}
+
+.filter-item:last-child {
+    margin-bottom: 0;
+}
+
+.filter-label {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20rpx;
+}
+
+.label-icon {
+    font-size: 28rpx;
+    margin-right: 8rpx;
+}
+
+.label-text {
+    font-size: 28rpx;
+    color: #333333;
+    font-weight: 500;
+}
+
+/* Tag按钮组 */
+.tag-group {
+    display: flex;
+    gap: 20rpx;
+}
+
+/* 可换行的标签组 */
+.tag-group-wrap {
+    flex-wrap: wrap;
+}
+
+.tag-item {
+    flex: 1;
+    height: 70rpx;
+    line-height: 70rpx;
+    text-align: center;
+    border-radius: 12rpx;
+    background-color: #F5F5F5;
+    border: 2rpx solid #E0E0E0;
+    font-size: 28rpx;
+    color: #999999;
+    transition: all 0.3s;
+}
+
+/* 换行标签组中的标签项 - 一行3个 */
+.tag-group-wrap .tag-item {
+    flex: 0 0 30%;
+    min-width: 0;
+    margin-bottom: 20rpx;
+}
+
+.tag-active {
+    background-color: #E8F9F0;
+    border-color: #07C160;
+    border-width: 2rpx;
+    color: #07C160;
+    font-weight: 500;
+}
+
+/* Picker包装器 */
+.picker-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 70rpx;
+    padding: 0 24rpx;
+    background-color: #F5F5F5;
+    border-radius: 12rpx;
+    border: 2rpx solid #E0E0E0;
+}
+
+.picker-text {
+    font-size: 28rpx;
+    color: #333333;
+    flex: 1;
+}
+
+.picker-placeholder {
+    color: #999999;
+}
+
+.picker-arrow {
+    font-size: 36rpx;
+    color: #CCCCCC;
+    font-weight: 300;
+    margin-left: 20rpx;
+}
+
+/* 底部固定按钮组 */
+.action-buttons-fixed {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-color: #FFFFFF;
+    padding: 20rpx 30rpx;
+    padding-bottom: calc(20rpx + env(safe-area-inset-bottom));
+    box-shadow: 0 -4rpx 20rpx rgba(0, 0, 0, 0.08);
+    z-index: 100;
+}
+
+.button-wrapper {
+    display: flex;
+    gap: 20rpx;
+}
+
+.search-btn {
+    flex: 2;
+    height: 88rpx;
+    line-height: 88rpx;
+    border-radius: 16rpx;
+    background: linear-gradient(135deg, #238E23 0%, #2BA02B 100%);
+    color: #FFFFFF;
+    font-size: 32rpx;
+    font-weight: 500;
+    border: none;
+    box-shadow: 0 4rpx 12rpx rgba(35, 142, 35, 0.3);
+}
+
+.search-btn[disabled] {
+    background: linear-gradient(135deg, #CCCCCC 0%, #BBBBBB 100%);
+    box-shadow: none;
+}
+
+.reset-btn {
+    flex: 1;
+    height: 88rpx;
+    line-height: 88rpx;
+    border-radius: 16rpx;
+    background-color: #FFFFFF;
+    color: #666666;
+    font-size: 28rpx;
+    border: 2rpx solid #E0E0E0;
+}
+
+/* 加载提示 */
+.loading-toast {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 200;
+}
+
+.loading-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: rgba(0, 0, 0, 0.7);
+    padding: 30rpx 50rpx;
+    border-radius: 12rpx;
+}
+
+.loading-content .loading-icon {
+    font-size: 60rpx;
+    margin-bottom: 10rpx;
+    animation: rotate 1s linear infinite;
+}
+
+.loading-content .loading-text {
+    font-size: 28rpx;
+    color: #FFFFFF;
+}
+
+@keyframes rotate {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+

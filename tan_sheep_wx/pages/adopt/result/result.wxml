@@ -1,0 +1,34 @@
+<!--pages/adopt/result/result.wxml-->
+<view class="container">
+    <view class="result-header">
+        <text class="result-title">找到 {{sheepList.length}} 只符合条件的羊只</text>
+    </view>
+    
+    <!-- 搜索结果列表 -->
+    <view class="sheep-list" wx:if="{{sheepList.length > 0}}">
+        <view class="sheep-item" wx:for="{{sheepList}}" wx:key="id" bindtap="viewSheepDetail" data-id="{{item.id}}">
+            <view class="sheep-avatar">
+                <text class="avatar-icon">🐑</text>
+            </view>
+            <view class="sheep-info">
+                <view class="sheep-id">羊只 #{{item.id}}</view>
+                <view class="sheep-details">
+                    <text class="detail-item">{{item.gender}}</text>
+                    <text class="detail-item">{{item.weight}}kg</text>
+                    <text class="detail-item">{{item.height}}cm</text>
+                    <text class="detail-item">{{item.length}}cm</text>
+                </view>
+            </view>
+            <view class="sheep-action">
+                <text class="action-arrow">›</text>
+            </view>
+        </view>
+    </view>
+    
+    <!-- 空状态 -->
+    <view class="empty-state" wx:if="{{sheepList.length === 0}}">
+        <view class="empty-icon">🐑</view>
+        <text class="empty-text">暂无搜索结果</text>
+        <text class="empty-hint">请尝试其他筛选条件</text>
+    </view>
+</view>

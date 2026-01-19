@@ -12,7 +12,6 @@
         "pages/search/index",
         "pages/category/index",
         "pages/goodsdetail/goodsdetail",
-        "pages/adopt/index",
         "pages/search/search-content",
         "pages/asset/index",
         "pages/score/index",
@@ -22,18 +21,19 @@
     ],
     "subPackages": [
         {
-            "root": "pages/feature1",
-            "name": "feature1",
+            "root": "pages/adopt",
+            "name": "adopt",
             "pages": [
-                "feature1",
-                "customize/customize"
+                "index",
+                "customize/customize",
+                "result/result"
             ]
         },
         {
-            "root": "pages/feature2",
-            "name": "feature2",
+            "root": "pages/recipe",
+            "name": "recipe",
             "pages": [
-                "feature2",
+                "index",
                 "newpage1/newpage1",
                 "newpage2/newpage2",
                 "newpage3/newpage3",
@@ -43,33 +43,33 @@
             ]
         },
         {
-            "root": "pages/feature3",
-            "name": "feature3",
+            "root": "pages/map",
+            "name": "map",
             "pages": [
-                "feature3",
+                "index",
                 "navigatePage/navigatePage"
             ]
         },
         {
-            "root": "pages/feature4",
-            "name": "feature4",
+            "root": "pages/promotion",
+            "name": "promotion",
             "pages": [
-                "feature4"
+                "index"
             ]
         },
         {
-            "root": "pages/feature5",
-            "name": "feature5",
+            "root": "pages/growth",
+            "name": "growth",
             "pages": [
-                "feature5",
+                "index",
                 "grouth/grouth"
             ]
         },
         {
-            "root": "pages/feature6",
-            "name": "feature6",
+            "root": "pages/monitor",
+            "name": "monitor",
             "pages": [
-                "feature6",
+                "index",
                 "monitor1/monitor1",
                 "monitor2/monitor2",
                 "monitor3/monitor3",
@@ -77,17 +77,17 @@
             ]
         },
         {
-            "root": "pages/feature7",
-            "name": "feature7",
+            "root": "pages/feed",
+            "name": "feed",
             "pages": [
-                "feature7"
+                "index"
             ]
         },
         {
-            "root": "pages/feature8",
-            "name": "feature8",
+            "root": "pages/breeder",
+            "name": "breeder",
             "pages": [
-                "feature8",
+                "index",
                 "my1/my1",
                 "my2/my2",
                 "my3/my3"
@@ -104,7 +104,7 @@
     "preloadRule": {
         "pages/index/index": {
             "network": "all",
-            "packages": ["feature1", "feature2", "feature3", "feature4", "feature5", "feature6"]
+            "packages": ["adopt", "recipe", "map", "promotion", "growth", "monitor"]
         }
     },
     "window": {

@@ -1,1 +1,95 @@
-<text>pages/adopt/index.wxml</text>
+<!--pages/adopt/index.wxml-->
+<view class="container">
+    <!-- 头部装饰 -->
+    <view class="header-banner"></view>
+    
+    <!-- 筛选卡片 -->
+    <view class="filter-card">
+        <view class="card-title">
+            <text class="title-icon">🐑</text>
+            <text class="title-text">筛选条件</text>
+        </view>
+        
+        <!-- 性别选择 - Tag按钮 -->
+        <view class="filter-item">
+            <view class="filter-label">
+                <text class="label-icon">⚧️</text>
+                <text class="label-text">性别</text>
+            </view>
+            <view class="tag-group">
+                <view class="tag-item {{selectedCategory === '雄性' ? 'tag-active' : ''}}" 
+                      bindtap="selectGender" data-value="雄性">
+                    <text>雄性</text>
+                </view>
+                <view class="tag-item {{selectedCategory === '雌性' ? 'tag-active' : ''}}" 
+                      bindtap="selectGender" data-value="雌性">
+                    <text>雌性</text>
+                </view>
+            </view>
+        </view>
+        
+        <!-- 体重选择 - Tag标签 -->
+        <view class="filter-item">
+            <view class="filter-label">
+                <text class="label-icon">⚖️</text>
+                <text class="label-text">体重</text>
+            </view>
+            <view class="tag-group tag-group-wrap">
+                <view class="tag-item {{selectedWeight === item ? 'tag-active' : ''}}" 
+                      wx:for="{{weightOptions}}" wx:key="index"
+                      bindtap="selectWeight" data-value="{{item}}">
+                    <text>{{item}}</text>
+                </view>
+            </view>
+        </view>
+        
+        <!-- 身高选择 - Tag标签 -->
+        <view class="filter-item">
+            <view class="filter-label">
+                <text class="label-icon">📏</text>
+                <text class="label-text">身高</text>
+            </view>
+            <view class="tag-group tag-group-wrap">
+                <view class="tag-item {{selectedHeight === item ? 'tag-active' : ''}}" 
+                      wx:for="{{heightOptions}}" wx:key="index"
+                      bindtap="selectHeight" data-value="{{item}}">
+                    <text>{{item}}</text>
+                </view>
+            </view>
+        </view>
+        
+        <!-- 体长选择 - Tag标签 -->
+        <view class="filter-item">
+            <view class="filter-label">
+                <text class="label-icon">📐</text>
+                <text class="label-text">体长</text>
+            </view>
+            <view class="tag-group tag-group-wrap">
+                <view class="tag-item {{selectedLength === item ? 'tag-active' : ''}}" 
+                      wx:for="{{lengthOptions}}" wx:key="index"
+                      bindtap="selectLength" data-value="{{item}}">
+                    <text>{{item}}</text>
+                </view>
+            </view>
+        </view>
+    </view>
+    
+    <!-- 加载中提示 -->
+    <view class="loading-toast" wx:if="{{loading}}">
+        <view class="loading-content">
+            <view class="loading-icon">⏳</view>
+            <text class="loading-text">搜索中...</text>
+        </view>
+    </view>
+    
+    <!-- 底部固定按钮组 -->
+    <view class="action-buttons-fixed">
+        <view class="button-wrapper">
+            <button class="search-btn" bindtap="searchSheep" disabled="{{loading}}">
+                <text wx:if="{{loading}}">搜索中...</text>
+                <text wx:else>🔍 搜索</text>
+            </button>
+            <button class="reset-btn" bindtap="resetFilter">重置</button>
+        </view>
+    </view>
+</view>

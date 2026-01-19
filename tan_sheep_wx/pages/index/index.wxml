@@ -24,41 +24,41 @@
         </swiper>
     </view>
 <view class="function-grid">
-    <navigator url="/pages/feature1/feature1" class="function-item">
+    <navigator url="/pages/adopt/index" class="function-item">
         <image src="{{functionIcons.f1}}" class="function-icon" />
         <text>定制领养</text>
     </navigator>
-    <navigator url="/pages/feature6/feature6" class="function-item">
+    <navigator url="/pages/monitor/index" class="function-item">
         <image src="{{functionIcons.f6}}" class="function-icon" />
         <text>场地监控</text>
     </navigator>
 
-    <navigator url="/pages/feature3/feature3" class="function-item">
+    <navigator url="/pages/map/index" class="function-item">
         <image src="{{functionIcons.f3}}" class="function-icon" />
         <text>盐池县地图</text>
     </navigator>
-    <navigator url="/pages/feature5/feature5" class="function-item">
+    <navigator url="/pages/growth/index" class="function-item">
         <image src="{{functionIcons.f5}}" class="function-icon" />
         <text>生长周期</text>
     </navigator>
-    <navigator url="/pages/feature4/feature4" class="function-item">
+    <navigator url="/pages/promotion/index" class="function-item">
         <image src="{{functionIcons.f4}}" class="function-icon" />
         <text>优惠活动</text>
     </navigator>
   
-    <navigator url="/pages/feature2/feature2" class="function-item">
+    <navigator url="/pages/recipe/index" class="function-item">
         <image src="{{functionIcons.food}}" class="function-icon" />
         <text>滩羊食谱</text>
     </navigator>
-    <!-- <navigator url="/pages/feature6/feature6" class="function-item">
+    <!-- <navigator url="/pages/monitor/index" class="function-item">
         <image src="{{functionIcons.f6}}" class="function-icon" />
         <text>场地监控</text>
     </navigator> -->
-    <navigator url="/pages/feature7/feature7" class="function-item">
+    <navigator url="/pages/feed/index" class="function-item">
         <image src="{{functionIcons.f7}}" class="function-icon" />
         <text>日常饲料</text>
     </navigator>
-    <navigator url="/pages/feature8/feature8" class="function-item">
+    <navigator url="/pages/breeder/index" class="function-item">
         <image src="{{functionIcons.f8}}" class="function-icon" />
         <text>养殖户</text>
     </navigator>

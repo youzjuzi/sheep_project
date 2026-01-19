@@ -1,5 +1,5 @@
 // 在文件顶部引入API，避免在函数内部require导致路径解析问题
-// 从 pages/feature8/ 到 utils/ 需要向上两级
+// 从 pages/breeder/ 到 utils/ 需要向上两级
 const API = require('../../utils/api.js');
 
 Page({
@@ -100,7 +100,7 @@ Page({
         const breeder = this.data.breeders[index];
         
         wx.navigateTo({
-          url: `/pages/feature8/my1/my1?id=${breeder.id}`  
+          url: `/pages/breeder/my1/my1?id=${breeder.id}`  
         });
     },
     

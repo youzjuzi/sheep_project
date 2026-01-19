@@ -179,7 +179,7 @@ Page({
 
   goToFeature1() {
     wx.navigateTo({
-      url: '/pages/feature1/feature1'
+      url: '/pages/adopt/index'
     });
   },
 

@@ -1,5 +1,5 @@
 // 在文件顶部引入API，避免在函数内部require导致路径解析问题
-// 从 pages/feature8/my1/ 到 utils/ 需要向上三级
+// 从 pages/breeder/my1/ 到 utils/ 需要向上三级
 const API = require('../../../utils/api.js');
 
 Page({
@@ -44,7 +44,7 @@ Page({
     viewSheepDetail: function(e) {
         const sheepId = e.currentTarget.dataset.id;
         wx.navigateTo({
-            url: `/pages/feature1/customize/customize?id=${sheepId}`
+            url: `/pages/adopt/customize/customize?id=${sheepId}`
         });
     },
     
@@ -72,7 +72,7 @@ Page({
         const breeder = this.data.currentBreeder;
         if (breeder && breeder.latitude && breeder.longitude) {
             wx.navigateTo({
-                url: `/pages/feature3/feature3?latitude=${breeder.latitude}&longitude=${breeder.longitude}`
+                url: `/pages/map/index?latitude=${breeder.latitude}&longitude=${breeder.longitude}`
             });
         } else {
             wx.showToast({
