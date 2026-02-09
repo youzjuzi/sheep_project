@@ -170,12 +170,19 @@ def api_search_sheep(request):
         query = Q()
 
         if gender:
-            if gender in ['公', '雄性', 'male']:
-                query &= Q(gender__in=['公', '雄性'])
-            elif gender in ['母', '雌性', 'female']:
-                query &= Q(gender__in=['母', '雌性'])
+            # 支持数字和中文关键词
+            if gender in ['公', '雄性', 'male', '1', 1]:
+                query &= Q(gender=1)
+            elif gender in ['母', '雌性', 'female', '0', 0]:
+                query &= Q(gender=0)
             else:
-                query &= Q(gender=gender)
+                # 尝试转换为整数
+                try:
+                    gender_int = int(gender)
+                    if gender_int in [0, 1]:
+                        query &= Q(gender=gender_int)
+                except (ValueError, TypeError):
+                    pass
 
         if weight:
             weight_range = parse_range(weight)
@@ -198,7 +205,7 @@ def api_search_sheep(request):
         for sheep in sheep_list:
             result.append({
                 'id': sheep.id,
-                'gender': sheep.gender,
+                'gender': sheep.get_gender_display(),  # 显示为中文
                 'weight': float(sheep.weight),
                 'height': float(sheep.height),
                 'length': float(sheep.length)
@@ -227,7 +234,7 @@ def api_get_sheep_by_id(request, sheep_id=None):
             sheep = Sheep.objects.get(pk=sheep_id)
             result = {
                 'id': sheep.id,
-                'gender': sheep.gender,
+                'gender': sheep.get_gender_display(),  # 显示为中文
                 'weight': float(sheep.weight),
                 'height': float(sheep.height),
                 'length': float(sheep.length)
@@ -299,8 +306,8 @@ def api_get_breeders(request, breeder_id=None):
                 actual_sheep_count = sheep_list.count()
 
                 # 统计羊只性别分布
-                actual_female_count = sheep_list.filter(gender__in=['母', '雌性', 'female']).count()
-                actual_male_count = sheep_list.filter(gender__in=['公', '雄性', 'male']).count()
+                actual_female_count = sheep_list.filter(gender=0).count()
+                actual_male_count = sheep_list.filter(gender=1).count()
 
                 # 获取羊只详细信息
                 sheep_data = []
@@ -317,7 +324,7 @@ def api_get_breeders(request, breeder_id=None):
 
                     sheep_data.append({
                         'id': sheep.id,
-                        'gender': sheep.gender,
+                        'gender': sheep.get_gender_display(),  # 显示为中文
                         'weight': float(sheep.weight),
                         'height': float(sheep.height),
                         'length': float(sheep.length),
@@ -460,10 +467,16 @@ def api_search_goods(request):
                         Q(length__gte=num_value-5, length__lte=num_value+5)
                     )[:10]
             except ValueError:
-                # 文本搜索：性别字段
-                sheep_list = Sheep.objects.filter(
-                    Q(gender__icontains=keyword)
-                )[:10]
+                # 文本搜索：性别字段（支持中文关键词）
+                gender_map = {
+                    '公': 1, '雄': 1, '雄性': 1, 'male': 1, '1': 1,
+                    '母': 0, '雌': 0, '雌性': 0, 'female': 0, '0': 0
+                }
+                gender_value = gender_map.get(keyword.lower(), gender_map.get(keyword))
+                if gender_value is not None:
+                    sheep_list = Sheep.objects.filter(gender=gender_value)[:10]
+                else:
+                    sheep_list = Sheep.objects.none()
             
             # 计算价格：根据体重计算（单价约 8-10元/kg）
             PRICE_PER_KG = 8.5  # 每公斤价格
@@ -476,11 +489,11 @@ def api_search_goods(request):
                     'type': 'sheep',
                     'id': sheep.id,
                     'name': f'羊只#{sheep.id}',
-                    'title': f'羊只#{sheep.id} - {sheep.gender}',
-                    'description': f'性别: {sheep.gender}, 体重: {sheep.weight}kg, 身高: {sheep.height}cm, 体长: {sheep.length}cm',
+                    'title': f'羊只#{sheep.id} - {sheep.get_gender_display()}',
+                    'description': f'性别: {sheep.get_gender_display()}, 体重: {sheep.weight}kg, 身高: {sheep.height}cm, 体长: {sheep.length}cm',
                     'price': calculated_price,
                     'image': '/images/icons/function/f1.png',
-                    'gender': sheep.gender,
+                    'gender': sheep.get_gender_display(),  # 显示为中文
                     'weight': float(sheep.weight),
                     'height': float(sheep.height),
                     'length': float(sheep.length),
@@ -646,7 +659,7 @@ def api_get_sheep_with_growth(request, sheep_id):
 
         result = {
             'id': sheep.id,
-            'gender': sheep.gender or '',
+            'gender': sheep.get_gender_display() if sheep.gender is not None else '',  # 显示为中文
             'weight': float(sheep.weight) if sheep.weight is not None else 0.0,
             'height': float(sheep.height) if sheep.height is not None else 0.0,
             'length': float(sheep.length) if sheep.length is not None else 0.0,
@@ -889,3 +902,44 @@ def api_login_wx(request):
         return JsonResponse({'code': 400, 'msg': '请求数据格式错误', 'data': None}, status=400)
     except Exception as e:
         return JsonResponse({'code': 500, 'msg': f'服务器错误: {str(e)}', 'data': None}, status=500)
+
+
+@csrf_exempt
+@require_http_methods(["GET"])
+def api_get_sheep_by_ear_tag(request):
+    """
+    根据耳标编号查询羊只信息（供扫码溯源使用）
+    GET /api/sheep/trace?ear_tag=TY-2026-001
+    """
+    try:
+        ear_tag = request.GET.get('ear_tag', '').strip()
+        
+        if not ear_tag:
+            return JsonResponse({'error': '耳标编号不能为空'}, status=400)
+        
+        # 查询羊只
+        try:
+            sheep = Sheep.objects.get(ear_tag=ear_tag)
+        except Sheep.DoesNotExist:
+            return JsonResponse({'error': f'未找到耳标编号为 {ear_tag} 的羊只'}, status=404)
+        
+        # 构造返回数据
+        result = {
+            'id': sheep.id,
+            'ear_tag': sheep.ear_tag,
+            'gender': sheep.get_gender_display(),
+            'weight': float(sheep.weight),
+            'height': float(sheep.height),
+            'length': float(sheep.length),
+            'qr_code': request.build_absolute_uri(sheep.qr_code.url) if sheep.qr_code else None,
+            'breeder': {
+                'id': sheep.breeder.id if sheep.breeder else None,
+                'name': sheep.breeder.name if sheep.breeder else None,
+                'phone': sheep.breeder.phone if sheep.breeder else None,
+            } if sheep.breeder else None
+        }
+        
+        return JsonResponse(result)
+    
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)

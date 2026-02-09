@@ -1,14 +1,25 @@
 from django.db import models
+import qrcode
+from io import BytesIO
+from django.core.files import File
+from pathlib import Path
+import os
 
 
 class Sheep(models.Model):
     """羊只基本信息表"""
-    gender = models.CharField(max_length=10, verbose_name='性别（公/母）')
+    GENDER_CHOICES = [
+        (0, '母'),
+        (1, '公'),
+    ]
+    ear_tag = models.CharField(max_length=50, null=True, blank=True, verbose_name='耳标编号')
+    gender = models.IntegerField(choices=GENDER_CHOICES, verbose_name='性别')
     weight = models.FloatField(verbose_name='体重（kg）')
     height = models.FloatField(verbose_name='身高（cm）')
     length = models.FloatField(verbose_name='体长（cm）')
     breeder = models.ForeignKey('Breeder', on_delete=models.SET_NULL, null=True, blank=True, related_name='sheep_list',
                                 db_column='breeder_id', verbose_name='养殖户')
+    qr_code = models.ImageField(upload_to='qrcodes/', null=True, blank=True, verbose_name='二维码')
 
     class Meta:
         db_table = 'sheep'
@@ -16,7 +27,55 @@ class Sheep(models.Model):
         verbose_name_plural = '羊只信息'
 
     def __str__(self):
-        return f"羊只#{self.id} - {self.gender} - {self.weight}kg"
+        return f"羊只#{self.id} - {self.get_gender_display()} - {self.weight}kg"
+    
+    def save(self, *args, **kwargs):
+        """
+        重写save方法，自动生成二维码
+        每次保存时，如果有耳标编号，就生成对应的二维码
+        """
+        # 先保存一次，确保有ID
+        if not self.id:
+            super().save(*args, **kwargs)
+        
+        # 如果有耳标编号，生成二维码
+        if self.ear_tag:
+            # 创建二维码实例
+            qr = qrcode.QRCode(
+                version=1,  # 控制二维码大小，1是最小的
+                error_correction=qrcode.constants.ERROR_CORRECT_L,  # 纠错级别
+                box_size=10,  # 每个格子的像素大小
+                border=4,  # 边框格子数
+            )
+            
+            # 添加数据（耳标编号）
+            qr.add_data(self.ear_tag)
+            qr.make(fit=True)
+            
+            # 创建图片
+            img = qr.make_image(fill_color="black", back_color="white")
+            
+            # 保存到BytesIO
+            buffer = BytesIO()
+            img.save(buffer, format='PNG')
+            buffer.seek(0)
+            
+            # 生成文件名
+            filename = f'sheep_{self.id}_{self.ear_tag}.png'
+            
+            # 删除旧的二维码文件（如果存在）
+            if self.qr_code:
+                try:
+                    if os.path.isfile(self.qr_code.path):
+                        os.remove(self.qr_code.path)
+                except Exception as e:
+                    print(f"删除旧二维码失败: {e}")
+            
+            # 保存新的二维码
+            self.qr_code.save(filename, File(buffer), save=False)
+        
+        # 最终保存
+        super().save(*args, **kwargs)
 
 
 class Breeder(models.Model):

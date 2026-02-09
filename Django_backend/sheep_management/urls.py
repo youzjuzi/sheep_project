@@ -49,4 +49,7 @@ urlpatterns = [
 
     # 智能问答
     path('api/qa/ask', views.api_qa_ask, name='api_qa_ask'),
+    
+    # 溯源查询（通过耳标编号）
+    path('api/sheep/trace', views.api_get_sheep_by_ear_tag, name='api_get_sheep_by_ear_tag'),
 ]

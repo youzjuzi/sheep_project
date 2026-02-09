@@ -33,6 +33,15 @@
   color: #333;
 }
 
+/* 扫码按钮 */
+.scan-btn {
+  margin-left: 16rpx;
+  padding: 8rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .clear-btn {
   margin-left: 16rpx;
   padding: 8rpx;

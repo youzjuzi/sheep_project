@@ -1,0 +1,88 @@
+<!--pages/trace/detail.wxml-->
+<view class="trace-page">
+  <!-- 加载中 -->
+  <view wx:if="{{loading}}" class="loading-container">
+    <van-loading type="spinner" size="50rpx" color="#1989fa">加载中...</van-loading>
+  </view>
+
+  <!-- 错误提示 -->
+  <view wx:elif="{{error}}" class="error-container">
+    <view class="error-content">
+      <van-icon name="info-o" size="80px" color="#ff6b6b" />
+      <text class="error-title">查询失败</text>
+      <text class="error-message">{{error}}</text>
+      <view class="error-actions">
+        <van-button round type="primary" bindtap="retry" icon="replay">重新查询</van-button>
+        <van-button round plain type="default" bindtap="goBack" icon="arrow-left">返回</van-button>
+      </view>
+    </view>
+  </view>
+
+  <!-- 羊只信息 -->
+  <view wx:else class="sheep-info-container">
+    <!-- 头部卡片 -->
+    <view class="header-card">
+      <view class="ear-tag-section">
+        <text class="label">耳标编号</text>
+        <text class="ear-tag">{{sheepInfo.ear_tag}}</text>
+      </view>
+      
+      <!-- 二维码图片 -->
+      <view wx:if="{{sheepInfo.qr_code}}" class="qr-code-section">
+        <image src="{{sheepInfo.qr_code}}" mode="aspectFit" class="qr-code-image"></image>
+        <text class="qr-tip">扫描二维码查看溯源信息</text>
+      </view>
+    </view>
+
+    <!-- 基本信息卡片 -->
+    <view class="info-card">
+      <view class="card-title">
+        <van-icon name="info-o" size="18px" color="#1989fa" />
+        <text>基本信息</text>
+      </view>
+      
+      <view class="info-grid">
+        <view class="info-item">
+          <text class="label">性别</text>
+          <text class="value">{{sheepInfo.gender}}</text>
+        </view>
+        <view class="info-item">
+          <text class="label">体重</text>
+          <text class="value">{{sheepInfo.weight}} kg</text>
+        </view>
+        <view class="info-item">
+          <text class="label">体高</text>
+          <text class="value">{{sheepInfo.height}} cm</text>
+        </view>
+        <view class="info-item">
+          <text class="label">体长</text>
+          <text class="value">{{sheepInfo.length}} cm</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 养殖户信息卡片 -->
+    <view wx:if="{{sheepInfo.breeder}}" class="info-card">
+      <view class="card-title">
+        <van-icon name="user-o" size="18px" color="#07c160" />
+        <text>养殖户信息</text>
+      </view>
+      
+      <view class="breeder-info">
+        <view class="breeder-item">
+          <text class="label">姓名</text>
+          <text class="value">{{sheepInfo.breeder.name}}</text>
+        </view>
+        <view class="breeder-item">
+          <text class="label">联系电话</text>
+          <text class="value">{{sheepInfo.breeder.phone}}</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 底部按钮 -->
+    <view class="bottom-actions">
+      <van-button round block type="primary" bindtap="goBack">返回</van-button>
+    </view>
+  </view>
+</view>

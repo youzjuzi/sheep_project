@@ -17,7 +17,8 @@
         "pages/score/index",
         "pages/score/growth",
         "pages/deposit/pay",
-        "pages/recharge/index"
+        "pages/recharge/index",
+        "pages/trace/detail"
     ],
     "subPackages": [
         {
@@ -104,7 +105,14 @@
     "preloadRule": {
         "pages/index/index": {
             "network": "all",
-            "packages": ["adopt", "recipe", "map", "promotion", "growth", "monitor"]
+            "packages": [
+                "adopt",
+                "recipe",
+                "map",
+                "promotion",
+                "growth",
+                "monitor"
+            ]
         }
     },
     "window": {
@@ -117,24 +125,31 @@
         "color": "#999",
         "selectedColor": "#FF5700",
         "backgroundColor": "#fafafa",
-        "list": [{
-            "pagePath": "pages/index/index",
-            "text": "首页",
-            "iconPath": "/icons/_home.png",
-            "selectedIconPath": "/icons/home.png"
-        }, {
-            "pagePath": "pages/cart/index",
-            "text": "购物车",
-            "iconPath": "/icons/_cart.png",
-            "selectedIconPath": "/icons/cart.png"
-        }, {
-            "pagePath": "pages/my/index",
-            "text": "我的",
-            "iconPath": "/icons/_my.png",
-            "selectedIconPath": "/icons/my.png"
-        }]
+        "list": [
+            {
+                "pagePath": "pages/index/index",
+                "text": "首页",
+                "iconPath": "/icons/_home.png",
+                "selectedIconPath": "/icons/home.png"
+            },
+            {
+                "pagePath": "pages/cart/index",
+                "text": "购物车",
+                "iconPath": "/icons/_cart.png",
+                "selectedIconPath": "/icons/cart.png"
+            },
+            {
+                "pagePath": "pages/my/index",
+                "text": "我的",
+                "iconPath": "/icons/_my.png",
+                "selectedIconPath": "/icons/my.png"
+            }
+        ]
     },
-    "requiredBackgroundModes": ["audio", "location"],
+    "requiredBackgroundModes": [
+        "audio",
+        "location"
+    ],
     "requiredPrivateInfos": [
         "getLocation",
         "chooseLocation"

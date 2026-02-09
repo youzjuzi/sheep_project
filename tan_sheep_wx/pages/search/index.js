@@ -104,28 +104,28 @@ Page({
     API.request('/search_goods', 'GET', {
       keyword: keyword.trim()
     })
-    .then((res) => {
-      wx.hideLoading();
-      const results = Array.isArray(res) ? res : [];
-      this.setData({
-        resultList: results,
-        originalResults: results,
-        hasSearched: true,
-        searchKeyword: keyword
+      .then((res) => {
+        wx.hideLoading();
+        const results = Array.isArray(res) ? res : [];
+        this.setData({
+          resultList: results,
+          originalResults: results,
+          hasSearched: true,
+          searchKeyword: keyword
+        });
+      })
+      .catch((err) => {
+        wx.hideLoading();
+        console.error('搜索请求失败:', err);
+
+        // 如果后端服务未启动，使用模拟数据
+        this.setData({
+          resultList: this.getMockResults(keyword),
+          originalResults: this.getMockResults(keyword),
+          hasSearched: true,
+          searchKeyword: keyword
+        });
       });
-    })
-    .catch((err) => {
-      wx.hideLoading();
-      console.error('搜索请求失败:', err);
-      
-      // 如果后端服务未启动，使用模拟数据
-      this.setData({
-        resultList: this.getMockResults(keyword),
-        originalResults: this.getMockResults(keyword),
-        hasSearched: true,
-        searchKeyword: keyword
-      });
-    });
   },
 
   // 获取模拟搜索结果（用于测试）
@@ -171,8 +171,8 @@ Page({
 
     // 根据关键词过滤
     if (keyword) {
-      return mockData.filter(item => 
-        item.name.includes(keyword) || 
+      return mockData.filter(item =>
+        item.name.includes(keyword) ||
         item.description.includes(keyword) ||
         item.gender.includes(keyword)
       );
@@ -230,6 +230,134 @@ Page({
     wx.navigateBack();
   },
 
+  /**
+   * 扫描二维码进行溯源查询
+   * 功能：调用微信原生扫码接口，支持相册选择和二维码/条形码
+   * 扫码成功后跳转到溯源详情页，传递耳标编号
+   */
+  onScanQRCode() {
+    console.log('[扫码溯源] 开始扫码');
+
+    // 开发环境调试：提供手动输入选项
+    const that = this;
+    wx.showModal({
+      title: '扫码溯源',
+      content: '请选择测试方式：\n\n• 手动输入：适用于开发调试\n• 扫码：适用于真机测试',
+      confirmText: '手动输入',
+      cancelText: '扫码',
+      success: (res) => {
+        if (res.confirm) {
+          // 手动输入耳标编号（开发调试用）
+          that.manualInputEarTag();
+        } else if (res.cancel) {
+          // 调用真实扫码功能
+          that.realScanCode();
+        }
+      }
+    });
+  },
+
+  /**
+   * 手动输入耳标编号（开发调试用）
+   */
+  manualInputEarTag() {
+    wx.showModal({
+      title: '输入耳标编号',
+      editable: true,
+      placeholderText: '例如：TY-2026-001',
+      success: (inputRes) => {
+        if (inputRes.confirm && inputRes.content) {
+          const earTag = inputRes.content.trim();
+          console.log('[扫码溯源] 手动输入耳标:', earTag);
+          this.jumpToTraceDetail(earTag);
+        }
+      }
+    });
+  },
+
+  /**
+   * 真实扫码功能
+   */
+  realScanCode() {
+    wx.scanCode({
+      // 支持从相册选择二维码图片
+      onlyFromCamera: false,
+      // 支持二维码和条形码
+      scanType: ['qrCode', 'barCode'],
+      success: (res) => {
+        console.log('[扫码溯源] 扫码成功', res);
+
+        // 获取扫码结果（羊只耳标编号）
+        const earTag = res.result;
+
+        // 检查扫码结果是否为空
+        if (!earTag || earTag.trim() === '') {
+          wx.showToast({
+            title: '无法识别二维码',
+            icon: 'none',
+            duration: 2000
+          });
+          console.warn('[扫码溯源] 扫码结果为空');
+          return;
+        }
+
+        console.log('[扫码溯源] 耳标编号:', earTag);
+        this.jumpToTraceDetail(earTag);
+      },
+      fail: (err) => {
+        // 用户取消扫码，不显示错误提示
+        if (err.errMsg && err.errMsg.indexOf('cancel') !== -1) {
+          console.log('[扫码溯源] 用户取消扫码');
+          return;
+        }
+
+        console.error('[扫码溯源] 扫码失败:', err);
+        wx.showToast({
+          title: '扫码功能仅支持真机',
+          icon: 'none',
+          duration: 3000
+        });
+      }
+    });
+  },
+
+  /**
+   * 跳转到溯源详情页
+   */
+  jumpToTraceDetail(earTag) {
+    // 跳转到溯源详情页，传递耳标编号参数
+    wx.navigateTo({
+      url: `/pages/trace/detail?ear_tag=${encodeURIComponent(earTag)}`,
+      success: () => {
+        console.log('[扫码溯源] 成功跳转到溯源详情页');
+      },
+      fail: (err) => {
+        console.error('[扫码溯源] 跳转失败:', err);
+        wx.showToast({
+          title: '页面跳转失败',
+          icon: 'none',
+          duration: 2000
+        });
+      }
+    });
+  },
+  fail: (err) => {
+    // 用户取消扫码，只打印日志，不显示错误提示
+    if (err.errMsg && err.errMsg.indexOf('cancel') !== -1) {
+      console.log('[扫码溯源] 用户取消扫码');
+      return;
+    }
+
+
+    // 其他错误，显示提示
+    console.error('[扫码溯源] 扫码失败:', err);
+    wx.showToast({
+      title: '扫码失败，请重试',
+      icon: 'none',
+      duration: 2000
+    });
+  },
+
   // 显示筛选弹窗
   showFilter() {
     this.setData({
@@ -277,7 +405,7 @@ Page({
 
     // 性别筛选
     if (this.data.selectedGender) {
-      results = results.filter(function(item) {
+      results = results.filter(function (item) {
         return item.gender === this.data.selectedGender;
       }.bind(this));
     }
@@ -290,13 +418,13 @@ Page({
         var parts = range.split('-');
         var min = parts[0];
         var max = parts[1];
-        results = results.filter(function(item) {
+        results = results.filter(function (item) {
           var price = item.price || 0;
           return price >= parseFloat(min) && (max ? price <= parseFloat(max) : true);
         });
       } else if (range.charAt(range.length - 1) === '-') {
         var min = parseFloat(range.replace('-', ''));
-        results = results.filter(function(item) {
+        results = results.filter(function (item) {
           return (item.price || 0) >= min;
         });
       }
@@ -312,7 +440,7 @@ Page({
   goToDetail(e) {
     const id = e.currentTarget.dataset.id;
     const type = e.currentTarget.dataset.type || 'sheep';
-    
+
     let url = '';
     if (type === 'sheep') {
       // 跳转到羊只详情页
@@ -330,7 +458,7 @@ Page({
       // 默认跳转到羊只详情页
       url = `/pages/goodsdetail/goodsdetail?id=${id}`;
     }
-    
+
     wx.navigateTo({
       url: url
     });

@@ -1,13 +1,29 @@
 from django.contrib import admin
 from .models import Sheep, Breeder, GrowthRecord, FeedingRecord, VaccinationHistory, User, CartItem
+from django.utils.html import format_html
 
 
 @admin.register(Sheep)
 class SheepAdmin(admin.ModelAdmin):
-    list_display = ['id', 'gender', 'weight', 'height', 'length', 'breeder']
+    list_display = ['id', 'ear_tag', 'get_gender_display', 'weight', 'height', 'length', 'breeder', 'qrcode_preview']
     list_filter = ['gender', 'breeder']
-    search_fields = ['id', 'gender', 'breeder__name']
+    search_fields = ['id', 'ear_tag', 'breeder__name']
     list_per_page = 20
+    readonly_fields = ['qrcode_image']
+    
+    def qrcode_preview(self, obj):
+        """在列表页显示二维码缩略图"""
+        if obj.qr_code:
+            return format_html('<img src="{}" width="50" height="50" />', obj.qr_code.url)
+        return "未生成"
+    qrcode_preview.short_description = '二维码'
+    
+    def qrcode_image(self, obj):
+        """在详情页显示完整二维码"""
+        if obj.qr_code:
+            return format_html('<img src="{}" width="200" height="200" />', obj.qr_code.url)
+        return "未生成二维码"
+    qrcode_image.short_description = '二维码图片'
 
 
 @admin.register(Breeder)

@@ -19,6 +19,33 @@
     background-color: #808080; 
     cursor: not-allowed;
   }
+
+/* 购物车按钮 */
+.cart-button {
+    background-color: #1989fa;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    margin-top: 10px;
+}
+
+.cart-button[disabled] {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+/* 调试按钮 */
+.debug-button {
+    background-color: #ff9800;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    margin-top: 10px;
+}
 .title {
     font-size: 24px;
     font-weight: bold;

@@ -1,3 +1,6 @@
+// 在文件顶部引入API工具
+const API = require('../../utils/api.js');
+
 Page({
     data: {
         imageList: [
@@ -43,28 +46,23 @@ Page({
 
     getSheepDetail: function (sheepId) {
         var that = this;
-        wx.request({
-            url: 'http://localhost:5000/search_sheep_by_id?id=' + sheepId,
-            method: 'GET',
-            success: function(res) {
-                if (res.statusCode === 200) {
-                    that.setData({
-                        sheepDetail: res.data
-                    });
-                } else {
-                    wx.showToast({
-                        title: '羊信息获取失败',
-                        icon: 'none'
-                    });
-                }
-            },
-            fail: function() {
-                wx.showToast({
-                    title: '网络请求失败',
-                    icon: 'none'
+        console.log('[获取羊只详情] sheepId:', sheepId);
+
+        API.request(`/api/sheep/${sheepId}`, 'GET')
+            .then((res) => {
+                console.log('[获取羊只详情] 返回数据:', res);
+                that.setData({
+                    sheepDetail: res
                 });
-            }
-        });
+            })
+            .catch((error) => {
+                console.error('[获取羊只详情] 请求失败:', error);
+                wx.showToast({
+                    title: '羊信息获取失败',
+                    icon: 'none',
+                    duration: 2000
+                });
+            });
     },
 
     // 打开购买弹窗
@@ -113,7 +111,7 @@ Page({
         newItem.quantity = 1;
         newItem.price = sheepDetail.weight * 10 || 0; // 假设价格是体重乘以10
         newItem.imagePath = sheepDetail.imagePath || '';
-        
+
         cartItems.push(newItem);
         wx.setStorageSync('cartItems', cartItems);
 
