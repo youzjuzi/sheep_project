@@ -35,43 +35,41 @@ Page({
                     wx.hideLoading();
                     console.log('[购物车] 从服务器加载:', res);
 
-                    if (Array.isArray(res)) {
-                        // 格式化数据
-                        const cartItems = res.map(item => {
-                            const sheep = item.sheep || {};
-                            return {
-                                id: item.sheep_id || sheep.id || item.id,
-                                cart_item_id: item.id, // 购物车记录ID，用于删除
-                                sheep: sheep,
-                                gender: sheep.gender || '',
-                                weight: sheep.weight || 0,
-                                height: sheep.height || 0,
-                                length: sheep.length || 0,
-                                quantity: item.quantity || 1,
-                                price: item.price || 0,
-                                total_price: item.total_price || (item.price * (item.quantity || 1)) || 0
-                            };
-                        });
+                    // 后端返回 { code: 0, data: [...] } 格式
+                    const cartData = res.data || res;
+                    const items = Array.isArray(cartData) ? cartData : [];
 
-                        // 同步到本地存储（作为备用）
-                        wx.setStorageSync('cartItems', cartItems);
+                    // 格式化数据
+                    const cartItems = items.map(item => {
+                        const sheep = item.sheep || {};
+                        const unitPrice = item.price || sheep.price || 0;
+                        const qty = item.quantity || 1;
+                        return {
+                            id: sheep.id || item.sheep_id || item.id,
+                            cart_item_id: item.id, // 购物车记录ID，用于删除
+                            sheep: sheep,
+                            gender: sheep.gender || '',
+                            weight: sheep.weight || 0,
+                            height: sheep.height || 0,
+                            length: sheep.length || 0,
+                            quantity: qty,
+                            price: unitPrice,
+                            total_price: unitPrice * qty
+                        };
+                    });
 
-                        const totalPrice = cartItems.reduce((sum, item) => sum + (item.total_price || item.price || 0), 0);
-                        that.setData({ cartItems, totalPrice });
-                    } else {
-                        // 如果服务器返回格式不对，使用本地存储
-                        that.loadFromLocal();
-                    }
+                    const totalPrice = cartItems.reduce((sum, item) => sum + (item.total_price || 0), 0);
+                    that.setData({ cartItems, totalPrice });
                 })
                 .catch((error) => {
                     wx.hideLoading();
-                    console.warn('[购物车] 从服务器加载失败，使用本地存储:', error);
-                    // 降级到本地存储
-                    that.loadFromLocal();
+                    console.error('[购物车] 从服务器加载失败:', error);
+                    that.setData({ cartItems: [], totalPrice: 0 });
+                    wx.showToast({ title: '加载失败', icon: 'none' });
                 });
         } else {
-            // 未登录，使用本地存储
-            this.loadFromLocal();
+            // 未登录，提示登录
+            this.setData({ cartItems: [], totalPrice: 0 });
         }
     },
 
@@ -95,61 +93,35 @@ Page({
     deleteItem: function (e) {
         const that = this;
         const cartItemId = e.currentTarget.dataset.cartItemId; // 购物车记录ID
-        const itemId = e.currentTarget.dataset.id; // 羊只ID
         const token = wx.getStorageSync('token');
 
-        // 如果已登录且有购物车记录ID，从服务器删除
-        if (token && cartItemId) {
-            wx.showLoading({
-                title: '删除中...',
-                mask: true
-            });
-
-            API.removeFromCart(token, cartItemId)
-                .then((res) => {
-                    wx.hideLoading();
-                    console.log('[购物车] 删除成功:', res);
-
-                    // 同时更新本地存储
-                    let cartItems = wx.getStorageSync('cartItems') || [];
-                    cartItems = cartItems.filter(item => item.id != itemId && item.cart_item_id != cartItemId);
-                    wx.setStorageSync('cartItems', cartItems);
-
-                    that.loadCartItems(); // 重新加载
-                    wx.showToast({
-                        title: '已删除',
-                        icon: 'success',
-                        duration: 2000
-                    });
-                })
-                .catch((error) => {
-                    wx.hideLoading();
-                    console.error('[购物车] 删除失败:', error);
-
-                    // 降级处理：只删除本地存储
-                    let cartItems = wx.getStorageSync('cartItems') || [];
-                    cartItems = cartItems.filter(item => item.id != itemId);
-                    wx.setStorageSync('cartItems', cartItems);
-                    that.loadCartItems();
-
-                    wx.showToast({
-                        title: '已删除（离线模式）',
-                        icon: 'success',
-                        duration: 2000
-                    });
-                });
-        } else {
-            // 未登录或没有记录ID，只删除本地存储
-            let cartItems = wx.getStorageSync('cartItems') || [];
-            cartItems = cartItems.filter(item => item.id !== itemId);
-            wx.setStorageSync('cartItems', cartItems);
-            this.loadCartItems();
-            wx.showToast({
-                title: '已删除',
-                icon: 'success',
-                duration: 2000
-            });
+        if (!token || !cartItemId) {
+            wx.showToast({ title: '操作失败', icon: 'none' });
+            return;
         }
+
+        wx.showModal({
+            title: '确认删除',
+            content: '确认从购物车中移除吗？',
+            success: function (res) {
+                if (res.confirm) {
+                    wx.showLoading({ title: '删除中...', mask: true });
+
+                    API.removeFromCart(token, cartItemId)
+                        .then((res) => {
+                            wx.hideLoading();
+                            console.log('[购物车] 删除成功:', res);
+                            that.loadCartItems(); // 重新加载
+                            wx.showToast({ title: '已删除', icon: 'success' });
+                        })
+                        .catch((error) => {
+                            wx.hideLoading();
+                            console.error('[购物车] 删除失败:', error);
+                            wx.showToast({ title: '删除失败', icon: 'none' });
+                        });
+                }
+            }
+        });
     },
 
     viewOrderDetail: function (e) {
@@ -160,12 +132,61 @@ Page({
     },
 
     checkout: function () {
-        wx.showToast({
-            title: '结算成功',
-            icon: 'success',
-            duration: 2000
+        const that = this;
+        const token = wx.getStorageSync('token');
+
+        if (!token) {
+            wx.showToast({ title: '请先登录', icon: 'none' });
+            return;
+        }
+
+        if (this.data.cartItems.length === 0) {
+            wx.showToast({ title: '购物车为空', icon: 'none' });
+            return;
+        }
+
+        wx.showModal({
+            title: '确认结算',
+            content: '总价 ¥' + that.data.totalPrice + '，确认结算吗？',
+            success: function (res) {
+                if (res.confirm) {
+                    wx.showLoading({ title: '结算中...', mask: true });
+
+                    API.checkout(token)
+                        .then((res) => {
+                            wx.hideLoading();
+                            console.log('[结算] API返回:', res);
+
+                            if (res.code === 0) {
+                                that.setData({ cartItems: [], totalPrice: 0 });
+                                wx.showToast({
+                                    title: '结算成功！',
+                                    icon: 'success',
+                                    duration: 2000
+                                });
+                            } else {
+                                wx.showToast({ title: res.msg || '结算失败', icon: 'none' });
+                            }
+                        })
+                        .catch((error) => {
+                            wx.hideLoading();
+                            console.error('[结算] 失败:', error);
+                            wx.showToast({ title: '网络错误', icon: 'none' });
+                        });
+                }
+            }
         });
-        wx.removeStorageSync('cartItems');
-        this.setData({ cartItems: [], totalPrice: 0 });
+    },
+
+    goToHistory: function () {
+        wx.navigateTo({
+            url: '/pages/cart/history/index'
+        });
+    },
+
+    goHome: function () {
+        wx.switchTab({
+            url: '/pages/index/index'
+        });
     }
 });

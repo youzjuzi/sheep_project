@@ -3,6 +3,7 @@
         "pages/index/index",
         "pages/login/index",
         "pages/cart/index",
+        "pages/cart/history/index",
         "pages/cart/checkout",
         "pages/my/index",
         "pages/my/youhui/youhui",

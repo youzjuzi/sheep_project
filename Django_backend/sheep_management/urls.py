@@ -3,6 +3,7 @@ from . import views  # 传统视图 + 其余 API（后续逐步迁移）
 from .api import auth_api  # 认证 API（已重构）
 from .api import user_api  # 用户 API
 from .api import sheep_api  # 羊只 API（已重构）
+from .api import commerce_api  # 商业模块 API（购物车）
 
 urlpatterns = [
     # ==========================
@@ -67,4 +68,14 @@ urlpatterns = [
     
     # 溯源查询（已迁移到 api/sheep_api.py）
     path('api/sheep/trace', sheep_api.api_get_sheep_by_ear_tag, name='api_get_sheep_by_ear_tag'),
+
+    # ==========================
+    # 购物车接口（api/commerce_api.py）
+    # ==========================
+    path('api/cart', commerce_api.api_cart, name='api_cart'),
+    path('api/cart/<int:item_id>', commerce_api.api_cart_item, name='api_cart_item'),
+    path('api/cart/checkout', commerce_api.api_checkout, name='api_checkout'),
+    path('api/my/sheep', commerce_api.api_my_sheep, name='api_my_sheep'),
+    path('api/sheep/<int:sheep_id>/status', commerce_api.api_sheep_status, name='api_sheep_status'),
+    path('api/orders', commerce_api.api_order_history, name='api_order_history'),
 ]

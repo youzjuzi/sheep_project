@@ -1,11 +1,11 @@
 from django.contrib import admin
-from .models import Sheep, GrowthRecord, FeedingRecord, VaccineType, VaccinationHistory, User, CartItem
+from .models import Sheep, GrowthRecord, FeedingRecord, VaccineType, VaccinationHistory, User, CartItem, Order, OrderItem
 from django.utils.html import format_html
 
 
 @admin.register(Sheep)
 class SheepAdmin(admin.ModelAdmin):
-    list_display = ['id', 'ear_tag', 'get_gender_display', 'weight', 'height', 'length', 'owner', 'qrcode_preview']
+    list_display = ['id', 'ear_tag', 'get_gender_display', 'weight', 'height', 'length', 'price', 'owner', 'qrcode_preview']
     list_filter = ['gender', 'owner']
     search_fields = ['id', 'ear_tag', 'owner__username', 'owner__nickname']
     list_per_page = 20
@@ -94,3 +94,30 @@ class CartItemAdmin(admin.ModelAdmin):
     date_hierarchy = 'created_at'
     list_per_page = 20
     readonly_fields = ['created_at', 'updated_at']
+
+
+class OrderItemInline(admin.TabularInline):
+    """订单明细内联（嵌入到订单详情页中）"""
+    model = OrderItem
+    extra = 0
+    readonly_fields = ['sheep', 'price']
+
+
+@admin.register(Order)
+class OrderAdmin(admin.ModelAdmin):
+    list_display = ['id', 'order_no', 'user', 'total_amount', 'status', 'created_at', 'pay_time']
+    list_filter = ['status', 'created_at']
+    search_fields = ['order_no', 'user__username', 'user__nickname']
+    date_hierarchy = 'created_at'
+    list_per_page = 20
+    readonly_fields = ['created_at']
+    inlines = [OrderItemInline]
+
+
+@admin.register(OrderItem)
+class OrderItemAdmin(admin.ModelAdmin):
+    list_display = ['id', 'order', 'sheep', 'price']
+    list_filter = ['order__status']
+    search_fields = ['order__order_no', 'sheep__id', 'sheep__ear_tag']
+    list_per_page = 20
+

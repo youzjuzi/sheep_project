@@ -19,6 +19,7 @@ class Sheep(models.Model):
         related_name='sheep_list',
         verbose_name='所属养殖户'
     )
+    price = models.DecimalField(max_digits=10, decimal_places=2, default=0, verbose_name='价格（元）')
     qr_code = models.ImageField(upload_to='qrcodes/', null=True, blank=True, verbose_name='二维码')
     class Meta:
         db_table = 'sheep'

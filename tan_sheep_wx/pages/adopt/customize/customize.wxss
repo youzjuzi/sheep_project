@@ -13,6 +13,7 @@
     border: none;
     border-radius: 5px;
     font-size: 16px;
+    margin-top: 16px;
   }
   
   .adopt-button.adopted {
@@ -20,31 +21,35 @@
     cursor: not-allowed;
   }
 
-/* 购物车按钮 */
-.cart-button {
-    background-color: #1989fa;
-    color: white;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 5px;
-    font-size: 16px;
-    margin-top: 10px;
+/* 领养状态提示 */
+.status-tip {
+    text-align: center;
+    padding: 12rpx 20rpx;
+    border-radius: 8rpx;
+    font-size: 28rpx;
+    margin-top: 16rpx;
 }
 
-.cart-button[disabled] {
-    background-color: #ccc;
-    cursor: not-allowed;
+.status-unavailable {
+    background-color: #fef0f0;
+    color: #f56c6c;
 }
 
-/* 调试按钮 */
-.debug-button {
-    background-color: #ff9800;
-    color: white;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 5px;
-    font-size: 16px;
-    margin-top: 10px;
+.status-mine {
+    background-color: #f0f9eb;
+    color: #67c23a;
+}
+
+.status-cart {
+    background-color: #fdf6ec;
+    color: #e6a23c;
+}
+
+/* 价格显示 */
+.price-value {
+    color: #e64340;
+    font-weight: bold;
+    font-size: 18px;
 }
 .title {
     font-size: 24px;

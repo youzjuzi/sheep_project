@@ -1,23 +1,77 @@
 <view class="cart-container">
-    <view class="cart-title">购物车</view>
-    <block wx:for="{{cartItems}}" wx:key="id">
-        <view class="cart-item">
-            <checkbox class="cart-checkbox" value="{{item.id}}" bindchange="updateSelection" />
-            <image class="cart-image" src="/images/icons/function/f1.png" mode="aspectFill"></image>
-            <view class="cart-details">
-                <text>ID: {{item.id}}</text>
-                <text>性别: {{item.gender}}</text>
-                <text>体重: {{item.weight}} kg</text>
-                <text>数量: {{item.quantity || 1}}</text>
-                <text>单价: ¥{{item.price}}</text>
-                <text wx:if="{{item.total_price}}">小计: ¥{{item.total_price}}</text>
-                <view class="button-group">
-                    <button class="detail-button" bindtap="viewOrderDetail" data-id="{{item.id}}">查看订单</button>
-                    <button class="delete-button" bindtap="deleteItem" data-id="{{item.id}}" data-cart-item-id="{{item.cart_item_id}}">删除</button>
-                </view>
-            </view>
+    <!-- 头部：购买历史入口 (卡片风格) -->
+    <view class="history-bar hover-class" bindtap="goToHistory" hover-class="history-bar-hover">
+        <view class="history-left">
+            <van-icon name="orders-o" size="20px" color="#FF5700" class="history-icon"/>
+            <text class="history-text">我的购买历史</text>
+        </view>
+        <view class="history-right">
+            <text class="history-desc">查看已买到的羊</text>
+            <van-icon name="arrow" color="#ccc" />
+        </view>
+    </view>
+
+    <!-- 购物车列表区域 -->
+    <view class="cart-title">
+      <text class="title-text">购物车</text>
+      <text class="count-text">共 {{cartItems.length}} 件商品</text>
+    </view>
+
+    <!-- 空购物车提示 -->
+    <block wx:if="{{cartItems.length === 0}}">
+        <view class="empty-cart">
+            <image class="empty-image" src="/images/icons/function/f1.png" mode="aspectFit"></image>
+            <text class="empty-title">购物车是空的</text>
+            <text class="empty-hint">领养一只羊，它就会出现在这里哦~</text>
+            <button class="go-adopt-button" bindtap="goHome">去领养</button>
         </view>
     </block>
-    <view class="total-price">总价: ¥{{totalPrice}}</view>
-    <button class="checkout-button" bindtap="checkout">结算</button>
+
+    <!-- 购物车列表 -->
+    <block wx:else>
+        <view class="cart-list">
+            <block wx:for="{{cartItems}}" wx:key="cart_item_id">
+                <view class="cart-item">
+                    <!-- 左侧图片 -->
+                    <image class="cart-image" src="/images/icons/function/f1.png" mode="aspectFill"></image>
+                    
+                    <!-- 右侧详情 -->
+                    <view class="cart-details">
+                        <view class="cart-header">
+                            <text class="sheep-name">滩羊 #{{item.id}}</text>
+                            <van-icon name="delete-o" size="18px" color="#999" bindtap="deleteItem" data-id="{{item.id}}" data-cart-item-id="{{item.cart_item_id}}" class="delete-icon" />
+                        </view>
+                        
+                        <view class="sheep-tags">
+                            <text class="tag">{{item.gender}}</text>
+                            <text class="tag">{{item.weight}} kg</text>
+                        </view>
+
+                        <view class="cart-footer">
+                            <view class="price-box">
+                                <text class="price-symbol">¥</text>
+                                <text class="price-text">{{item.price}}</text>
+                            </view>
+                            <view class="quantity-box">
+                                <text class="qty-label">x</text>
+                                <text class="qty-text">{{item.quantity || 1}}</text>
+                            </view>
+                        </view>
+                    </view>
+                </view>
+            </block>
+        </view>
+    </block>
+
+    <!-- 底部结算栏区域 (悬浮底部) -->
+    <view class="checkout-bar-wrapper" wx:if="{{cartItems.length > 0}}">
+        <view class="checkout-bar">
+            <view class="total-info">
+                <text class="total-label">合计:</text>
+                <text class="total-symbol">¥</text>
+                <text class="total-price">{{totalPrice}}</text>
+            </view>
+            <button class="checkout-button hover-class" bindtap="checkout" hover-class="checkout-hover">马上结算</button>
+        </view>
+    </view>
 </view>

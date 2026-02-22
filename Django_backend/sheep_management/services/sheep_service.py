@@ -78,7 +78,8 @@ class SheepService:
                 'gender': sheep.get_gender_display(),  # 显示为中文
                 'weight': float(sheep.weight),
                 'height': float(sheep.height),
-                'length': float(sheep.length)
+                'length': float(sheep.length),
+                'price': float(sheep.price),
             })
         return result
 
@@ -102,7 +103,8 @@ class SheepService:
             'gender': sheep.get_gender_display(),  # 显示为中文
             'weight': float(sheep.weight),
             'height': float(sheep.height),
-            'length': float(sheep.length)
+            'length': float(sheep.length),
+            'price': float(sheep.price),
         }
 
     @staticmethod
@@ -199,6 +201,7 @@ class SheepService:
             'weight': float(sheep.weight) if sheep.weight is not None else 0.0,
             'height': float(sheep.height) if sheep.height is not None else 0.0,
             'length': float(sheep.length) if sheep.length is not None else 0.0,
+            'price': float(sheep.price) if sheep.price is not None else 0.0,
             'growth_records': growth_data,
             'feeding_records': feeding_data,
             'vaccination_records': vaccination_data

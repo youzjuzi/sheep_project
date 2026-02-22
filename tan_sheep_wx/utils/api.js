@@ -253,6 +253,30 @@ function confirmAvatarUpload(token, objectKey) {
   })
 }
 
+/**
+ * 购物车结算（生成订单）
+ * @param {string} token 
+ */
+function checkout(token) {
+  return request('/api/cart/checkout', 'POST', { token: token })
+}
+
+/**
+ * 获取用户已购买的羊（结算后的）
+ * @param {string} token 
+ */
+function getMySheep(token) {
+  return request('/api/my/sheep?token=' + token, 'GET')
+}
+
+/**
+ * 获取用户订单历史
+ * @param {string} token 
+ */
+function getOrderHistory(token) {
+  return request('/api/orders?token=' + token, 'GET')
+}
+
 module.exports = {
   request,
   login,
@@ -270,5 +294,8 @@ module.exports = {
   updateCartItem,
   getAvatarUploadUrl,
   confirmAvatarUpload,
+  checkout,
+  getMySheep,
+  getOrderHistory,
   API_BASE_URL
 }

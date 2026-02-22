@@ -15,19 +15,31 @@
     <view wx:if="{{sheepDetail.length && sheepDetail.length != '0'}}" class="detail-item">
         <text class="label">体长:</text> {{sheepDetail.length}} cm
     </view>
+    <view wx:if="{{sheepDetail.price}}" class="detail-item">
+        <text class="label">价格:</text> <text class="price-value">¥{{sheepDetail.price}}</text>
+    </view>
     <view wx:if="{{!sheepDetail.id}}" class="detail-item">
         <text class="label" style="color: #999;">正在加载数据...</text>
     </view>
     <image class="sheep-image" src="{{imagePath}}" mode="aspectFill" binderror="onImageError"></image>
     
-    <!-- 领养按钮 -->
-    <button class="adopt-button {{isAdopted ? 'adopted' : ''}}" bindtap="adoptSheep">
-        {{isAdopted ? '已领养' : '领养'}}
-    </button>
-    
-    <!-- 加入购物车按钮 -->
-    <button class="cart-button" bindtap="addToCart" disabled="{{isInCart}}">
-        {{isInCart ? '已加入购物车' : '加入购物车'}}
+    <!-- 领养状态提示 -->
+    <view wx:if="{{adoptStatus === 'adopted_by_others'}}" class="status-tip status-unavailable">
+        该羊只已被其他用户领养
+    </view>
+    <view wx:elif="{{adoptStatus === 'adopted_by_me'}}" class="status-tip status-mine">
+        你已领养了这只羊
+    </view>
+    <view wx:elif="{{adoptStatus === 'in_my_cart'}}" class="status-tip status-cart">
+        已在你的购物车中，去购物车结算吧
+    </view>
+
+    <!-- 领养按钮（领养 = 加入购物车） -->
+    <button 
+        class="adopt-button {{adoptStatus !== 'available' ? 'adopted' : ''}}" 
+        bindtap="adoptSheep"
+        disabled="{{adoptStatus !== 'available'}}">
+        {{adoptStatusText}}
     </button>
 </view>
 

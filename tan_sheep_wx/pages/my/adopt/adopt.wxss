@@ -1,38 +1,176 @@
-.container {
-    padding: 20rpx;
-  }
-  .title {
-    font-size: 36rpx;
-    font-weight: bold;
-    margin-bottom: 20rpx;
-    text-align: center;
-  }
-  .adoption-list {
-    display: flex;
-    flex-direction: column;
-  }  
-  .no-records {
-    text-align: center;
-    color: #999;
-    margin-top: 50rpx;
-  }
-  .adoption-item {
-    background-color: #f0f0f0;
-    padding: 20rpx;
-    margin-bottom: 20rpx;
-    border-radius: 10rpx;
-    position: relative;
-  }
-  .sheep-info text {
-    display: block;
-    margin-bottom: 10rpx;
-  }
-  .delete-btn {
-    background-color: #ff4d4f;
-    color: white;
+page {
+  background-color: #f7f8fa;
+  padding-bottom: 180rpx;
 }
 
-page {
-    /* 防止 tabBar 遮挡底部内容 */
-    padding-bottom: 120rpx;
+.container {
+  padding: 24rpx;
+}
+
+/* ===== 页面标题 ===== */
+.page-title {
+  display: flex;
+  align-items: baseline;
+  margin-bottom: 30rpx;
+  padding: 0 10rpx;
+}
+
+.title-text {
+  font-size: 34rpx;
+  font-weight: bold;
+  color: #333;
+  margin-right: 16rpx;
+}
+
+.count-text {
+  font-size: 24rpx;
+  color: #999;
+}
+
+/* ===== 状态页面 ===== */
+.loading-state, .empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 120rpx;
+}
+
+.spin-icon {
+  margin-bottom: 20rpx;
+  animation: rotate 2s linear infinite;
+}
+
+@keyframes rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.loading-state text {
+  color: #999;
+  font-size: 28rpx;
+}
+
+.empty-image {
+  width: 240rpx;
+  height: 240rpx;
+  margin-bottom: 30rpx;
+  opacity: 0.5;
+}
+
+.empty-title {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 16rpx;
+}
+
+.empty-hint {
+  font-size: 26rpx;
+  color: #999;
+  margin-bottom: 40rpx;
+}
+
+.go-adopt-button {
+  background-color: #fff;
+  color: #4CAF50;
+  border: 2rpx solid #4CAF50;
+  border-radius: 40rpx;
+  padding: 0 60rpx;
+  height: 70rpx;
+  line-height: 66rpx;
+  font-size: 28rpx;
+}
+
+/* ===== 羊只卡片列表 ===== */
+.sheep-list {
+  display: flex;
+  flex-direction: column;
+  gap: 24rpx;
+}
+
+.sheep-card {
+  display: flex;
+  background-color: #fff;
+  border-radius: 16rpx;
+  padding: 24rpx;
+  box-shadow: 0 4rpx 12rpx rgba(0,0,0,0.02);
+  transition: all 0.2s ease;
+}
+
+.sheep-card:active {
+  transform: scale(0.98);
+  background-color: #f9f9f9;
+}
+
+.sheep-avatar {
+  width: 140rpx;
+  height: 140rpx;
+  border-radius: 12rpx;
+  background-color: #f5f5f5;
+  margin-right: 24rpx;
+  flex-shrink: 0;
+}
+
+.sheep-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.sheep-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.sheep-name {
+  font-size: 30rpx;
+  font-weight: bold;
+  color: #333;
+}
+
+.more-icon {
+  padding-left: 10rpx;
+}
+
+.sheep-tags {
+  display: flex;
+  gap: 12rpx;
+  margin-top: 10rpx;
+  margin-bottom: 10rpx;
+}
+
+.tag {
+  font-size: 22rpx;
+  padding: 4rpx 14rpx;
+  border-radius: 6rpx;
+}
+
+.gender-tag {
+  color: #1989fa;
+  background-color: #ebf5ff;
+}
+
+.w-tag {
+  color: #ff976a;
+  background-color: #fffbe8;
+}
+
+.sheep-details {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-top: auto;
+}
+
+.detail-text {
+  font-size: 22rpx;
+  color: #999;
+}
+
+.detail-divider {
+  font-size: 20rpx;
+  color: #eee;
+  margin: 0 10rpx;
 }
