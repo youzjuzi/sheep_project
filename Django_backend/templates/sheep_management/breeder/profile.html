@@ -38,6 +38,11 @@
                     <label>角色</label>
                     <input type="text" value="养殖户" disabled style="background: #f8f9fa; cursor: not-allowed;">
                 </div>
+                
+                <div class="form-group">
+                    <label for="description">个人简介</label>
+                    <textarea name="description" id="description" rows="3" placeholder="介绍一下自己吧（最多200字）" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:4px;font-size:14px;resize:vertical;">{{ user.description|default:'' }}</textarea>
+                </div>
             </div>
         </div>
         

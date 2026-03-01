@@ -10,6 +10,22 @@ class SheepAdmin(admin.ModelAdmin):
     search_fields = ['id', 'ear_tag', 'owner__username', 'owner__nickname']
     list_per_page = 20
     readonly_fields = ['qrcode_image']
+    fieldsets = (
+        ('基本信息', {
+            'fields': ('owner', 'gender', 'health_status', 'birth_date', 'farm_name')
+        }),
+        ('体征数据', {
+            'fields': ('weight', 'height', 'length')
+        }),
+        ('价格信息', {
+            'fields': ('price',),
+            'description': '设置该羊只的销售价格'
+        }),
+        ('图片与二维码', {
+            'fields': ('image', 'qrcode_image'),
+            'classes': ('collapse',)
+        }),
+    )
 
     def qrcode_preview(self, obj):
         """在列表页显示二维码缩略图"""

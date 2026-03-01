@@ -198,6 +198,7 @@ def sheep_create(request):
             height=float(request.POST.get('height')),
             length=float(request.POST.get('length')),
             birth_date=request.POST.get('birth_date') or None,
+            price=float(request.POST.get('price', 0)),
             owner=owner,
         )
         messages.success(request, f'羊只创建成功！耳标号：{sheep.ear_tag}')
@@ -240,6 +241,7 @@ def sheep_edit(request, pk):
         sheep.height = float(request.POST.get('height'))
         sheep.length = float(request.POST.get('length'))
         sheep.birth_date = request.POST.get('birth_date') or None
+        sheep.price = float(request.POST.get('price', 0))
         sheep.save()
         messages.success(request, '羊只信息更新成功！')
         return redirect('sheep_detail', pk=sheep.pk)

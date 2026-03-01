@@ -50,6 +50,7 @@
                 <th>性别</th>
                 <th>健康状态</th>
                 <th>体重(kg)</th>
+                <th>价格（元）</th>
                 {% if is_admin %}<th>所属养殖户</th>{% endif %}
                 <th>操作</th>
             </tr>
@@ -66,6 +67,7 @@
                     </span>
                 </td>
                 <td>{{ sheep.weight }}</td>
+                <td><strong style="color: #e74c3c;">¥ {{ sheep.price }}</strong></td>
                 {% if is_admin %}<td>{{ sheep.owner.nickname|default:sheep.owner.username }}</td>{% endif %}
                 <td>
                     <a href="{% url 'sheep_detail' sheep.pk %}" class="btn" style="padding: 5px 10px; font-size: 12px;">查看</a>
@@ -74,7 +76,7 @@
             </tr>
             {% empty %}
             <tr>
-                <td colspan="{% if is_admin %}7{% else %}6{% endif %}" style="text-align: center; padding: 40px;">
+                <td colspan="{% if is_admin %}8{% else %}7{% endif %}" style="text-align: center; padding: 40px;">
                     <div style="color: #999;">
                         <div style="font-size: 48px; margin-bottom: 10px;">🐑</div>
                         <div>暂无羊只数据</div>

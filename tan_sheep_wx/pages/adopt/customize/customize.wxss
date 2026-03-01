@@ -1,165 +1,331 @@
-/* pages/feature3/customize/customize.wxss */
-.view-container {
-    padding: 20px;
-    background-color: #f8f8f8;
-    border-radius: 10px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    margin: 20px;
+/* ===== 整体页面 ===== */
+page {
+    background: #f5f5f5;
 }
-.adopt-button {
-    background-color: #4CAF50; 
-    color: white;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 5px;
-    font-size: 16px;
-    margin-top: 16px;
-  }
-  
-  .adopt-button.adopted {
-    background-color: #808080; 
-    cursor: not-allowed;
-  }
-
-/* 领养状态提示 */
-.status-tip {
-    text-align: center;
-    padding: 12rpx 20rpx;
-    border-radius: 8rpx;
-    font-size: 28rpx;
-    margin-top: 16rpx;
+.page {
+    background: #f5f5f5;
+    min-height: 100vh;
+    padding-bottom: 40rpx;
 }
 
-.status-unavailable {
-    background-color: #fef0f0;
-    color: #f56c6c;
+/* ===== 顶部全宽图片 ===== */
+.hero-wrap {
+    position: relative;
+    width: 100%;
+    height: 680rpx;
+    background: #e8f5e9;
+}
+.hero-img {
+    width: 100%;
+    height: 100%;
+}
+.hero-badge {
+    position: absolute;
+    bottom: 24rpx;
+    left: 24rpx;
+    background: rgba(0,0,0,0.45);
+    color: #fff;
+    font-size: 24rpx;
+    padding: 8rpx 20rpx;
+    border-radius: 30rpx;
+    backdrop-filter: blur(4px);
 }
 
-.status-mine {
-    background-color: #f0f9eb;
-    color: #67c23a;
+/* ===== 价格区 ===== */
+.price-section {
+    background: linear-gradient(135deg, #c62828, #e53935);
+    padding: 30rpx 32rpx 28rpx;
 }
-
-.status-cart {
-    background-color: #fdf6ec;
-    color: #e6a23c;
+.price-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16rpx;
 }
-
-/* 价格显示 */
-.price-value {
-    color: #e64340;
-    font-weight: bold;
-    font-size: 18px;
+.price-left {
+    display: flex;
+    align-items: baseline;
+    gap: 4rpx;
 }
-.title {
-    font-size: 24px;
-    font-weight: bold;
-    color: #333;
-    margin-bottom: 10px;
-}
-
-.detail-item {
-    margin-bottom: 5px;
-}
-
-.label {
+.price-symbol {
+    font-size: 36rpx;
+    color: #fff;
     font-weight: bold;
 }
+.price-num {
+    font-size: 80rpx;
+    color: #fff;
+    font-weight: bold;
+    line-height: 1;
+}
+.status-badge {
+    font-size: 22rpx;
+    padding: 8rpx 18rpx;
+    border-radius: 30rpx;
+    font-weight: bold;
+}
+.badge-cart { background: rgba(255,255,255,0.2); color: #fff; }
+.badge-mine { background: #e8f5e9; color: #2e7d32; }
+.badge-sold { background: #fef0f0; color: #e53935; }
+.product-title {
+    font-size: 34rpx;
+    color: #fff;
+    font-weight: bold;
+    margin-bottom: 16rpx;
+}
+.tags-row {
+    display: flex;
+    gap: 12rpx;
+}
+.tag {
+    background: rgba(255,255,255,0.2);
+    color: #fff;
+    font-size: 22rpx;
+    padding: 6rpx 16rpx;
+    border-radius: 6rpx;
+}
 
-.content {
+/* ===== 耳标号条 ===== */
+.ear-tag-bar {
+    background: #fff;
+    display: flex;
+    align-items: center;
+    padding: 24rpx 32rpx;
+    gap: 16rpx;
+    border-bottom: 1rpx solid #f0f0f0;
+}
+.etb-label {
+    font-size: 26rpx;
     color: #666;
 }
-.sheep-image {
-    width: 100px; 
-    height: 100px;
-    margin-top: 10px; 
-}
-.container {
-    padding: 20rpx;
-}
-
-.title {
-    font-size: 30px;
-    font-weight: bold;
-    margin-bottom: 10rpx;
-}
-
-.record-item {
-    margin-bottom: 10rpx;
-    border: 1rpx solid #ccc;
-    padding: 10rpx;
-    white-space: nowrap;     
-    overflow: hidden;       
-    text-overflow: ellipsis;
-}
-
-.container {
-    padding: 20rpx;
-  }
-  
-  .sheep-info {
-    display: flex;
-    margin-bottom: 30rpx;
-  }
-  
-  .sheep-image {
-    width: 200rpx;
-    height: 200rpx;
-    margin-right: 20rpx;
-    border-radius: 10rpx;
-  }
-  
-  .sheep-details {
+.etb-value {
     flex: 1;
-  }
-  
-  .sheep-details text {
-    display: block;
-    margin-bottom: 10rpx;
-  }
-  
-  .section {
-    margin-bottom: 30rpx;
-  }
-  
-  .section-title {
-    font-size: 32rpx;
-    font-weight: bold;
-    margin-bottom: 20rpx;
-  }
-  
-  .vaccine-records-list,
-  .growth-records-list {
-    background-color: #f8f8f8;
-    border-radius: 10rpx;
-    padding: 20rpx;
-  }
-  
-  .no-records {
-    text-align: center;
-    color: #999;
     font-size: 28rpx;
-  }
-  
-  .vaccine-record-item,
-  .growth-record-item {
-    background-color: #fff;
-    padding: 20rpx;
-    margin-bottom: 20rpx;
-    border-radius: 10rpx;
-    box-shadow: 0 2rpx 4rpx rgba(0,0,0,0.1);
-  }
-  
-  .vaccine-record-item text,
-  .growth-record-item text {
-    display: block;
-    margin-bottom: 10rpx;
-    font-size: 26rpx;
-    color: #333;
-  }
-  
-  .vaccine-type {
     font-weight: bold;
-    color: #007aff;
-  }
-  
+    color: #2e7d32;
+    letter-spacing: 1rpx;
+}
+.etb-tip {
+    font-size: 24rpx;
+    color: #bbb;
+}
+
+/* ===== 分割线 ===== */
+.section-divider {
+    height: 16rpx;
+    background: #f5f5f5;
+}
+
+/* ===== 通用卡片 ===== */
+.card {
+    background: #fff;
+    margin-bottom: 16rpx;
+    padding: 0 32rpx 32rpx;
+}
+.card-hd {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 28rpx 0 20rpx;
+    border-bottom: 1rpx solid #f5f5f5;
+    margin-bottom: 24rpx;
+}
+.card-hd-title {
+    font-size: 30rpx;
+    font-weight: bold;
+    color: #222;
+}
+.card-hd-count {
+    font-size: 24rpx;
+    color: #999;
+}
+
+/* ===== 参数规格网格 ===== */
+.param-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16rpx;
+}
+.param-item {
+    background: #fafafa;
+    border-radius: 12rpx;
+    padding: 20rpx 22rpx;
+    display: flex;
+    flex-direction: column;
+    gap: 8rpx;
+}
+.pk {
+    font-size: 22rpx;
+    color: #999;
+}
+.pv {
+    font-size: 30rpx;
+    font-weight: bold;
+    color: #333;
+}
+.pv-health {
+    color: #4caf50;
+}
+.punit {
+    font-size: 22rpx;
+    color: #999;
+    font-weight: normal;
+}
+
+/* ===== 养殖户信息 ===== */
+.breeder-row {
+    display: flex;
+    align-items: center;
+    gap: 24rpx;
+    padding: 8rpx 0;
+}
+.breeder-avatar {
+    width: 88rpx;
+    height: 88rpx;
+    background: #e8f5e9;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 44rpx;
+    flex-shrink: 0;
+}
+.breeder-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 8rpx;
+}
+.breeder-name {
+    font-size: 30rpx;
+    font-weight: bold;
+    color: #333;
+}
+.breeder-farm {
+    font-size: 24rpx;
+    color: #888;
+}
+.breeder-arrow {
+    font-size: 36rpx;
+    color: #ccc;
+}
+
+/* ===== 生长记录表格 ===== */
+.table-head {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+    background: #f0f7f0;
+    border-radius: 10rpx;
+    padding: 16rpx 12rpx;
+    margin-bottom: 4rpx;
+}
+.table-head text {
+    font-size: 22rpx;
+    color: #4caf50;
+    font-weight: bold;
+    text-align: center;
+}
+.table-row {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+    padding: 18rpx 12rpx;
+    border-radius: 8rpx;
+}
+.table-row text {
+    font-size: 24rpx;
+    color: #444;
+    text-align: center;
+}
+.row-even { background: #fafafa; }
+.row-odd  { background: #fff; }
+
+/* ===== 疫苗记录列表 ===== */
+.vaccine-item {
+    background: #fafafa;
+    border-radius: 14rpx;
+    padding: 24rpx;
+    margin-bottom: 16rpx;
+}
+.vaccine-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16rpx;
+}
+.vaccine-name {
+    font-size: 28rpx;
+    font-weight: bold;
+    color: #333;
+}
+.vaccine-date {
+    font-size: 22rpx;
+    color: #4caf50;
+}
+.vaccine-attrs {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12rpx;
+}
+.vattr {
+    display: flex;
+    flex-direction: column;
+    gap: 4rpx;
+}
+.vattr-k {
+    font-size: 20rpx;
+    color: #bbb;
+}
+.vattr-v {
+    font-size: 24rpx;
+    color: #555;
+}
+
+/* ===== 空数据提示 ===== */
+.empty-tip {
+    text-align: center;
+    padding: 40rpx 0;
+    color: #bbb;
+    font-size: 28rpx;
+}
+
+/* ===== 底部固定操作栏 ===== */
+.bottom-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: #fff;
+    padding: 16rpx 32rpx;
+    padding-bottom: calc(16rpx + env(safe-area-inset-bottom));
+    box-shadow: 0 -2rpx 16rpx rgba(0,0,0,0.08);
+    display: flex;
+    flex-direction: column;
+    gap: 12rpx;
+}
+.bottom-status {
+    text-align: center;
+    font-size: 24rpx;
+    padding: 10rpx 0;
+    border-radius: 8rpx;
+}
+.status-cart { background: #fdf6ec; color: #e6a23c; }
+.status-mine { background: #f0f9eb; color: #67c23a; }
+.status-sold { background: #fef0f0; color: #f56c6c; }
+.adopt-btn {
+    width: 100%;
+    background: linear-gradient(135deg, #e53935, #c62828);
+    color: #fff;
+    font-size: 34rpx;
+    font-weight: bold;
+    border-radius: 50rpx;
+    padding: 22rpx 0;
+    border: none;
+    letter-spacing: 4rpx;
+    box-shadow: 0 6rpx 20rpx rgba(229,57,53,0.4);
+    margin: 0;
+}
+.btn-disabled {
+    background: #d0d0d0;
+    box-shadow: none;
+    color: #fff;
+}

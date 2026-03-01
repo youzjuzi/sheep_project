@@ -39,6 +39,10 @@
             <td>{{ target_user.mobile|default:"未设置" }}</td>
         </tr>
         <tr>
+            <th>个人简介</th>
+            <td>{{ target_user.description|default:"未填写" }}</td>
+        </tr>
+        <tr>
             <th>角色</th>
             <td>{{ target_user.get_role_display }}</td>
         </tr>

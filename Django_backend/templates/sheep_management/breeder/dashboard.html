@@ -19,6 +19,9 @@
                 <div>
                     <h4 style="margin: 0; font-size: 18px;">{{ user.nickname|default:user.username }}</h4>
                     <p style="margin: 5px 0; color: #666;">{{ user.mobile|default:'无手机号' }}</p>
+                    {% if user.description %}
+                    <p style="margin: 4px 0 8px; color: #888; font-size: 13px; max-width: 240px;">{{ user.description }}</p>
+                    {% endif %}
                     <a href="{% url 'breeder_profile' %}" class="btn" style="padding: 3px 10px; font-size: 12px;">编辑资料</a>
                 </div>
             </div>

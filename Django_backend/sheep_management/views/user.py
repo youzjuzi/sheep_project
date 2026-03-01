@@ -87,6 +87,7 @@ def user_update(request, pk):
         user.mobile = mobile
         user.role = role
         user.is_verified = (request.POST.get('is_verified') == 'on')
+        user.description = request.POST.get('description', '').strip() or None
 
         if new_password:
             user.set_password(new_password)

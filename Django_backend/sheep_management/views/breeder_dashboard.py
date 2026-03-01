@@ -53,6 +53,7 @@ def breeder_profile(request):
     if request.method == 'POST':
         user.nickname = request.POST.get('nickname', user.nickname)
         user.mobile = request.POST.get('mobile', user.mobile)
+        user.description = request.POST.get('description', '').strip() or None
         
         # 处理头像上传
         if 'avatar' in request.FILES:

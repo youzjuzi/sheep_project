@@ -1,63 +1,164 @@
-<view class="view-container">
-    <view class="title">滩羊生长信息</view>
-    <view wx:if="{{sheepDetail.id}}" class="detail-item">
-        <text class="label">ID:</text> {{sheepDetail.id}}
-    </view>
-    <view wx:if="{{sheepDetail.gender}}" class="detail-item">
-        <text class="label">性别:</text> {{sheepDetail.gender}}
-    </view>
-    <view wx:if="{{sheepDetail.weight && sheepDetail.weight != '0'}}" class="detail-item">
-        <text class="label">体重:</text> {{sheepDetail.weight}} kg
-    </view>
-    <view wx:if="{{sheepDetail.height && sheepDetail.height != '0'}}" class="detail-item">
-        <text class="label">体高:</text> {{sheepDetail.height}} cm
-    </view>
-    <view wx:if="{{sheepDetail.length && sheepDetail.length != '0'}}" class="detail-item">
-        <text class="label">体长:</text> {{sheepDetail.length}} cm
-    </view>
-    <view wx:if="{{sheepDetail.price}}" class="detail-item">
-        <text class="label">价格:</text> <text class="price-value">¥{{sheepDetail.price}}</text>
-    </view>
-    <view wx:if="{{!sheepDetail.id}}" class="detail-item">
-        <text class="label" style="color: #999;">正在加载数据...</text>
-    </view>
-    <image class="sheep-image" src="{{imagePath}}" mode="aspectFill" binderror="onImageError"></image>
-    
-    <!-- 领养状态提示 -->
-    <view wx:if="{{adoptStatus === 'adopted_by_others'}}" class="status-tip status-unavailable">
-        该羊只已被其他用户领养
-    </view>
-    <view wx:elif="{{adoptStatus === 'adopted_by_me'}}" class="status-tip status-mine">
-        你已领养了这只羊
-    </view>
-    <view wx:elif="{{adoptStatus === 'in_my_cart'}}" class="status-tip status-cart">
-        已在你的购物车中，去购物车结算吧
+<!-- 淡宝风格商品详情页 -->
+<view class="page">
+
+    <!-- 顶部全宽图片 -->
+    <view class="hero-wrap">
+        <image class="hero-img" src="{{imagePath}}" mode="aspectFill" binderror="onImageError"/>
+        <view class="hero-badge">🌿 宁夏盐池·生态散养</view>
     </view>
 
-    <!-- 领养按钮（领养 = 加入购物车） -->
-    <button 
-        class="adopt-button {{adoptStatus !== 'available' ? 'adopted' : ''}}" 
-        bindtap="adoptSheep"
-        disabled="{{adoptStatus !== 'available'}}">
-        {{adoptStatusText}}
-    </button>
+    <!-- 价格区 -->
+    <view class="price-section">
+        <view class="price-row">
+            <view class="price-left">
+                <text class="price-symbol">¥</text>
+                <text class="price-num">{{sheepDetail.price || '0.00'}}</text>
+            </view>
+            <view wx:if="{{adoptStatus === 'in_my_cart'}}" class="status-badge badge-cart">🛒 已入购物车</view>
+            <view wx:elif="{{adoptStatus === 'adopted_by_me'}}" class="status-badge badge-mine">✅ 已领养</view>
+            <view wx:elif="{{adoptStatus === 'adopted_by_others'}}" class="status-badge badge-sold">⚠️ 已售出</view>
+        </view>
+        <view class="product-title">宁夏盐池滩羊 · 精品认养</view>
+        <view class="tags-row">
+            <text class="tag">产地直供</text>
+            <text class="tag">生态散养</text>
+            <text class="tag">品质保证</text>
+        </view>
+    </view>
+
+    <!-- 耳标号条 -->
+    <view class="ear-tag-bar">
+        <text class="etb-label">🏷️ 耳标号</text>
+        <text class="etb-value">{{sheepDetail.ear_tag || '暂无'}}</text>
+    </view>
+
+    <!-- 分割线 -->
+    <view class="section-divider"></view>
+
+    <!-- 参数规格 -->
+    <view class="card">
+        <view class="card-hd">
+            <text class="card-hd-title">📋 参数规格</text>
+        </view>
+        <view class="param-grid">
+            <view class="param-item">
+                <text class="pk">性别</text>
+                <text class="pv">{{sheepDetail.gender || '-'}}</text>
+            </view>
+            <view class="param-item">
+                <text class="pk">出生日期</text>
+                <text class="pv">{{sheepDetail.birth_date || '未记录'}}</text>
+            </view>
+            <view class="param-item">
+                <text class="pk">体重</text>
+                <text class="pv">{{sheepDetail.weight}} <text class="punit">kg</text></text>
+            </view>
+            <view class="param-item">
+                <text class="pk">体高</text>
+                <text class="pv">{{sheepDetail.height}} <text class="punit">cm</text></text>
+            </view>
+            <view class="param-item">
+                <text class="pk">体长</text>
+                <text class="pv">{{sheepDetail.length}} <text class="punit">cm</text></text>
+            </view>
+            <view class="param-item">
+                <text class="pk">健康状态</text>
+                <text class="pv pv-health">健康</text>
+            </view>
+        </view>
+    </view>
+
+    <!-- 养殖户信息 -->
+    <view class="card">
+        <view class="card-hd">
+            <text class="card-hd-title">🏡 养殖户信息</text>
+        </view>
+        <view class="breeder-row">
+            <view class="breeder-avatar">🧑‍🌾</view>
+            <view class="breeder-info">
+                <text class="breeder-name">{{sheepDetail.breeder_name || '官方牧场'}}</text>
+                <text class="breeder-farm">{{sheepDetail.farm_name || '宁夏盐池滩羊核心产区'}}</text>
+            </view>
+            <text class="breeder-arrow">›</text>
+        </view>
+    </view>
+
+    <!-- 生长记录 -->
+    <view class="card">
+        <view class="card-hd">
+            <text class="card-hd-title">📈 生长记录</text>
+            <text class="card-hd-count">{{growthRecords.length}}条</text>
+        </view>
+        <view wx:if="{{growthRecords.length === 0}}" class="empty-tip">
+            <text>📊 暂无生长记录</text>
+        </view>
+        <view wx:else>
+            <view class="table-head">
+                <text>日期</text>
+                <text>体重(kg)</text>
+                <text>体高(cm)</text>
+                <text>体长(cm)</text>
+            </view>
+            <view wx:for="{{growthRecords}}" wx:key="id"
+                  class="table-row {{index % 2 === 0 ? 'row-even' : 'row-odd'}}">
+                <text>{{item.record_date}}</text>
+                <text>{{item.weight}}</text>
+                <text>{{item.height}}</text>
+                <text>{{item.length}}</text>
+            </view>
+        </view>
+    </view>
+
+    <!-- 疫苗接种记录 -->
+    <view class="card">
+        <view class="card-hd">
+            <text class="card-hd-title">💉 疫苗接种记录</text>
+            <text class="card-hd-count">{{vaccineRecords.length}}条</text>
+        </view>
+        <view wx:if="{{vaccineRecords.length === 0}}" class="empty-tip">
+            <text>💉 暂无疫苗接种记录</text>
+        </view>
+        <view wx:else>
+            <view wx:for="{{vaccineRecords}}" wx:key="VaccinationID" class="vaccine-item">
+                <view class="vaccine-top">
+                    <text class="vaccine-name">{{item.VaccineType}}</text>
+                    <text class="vaccine-date">{{item.VaccinationDate}}</text>
+                </view>
+                <view class="vaccine-attrs">
+                    <view class="vattr">
+                        <text class="vattr-k">有效期至</text>
+                        <text class="vattr-v">{{item.ExpiryDate}}</text>
+                    </view>
+                    <view class="vattr">
+                        <text class="vattr-k">剂量</text>
+                        <text class="vattr-v">{{item.Dosage}} 毫升</text>
+                    </view>
+                    <view class="vattr">
+                        <text class="vattr-k">接种者</text>
+                        <text class="vattr-v">{{item.AdministeredBy}}</text>
+                    </view>
+                    <view wx:if="{{item.Notes}}" class="vattr">
+                        <text class="vattr-k">备注</text>
+                        <text class="vattr-v">{{item.Notes}}</text>
+                    </view>
+                </view>
+            </view>
+        </view>
+    </view>
+
+    <!-- 底部占位空间 -->
+    <view style="height: 140rpx;"></view>
 </view>
 
-<view class="section">
-    <view class="section-title">疫苗接种记录</view>
-    <view class="vaccine-records-list">
-      <view wx:if="{{vaccineRecords.length === 0}}" class="no-records">
-        暂无疫苗接种记录
-      </view>
-      <view wx:else>
-        <view wx:for="{{vaccineRecords}}" wx:key="VaccinationID" class="vaccine-record-item">
-          <text class="vaccine-type">疫苗类型: {{item.VaccineType}}</text>
-          <text>接种日期: {{item.VaccinationDate}}</text>
-          <text>有效期至: {{item.ExpiryDate}}</text>
-          <text>剂量: {{item.Dosage}}毫升</text>
-          <text>接种者: {{item.AdministeredBy}}</text>
-          <text wx:if="{{item.Notes}}">备注: {{item.Notes}}</text>
-        </view>
-      </view>
-    </view>
+<!-- 底部固定操作栏 -->
+<view class="bottom-bar">
+    <view wx:if="{{adoptStatus === 'in_my_cart'}}" class="bottom-status status-cart">🛒 已在购物车中，去购物车结算吧</view>
+    <view wx:elif="{{adoptStatus === 'adopted_by_me'}}" class="bottom-status status-mine">✅ 你已领养了这只羊</view>
+    <view wx:elif="{{adoptStatus === 'adopted_by_others'}}" class="bottom-status status-sold">⚠️ 该羊只已被其他用户领养</view>
+    <button
+        class="adopt-btn {{adoptStatus !== 'available' ? 'btn-disabled' : ''}}"
+        bindtap="adoptSheep"
+        disabled="{{adoptStatus !== 'available'}}">
+        {{adoptStatus === 'available' ? '👑 立即领养' : adoptStatusText}}
+    </button>
 </view>

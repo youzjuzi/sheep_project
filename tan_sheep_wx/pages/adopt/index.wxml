@@ -90,7 +90,7 @@
                 <text>重置</text>
             </view>
             <view class="confirm-btn" bindtap="searchSheep">
-                <text>查看 {{sheepCount}} 只符合条件的滩羊</text>
+                <text>提交</text>
             </view>
         </view>
         <view class="safe-area-bottom"></view>
