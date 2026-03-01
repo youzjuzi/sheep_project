@@ -319,6 +319,169 @@
   background: #fff;
 }
 
+/* 资产卡片 */
+.asset-card {
+  margin: -40rpx 32rpx 32rpx;
+  background: #fff;
+  border-radius: 24rpx;
+  padding: 32rpx;
+  box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.08);
+}
+
+.asset-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24rpx;
+}
+
+.asset-title {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #333;
+}
+
+.asset-content {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+}
+
+.asset-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.asset-value {
+  font-size: 36rpx;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 8rpx;
+}
+
+.asset-label {
+  font-size: 24rpx;
+  color: #999;
+}
+
+.asset-divider {
+  width: 1rpx;
+  height: 60rpx;
+  background: #eee;
+}
+
+/* 核心功能入口 */
+.core-functions {
+  margin: 0 32rpx 32rpx;
+  background: #fff;
+  border-radius: 24rpx;
+  padding: 32rpx;
+  box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.08);
+}
+
+.function-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 32rpx 16rpx;
+}
+
+.function-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.function-icon {
+  width: 96rpx;
+  height: 96rpx;
+  border-radius: 24rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 16rpx;
+}
+
+.function-text {
+  font-size: 24rpx;
+  color: #333;
+  text-align: center;
+  line-height: 1.3;
+}
+
+.function-badge {
+  position: absolute;
+  top: 0;
+  right: 20rpx;
+  background: #ff4444;
+  color: #fff;
+  font-size: 20rpx;
+  padding: 4rpx 12rpx;
+  border-radius: 20rpx;
+  min-width: 40rpx;
+  text-align: center;
+}
+
+/* 服务与工具区 */
+.tools-section {
+  margin: 0 32rpx 32rpx;
+  background: #fff;
+  border-radius: 24rpx;
+  overflow: hidden;
+  box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.08);
+}
+
+.tools-title {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #333;
+  padding: 32rpx 32rpx 16rpx;
+}
+
+.tools-list {
+  padding: 0 32rpx 32rpx;
+}
+
+.tool-item {
+  display: flex;
+  align-items: center;
+  padding: 24rpx 0;
+  position: relative;
+}
+
+.tool-item:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 1rpx;
+  background: #f5f5f5;
+}
+
+.tool-icon-wrapper {
+  width: 64rpx;
+  height: 64rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 24rpx;
+}
+
+.tool-text {
+  flex: 1;
+  font-size: 32rpx;
+  color: #333;
+}
+
+.tool-arrow {
+  opacity: 0.5;
+}
+
 /* 退出登录 */
 .logout-section {
   margin: 40rpx 32rpx 60rpx;

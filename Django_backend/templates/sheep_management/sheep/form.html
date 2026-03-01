@@ -5,33 +5,60 @@
     <h2>{{ title }}</h2>
     <form method="post" style="margin-top: 20px;">
         {% csrf_token %}
-        <div class="form-group">
-            <label>性别 *</label>
-            <select name="gender" required>
-                <option value="">请选择</option>
-                <option value="公" {% if sheep.gender == '公' %}selected{% endif %}>公</option>
-                <option value="母" {% if sheep.gender == '母' %}selected{% endif %}>母</option>
-                <option value="雄性" {% if sheep.gender == '雄性' %}selected{% endif %}>雄性</option>
-                <option value="雌性" {% if sheep.gender == '雌性' %}selected{% endif %}>雌性</option>
-            </select>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+            <div class="form-group">
+                <label>耳标号</label>
+                <input type="text" name="ear_tag" value="{% if sheep %}{{ sheep.ear_tag|default:'' }}{% endif %}">
+            </div>
+            <div class="form-group">
+                <label>批次号</label>
+                <input type="text" name="batch_no" value="{% if sheep %}{{ sheep.batch_no|default:'' }}{% endif %}">
+            </div>
+            <div class="form-group">
+                <label>性别 *</label>
+                <select name="gender" required>
+                    <option value="">请选择</option>
+                    <option value="1" {% if sheep.gender == 1 %}selected{% endif %}>公</option>
+                    <option value="0" {% if sheep.gender == 0 %}selected{% endif %}>母</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>品种 *</label>
+                <select name="breed" required>
+                    {% for value, label in breed_choices %}
+                    <option value="{{ value }}" {% if sheep.breed == value %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label>健康状态 *</label>
+                <select name="health_status" required>
+                    {% for value, label in health_choices %}
+                    <option value="{{ value }}" {% if sheep.health_status == value %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label>出生日期</label>
+                <input type="date" name="birth_date" value="{% if sheep and sheep.birth_date %}{{ sheep.birth_date|date:'Y-m-d' }}{% endif %}">
+            </div>
+            <div class="form-group">
+                <label>体重(kg) *</label>
+                <input type="number" name="weight" step="0.1" required value="{% if sheep %}{{ sheep.weight }}{% endif %}">
+            </div>
+            <div class="form-group">
+                <label>身高(cm) *</label>
+                <input type="number" name="height" step="0.1" required value="{% if sheep %}{{ sheep.height }}{% endif %}">
+            </div>
+            <div class="form-group">
+                <label>体长(cm) *</label>
+                <input type="number" name="length" step="0.1" required value="{% if sheep %}{{ sheep.length }}{% endif %}">
+            </div>
         </div>
-        <div class="form-group">
-            <label>体重(kg) *</label>
-            <input type="number" name="weight" step="0.1" required value="{% if sheep %}{{ sheep.weight }}{% endif %}">
-        </div>
-        <div class="form-group">
-            <label>身高(cm) *</label>
-            <input type="number" name="height" step="0.1" required value="{% if sheep %}{{ sheep.height }}{% endif %}">
-        </div>
-        <div class="form-group">
-            <label>体长(cm) *</label>
-            <input type="number" name="length" step="0.1" required value="{% if sheep %}{{ sheep.length }}{% endif %}">
-        </div>
-        <div style="display: flex; gap: 10px;">
+        <div style="display: flex; gap: 10px; margin-top: 20px;">
             <button type="submit" class="btn">保存</button>
             <a href="{% url 'sheep_list' %}" class="btn" style="background: #95a5a6;">取消</a>
         </div>
     </form>
 </div>
 {% endblock %}
-

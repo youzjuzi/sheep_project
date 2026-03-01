@@ -256,6 +256,12 @@
   white-space: pre-wrap;
 }
 
+.message-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 4rpx;
+}
+
 .message-time {
   font-size: 20rpx;
   opacity: 0.6;
@@ -263,7 +269,15 @@
   text-align: right;
 }
 
-.message-bubble.bot .message-time {
+.message-model {
+  font-size: 18rpx;
+  opacity: 0.5;
+  font-style: italic;
+  text-align: right;
+}
+
+.message-bubble.bot .message-time,
+.message-bubble.bot .message-model {
   text-align: left;
 }
 

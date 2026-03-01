@@ -35,7 +35,6 @@ Page({
       
       API.request('/api/breeders', 'GET')
         .then(function(res) {
-          wx.hideLoading();
           console.log('[养殖户列表] 获取数据:', res);
           console.log('[养殖户列表] 完整响应:', JSON.stringify(res, null, 2));
           console.log('[养殖户列表] 数据类型:', typeof res, Array.isArray(res));
@@ -85,13 +84,20 @@ Page({
           }
         })
         .catch(function(error) {
-          wx.hideLoading();
           console.error('[养殖户列表] 请求失败', error);
           wx.showToast({
             title: '加载失败: ' + (error.message || '未知错误'),
             icon: 'none',
             duration: 3000
           });
+        })
+        .finally(function() {
+          // 确保任何情况下都关闭Loading
+          try {
+            wx.hideLoading();
+          } catch (e) {
+            // ignore
+          }
         });
     },
   

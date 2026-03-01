@@ -1,0 +1,126 @@
+{% extends 'sheep_management/base.html' %}
+
+{% block content %}
+<div style="padding: 20px;">
+
+    <!-- 页面标题 -->
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+        <h2 style="margin:0;">
+            {% if is_admin %}
+                📋 订单管理（全部）
+            {% else %}
+                📋 我的订单（我的羊只相关）
+            {% endif %}
+        </h2>
+    </div>
+
+    <!-- 统计卡片 -->
+    <div style="display:grid; grid-template-columns:repeat(6,1fr); gap:14px; margin-bottom:24px;">
+        <a href="?status=" style="text-decoration:none;">
+            <div style="background:#fff; border-radius:10px; padding:16px 10px; text-align:center; box-shadow:0 1px 6px rgba(0,0,0,.08); border-bottom: 3px solid {% if not status_filter %}#5c6bc0{% else %}#e0e0e0{% endif %};">
+                <div style="font-size:24px; font-weight:700; color:#5c6bc0;">{{ stats.total }}</div>
+                <div style="font-size:12px; color:#666; margin-top:4px;">全部</div>
+            </div>
+        </a>
+        <a href="?status=pending" style="text-decoration:none;">
+            <div style="background:#fff; border-radius:10px; padding:16px 10px; text-align:center; box-shadow:0 1px 6px rgba(0,0,0,.08); border-bottom:3px solid {% if status_filter == 'pending' %}#f39c12{% else %}#e0e0e0{% endif %};">
+                <div style="font-size:24px; font-weight:700; color:#f39c12;">{{ stats.pending }}</div>
+                <div style="font-size:12px; color:#666; margin-top:4px;">待付款</div>
+            </div>
+        </a>
+        <a href="?status=paid" style="text-decoration:none;">
+            <div style="background:#fff; border-radius:10px; padding:16px 10px; text-align:center; box-shadow:0 1px 6px rgba(0,0,0,.08); border-bottom:3px solid {% if status_filter == 'paid' %}#3498db{% else %}#e0e0e0{% endif %};">
+                <div style="font-size:24px; font-weight:700; color:#3498db;">{{ stats.paid }}</div>
+                <div style="font-size:12px; color:#666; margin-top:4px;">已付款</div>
+            </div>
+        </a>
+        <a href="?status=shipping" style="text-decoration:none;">
+            <div style="background:#fff; border-radius:10px; padding:16px 10px; text-align:center; box-shadow:0 1px 6px rgba(0,0,0,.08); border-bottom:3px solid {% if status_filter == 'shipping' %}#9b59b6{% else %}#e0e0e0{% endif %};">
+                <div style="font-size:24px; font-weight:700; color:#9b59b6;">{{ stats.shipping }}</div>
+                <div style="font-size:12px; color:#666; margin-top:4px;">配送中</div>
+            </div>
+        </a>
+        <a href="?status=completed" style="text-decoration:none;">
+            <div style="background:#fff; border-radius:10px; padding:16px 10px; text-align:center; box-shadow:0 1px 6px rgba(0,0,0,.08); border-bottom:3px solid {% if status_filter == 'completed' %}#27ae60{% else %}#e0e0e0{% endif %};">
+                <div style="font-size:24px; font-weight:700; color:#27ae60;">{{ stats.completed }}</div>
+                <div style="font-size:12px; color:#666; margin-top:4px;">已完成</div>
+            </div>
+        </a>
+        <a href="?status=cancelled" style="text-decoration:none;">
+            <div style="background:#fff; border-radius:10px; padding:16px 10px; text-align:center; box-shadow:0 1px 6px rgba(0,0,0,.08); border-bottom:3px solid {% if status_filter == 'cancelled' %}#e74c3c{% else %}#e0e0e0{% endif %};">
+                <div style="font-size:24px; font-weight:700; color:#e74c3c;">{{ stats.cancelled }}</div>
+                <div style="font-size:12px; color:#666; margin-top:4px;">已取消</div>
+            </div>
+        </a>
+    </div>
+
+    <!-- 搜索栏 -->
+    <div style="background:#fff; border-radius:10px; padding:16px 20px; box-shadow:0 1px 6px rgba(0,0,0,.08); margin-bottom:20px;">
+        <form method="get" style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+            <input type="hidden" name="status" value="{{ status_filter }}">
+            <input type="text" name="search" value="{{ search }}"
+                   placeholder="搜索订单号 / 用户昵称 / 手机号"
+                   style="flex:1; min-width:200px; padding:8px 12px; border:1px solid #ddd; border-radius:6px; font-size:14px;">
+            <button type="submit" class="btn" style="padding:8px 20px;">🔍 搜索</button>
+            {% if search %}
+            <a href="?status={{ status_filter }}" class="btn" style="padding:8px 16px; background:#aaa;">✕ 清除</a>
+            {% endif %}
+        </form>
+    </div>
+
+    <!-- 订单表格 -->
+    <div class="card" style="padding:0; overflow:hidden;">
+        <table style="width:100%; border-collapse:collapse;">
+            <thead>
+                <tr style="background:#f5f6fa;">
+                    <th style="padding:14px 16px; text-align:left; font-size:13px; color:#666; border-bottom:1px solid #eee;">订单编号</th>
+                    {% if is_admin %}
+                    <th style="padding:14px 16px; text-align:left; font-size:13px; color:#666; border-bottom:1px solid #eee;">购买用户</th>
+                    {% endif %}
+                    <th style="padding:14px 16px; text-align:left; font-size:13px; color:#666; border-bottom:1px solid #eee;">总金额</th>
+                    <th style="padding:14px 16px; text-align:left; font-size:13px; color:#666; border-bottom:1px solid #eee;">状态</th>
+                    <th style="padding:14px 16px; text-align:left; font-size:13px; color:#666; border-bottom:1px solid #eee;">创建时间</th>
+                    <th style="padding:14px 16px; text-align:left; font-size:13px; color:#666; border-bottom:1px solid #eee;">操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for order in orders %}
+                <tr style="border-bottom:1px solid #f5f5f5; transition:background .15s;" onmouseover="this.style.background='#fafbff'" onmouseout="this.style.background=''">
+                    <td style="padding:14px 16px; font-family:monospace; font-size:13px; color:#333;">{{ order.order_no }}</td>
+                    {% if is_admin %}
+                    <td style="padding:14px 16px; font-size:13px; color:#333;">
+                        {{ order.user.nickname|default:order.user.username }}
+                        {% if order.user.mobile %}
+                        <div style="font-size:11px; color:#999; margin-top:2px;">{{ order.user.mobile }}</div>
+                        {% endif %}
+                    </td>
+                    {% endif %}
+                    <td style="padding:14px 16px; font-size:14px; font-weight:600; color:#e74c3c;">¥{{ order.total_amount }}</td>
+                    <td style="padding:14px 16px;">
+                        <span style="padding:4px 10px; border-radius:12px; font-size:12px; font-weight:500; color:white;
+                            background:{% if order.status == 'pending' %}#f39c12{% elif order.status == 'paid' %}#3498db{% elif order.status == 'shipping' %}#9b59b6{% elif order.status == 'completed' %}#27ae60{% else %}#95a5a6{% endif %};">
+                            {{ order.get_status_display }}
+                        </span>
+                    </td>
+                    <td style="padding:14px 16px; font-size:13px; color:#666;">{{ order.created_at|date:'Y-m-d H:i' }}</td>
+                    <td style="padding:14px 16px;">
+                        <a href="{% url 'order_detail' order.pk %}" class="btn" style="padding:5px 12px; font-size:12px; margin-right:6px;">查看</a>
+                        {% if order.status != 'completed' and order.status != 'cancelled' %}
+                        <a href="{% url 'order_update_status' order.pk %}" class="btn" style="padding:5px 12px; font-size:12px; background:#6c757d;">更新状态</a>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="{% if is_admin %}6{% else %}5{% endif %}" style="text-align:center; padding:60px; color:#aaa;">
+                        <div style="font-size:48px; margin-bottom:12px;">📭</div>
+                        <div>{% if search %}未找到匹配的订单{% else %}暂无订单数据{% endif %}</div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+</div>
+{% endblock %}

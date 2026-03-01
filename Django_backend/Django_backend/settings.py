@@ -25,7 +25,8 @@ SECRET_KEY = 'django-insecure-g!(8vj_8qpxkp9q#_9573#h@b#jgiyiyrlh1+g@am933xm@hd6
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+# 允许局域网访问与小程序调试
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -140,6 +141,9 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # 指定自定义用户模型
 AUTH_USER_MODEL = 'sheep_management.User'
+
+# 后台登录 URL（用于 @login_required 装饰器跳转）
+LOGIN_URL = '/login/'
 
 # 微信小程序配置
 WX_APP_ID = 'wx584a350ed4b974a0'

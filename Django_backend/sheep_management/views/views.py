@@ -10,6 +10,11 @@ from django.utils import timezone
 from ..models import User, Sheep, VaccinationHistory, GrowthRecord, FeedingRecord, CartItem, PromotionActivity, Coupon
 from ..utils import generate_token, verify_token
 import requests
+
+@require_http_methods(["GET"])
+def api_health(request):
+    """健康检查：返回后端运行状态"""
+    return JsonResponse({'status': 'ok', 'time': datetime.now().strftime('%Y-%m-%d %H:%M:%S')})
 @csrf_exempt
 @require_http_methods(["POST"])
 def api_register(request):
@@ -171,9 +176,9 @@ def api_search_sheep(request):
 
         if gender:
             # 支持数字和中文关键词
-            if gender in ['公', '雄性', 'male', '1', 1]:
+            if gender in ['公', 'male', '1', 1]:
                 query &= Q(gender=1)
-            elif gender in ['母', '雌性', 'female', '0', 0]:
+            elif gender in ['母', 'female', '0', 0]:
                 query &= Q(gender=0)
             else:
                 # 尝试转换为整数
@@ -469,8 +474,8 @@ def api_search_goods(request):
             except ValueError:
                 # 文本搜索：性别字段（支持中文关键词）
                 gender_map = {
-                    '公': 1, '雄': 1, '雄性': 1, 'male': 1, '1': 1,
-                    '母': 0, '雌': 0, '雌性': 0, 'female': 0, '0': 0
+                    '公': 1, 'male': 1, '1': 1,
+                    '母': 0, 'female': 0, '0': 0
                 }
                 gender_value = gender_map.get(keyword.lower(), gender_map.get(keyword))
                 if gender_value is not None:

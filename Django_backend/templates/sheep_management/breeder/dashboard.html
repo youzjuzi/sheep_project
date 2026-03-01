@@ -1,0 +1,129 @@
+{% extends 'sheep_management/base.html' %}
+
+{% block content %}
+<div class="card">
+    <h2>养殖户个人中心</h2>
+    
+    <div style="display: flex; flex-wrap: wrap; gap: 20px; margin-bottom: 30px;">
+        <!-- 个人信息卡片 -->
+        <div style="flex: 1; min-width: 300px; background: #f8f9fa; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+            <h3 style="margin-top: 0; margin-bottom: 15px;">个人信息</h3>
+            <div style="display: flex; align-items: center; margin-bottom: 15px;">
+                <div style="width: 80px; height: 80px; border-radius: 50%; background: #f8f9fa; display: flex; align-items: center; justify-content: center; font-size: 32px; margin-right: 15px; overflow: hidden; border: 2px solid #ddd;">
+                    {% if user.avatar_url %}
+                    <img src="{{ user.avatar_url }}" style="width: 100%; height: 100%; object-fit: cover;">
+                    {% else %}
+                    <span style="color: #3498db;">{{ user.nickname|default:user.username|first|upper }}</span>
+                    {% endif %}
+                </div>
+                <div>
+                    <h4 style="margin: 0; font-size: 18px;">{{ user.nickname|default:user.username }}</h4>
+                    <p style="margin: 5px 0; color: #666;">{{ user.mobile|default:'无手机号' }}</p>
+                    <a href="{% url 'breeder_profile' %}" class="btn" style="padding: 3px 10px; font-size: 12px;">编辑资料</a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 统计卡片 -->
+        <div style="flex: 1; min-width: 300px; background: #f8f9fa; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+            <h3 style="margin-top: 0; margin-bottom: 15px;">养殖统计</h3>
+            <div style="display: flex; justify-content: space-around;">
+                <div style="text-align: center;">
+                    <div style="font-size: 24px; font-weight: bold; color: #3498db;">{{ sheep_count }}</div>
+                    <div style="font-size: 14px; color: #666;">羊只数量</div>
+                </div>
+                <div style="text-align: center;">
+                    <div style="font-size: 24px; font-weight: bold; color: #27ae60;">{{ order_count }}</div>
+                    <div style="font-size: 14px; color: #666;">订单数量</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 最近羊只 -->
+    <div style="margin-bottom: 30px;">
+        <h3>最近添加的羊只</h3>
+        <table style="width: 100%; margin-top: 10px;">
+            <thead>
+                <tr>
+                    <th>编号</th>
+                    <th>耳标</th>
+                    <th>性别</th>
+                    <th>品种</th>
+                    <th>健康状况</th>
+                    <th>体重</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for sheep in sheep_list|slice:':5' %}
+                <tr>
+                    <td>{{ sheep.id }}</td>
+                    <td>{{ sheep.ear_tag|default:'无' }}</td>
+                    <td>{{ sheep.get_gender_display }}</td>
+                    <td>{{ sheep.breed }}</td>
+                    <td>
+                        <span style="padding: 2px 6px; border-radius: 10px; background: {% if sheep.health_status == '健康' %}#27ae60{% elif sheep.health_status == '良好' %}#2ecc71{% elif sheep.health_status == '一般' %}#f39c12{% elif sheep.health_status == '需关注' %}#e67e22{% else %}#e74c3c{% endif %}; color: white; font-size: 12px;">
+                            {{ sheep.health_status }}
+                        </span>
+                    </td>
+                    <td>{{ sheep.weight }}kg</td>
+                    <td>
+                        <a href="{% url 'sheep_detail' sheep.pk %}" class="btn" style="padding: 3px 8px; font-size: 12px;">查看</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="7" style="text-align: center; padding: 20px;">暂无羊只</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <div style="text-align: right; margin-top: 10px;">
+            <a href="{% url 'sheep_list' %}" class="btn">查看全部羊只</a>
+        </div>
+    </div>
+    
+    <!-- 最近订单 -->
+    <div>
+        <h3>最近订单</h3>
+        <table style="width: 100%; margin-top: 10px;">
+            <thead>
+                <tr>
+                    <th>订单编号</th>
+                    <th>用户</th>
+                    <th>总金额</th>
+                    <th>状态</th>
+                    <th>创建时间</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for order_info in orders|slice:':5' %}
+                <tr>
+                    <td>{{ order_info.order.order_no }}</td>
+                    <td>{{ order_info.order.user.nickname|default:order_info.order.user.username }}</td>
+                    <td>¥{{ order_info.order.total_amount }}</td>
+                    <td>
+                        <span style="padding: 4px 8px; border-radius: 12px; background: {% if order_info.order.status == 'pending' %}#f39c12{% elif order_info.order.status == 'paid' %}#3498db{% elif order_info.order.status == 'shipping' %}#9b59b6{% elif order_info.order.status == 'completed' %}#27ae60{% else %}#e74c3c{% endif %}; color: white; font-size: 12px;">
+                            {{ order_info.order.get_status_display }}
+                        </span>
+                    </td>
+                    <td>{{ order_info.order.created_at|date:'Y-m-d H:i' }}</td>
+                    <td>
+                        <a href="{% url 'order_detail' order_info.order.pk %}" class="btn" style="padding: 3px 8px; font-size: 12px;">查看</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" style="text-align: center; padding: 20px;">暂无订单</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <div style="text-align: right; margin-top: 10px;">
+            <a href="{% url 'order_list' %}" class="btn">查看全部订单</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

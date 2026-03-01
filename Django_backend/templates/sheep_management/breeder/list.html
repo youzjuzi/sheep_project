@@ -1,30 +1,51 @@
 {% extends 'sheep_management/base.html' %}
 
+{% block page_title %}养殖户管理{% endblock %}
+
 {% block content %}
 <div class="card">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+    <!-- 顶栏 -->
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
         <h2>养殖户列表</h2>
-        <a href="{% url 'breeder_create' %}" class="btn">添加养殖户</a>
+        <div style="display: flex; gap: 10px; align-items: center;">
+            {% if pending_count > 0 %}
+            <a href="{% url 'breeder_audit_list' %}" class="btn" style="background: #e67e22; position: relative;">
+                ⏳ 待审核申请
+                <span style="
+                    display: inline-block; margin-left: 6px;
+                    background: #e74c3c; color: white;
+                    border-radius: 50%; width: 20px; height: 20px;
+                    text-align: center; line-height: 20px; font-size: 12px;
+                ">{{ pending_count }}</span>
+            </a>
+            {% else %}
+            <a href="{% url 'breeder_audit_list' %}" class="btn" style="background: #95a5a6;">养殖户审核</a>
+            {% endif %}
+            <a href="{% url 'breeder_create' %}" class="btn btn-success">+ 新增养殖户</a>
+        </div>
     </div>
-    
+
+    <!-- 搜索框 -->
     <div class="search-box">
         <form method="get">
-            <input type="text" name="search" placeholder="搜索姓名、电话或编号..." value="{{ search }}">
+            <input type="text" name="search" placeholder="搜索用户名、昵称或手机号..." value="{{ search }}">
             <button type="submit" class="btn">搜索</button>
+            {% if search %}
+            <a href="{% url 'breeder_list' %}" class="btn" style="background: #95a5a6;">重置</a>
+            {% endif %}
         </form>
     </div>
-    
+
     <table>
         <thead>
             <tr>
                 <th>ID</th>
-                <th>姓名</th>
-                <th>性别</th>
-                <th>电话</th>
-                <th>记录总数</th>
-                <th>实际关联</th>
-                <th>羊只编号</th>
-                <th>母羊/公羊</th>
+                <th>用户名</th>
+                <th>昵称</th>
+                <th>手机号</th>
+                <th>旗下羊只</th>
+                <th>审核状态</th>
+                <th>注册时间</th>
                 <th>操作</th>
             </tr>
         </thead>
@@ -32,29 +53,29 @@
             {% for breeder in breeder_list %}
             <tr>
                 <td>{{ breeder.id }}</td>
-                <td>{{ breeder.name }}</td>
-                <td>{{ breeder.gender }}</td>
-                <td>{{ breeder.phone }}</td>
-                <td>{{ breeder.sheep_count }}只</td>
+                <td>{{ breeder.username }}</td>
+                <td>{{ breeder.nickname|default:"未设置" }}</td>
+                <td>{{ breeder.mobile|default:"未设置" }}</td>
                 <td>
-                    <strong style="color: {% if breeder.actual_sheep_count == breeder.sheep_count %}#27ae60{% else %}#e74c3c{% endif %};">
-                        {{ breeder.actual_sheep_count }}只
-                    </strong>
-                    {% if breeder.actual_sheep_count != breeder.sheep_count %}
-                        <span style="color: #e74c3c; font-size: 11px;">⚠</span>
+                    <strong style="color: #27ae60;">{{ breeder.actual_sheep_count }} 只</strong>
+                </td>
+                <td>
+                    {% if breeder.is_verified %}
+                    <span style="color: #27ae60; font-weight: 600;">✅ 已认证</span>
+                    {% else %}
+                    <span style="color: #e67e22; font-weight: 600;">⏳ 待审核</span>
                     {% endif %}
                 </td>
-                <td>{{ breeder.sheep_id }}</td>
-                <td>{{ breeder.female_count }} / {{ breeder.male_count }}</td>
+                <td>{{ breeder.created_at|date:"Y-m-d" }}</td>
                 <td>
-                    <a href="{% url 'breeder_detail' breeder.pk %}" class="btn" style="padding: 5px 10px; font-size: 12px;">查看</a>
-                    <a href="{% url 'breeder_edit' breeder.pk %}" class="btn" style="padding: 5px 10px; font-size: 12px;">编辑</a>
-                    <a href="{% url 'breeder_delete' breeder.pk %}" class="btn btn-danger" style="padding: 5px 10px; font-size: 12px;">删除</a>
+                    <a href="{% url 'breeder_detail' breeder.pk %}" class="btn" style="padding:5px 10px;font-size:12px;">查看</a>
+                    <a href="{% url 'breeder_edit' breeder.pk %}" class="btn" style="padding:5px 10px;font-size:12px;background:#f39c12;">编辑</a>
+                    <a href="{% url 'breeder_delete' breeder.pk %}" class="btn btn-danger" style="padding:5px 10px;font-size:12px;">删除</a>
                 </td>
             </tr>
             {% empty %}
             <tr>
-                <td colspan="9" style="text-align: center; padding: 40px;">暂无数据</td>
+                <td colspan="8" style="text-align: center; padding: 40px;">暂无养殖户数据</td>
             </tr>
             {% endfor %}
         </tbody>

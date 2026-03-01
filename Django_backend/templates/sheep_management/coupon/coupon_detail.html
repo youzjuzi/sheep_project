@@ -1,0 +1,213 @@
+{% extends 'sheep_management/base.html' %}
+
+{% block title %}优惠券详情 - {{ coupon.name }}{% endblock %}
+{% block page_title %}优惠券详情{% endblock %}
+
+{% block content %}
+<style>
+    .detail-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 30px;
+    }
+    .coupon-card {
+        background: linear-gradient(135deg, #238E23 0%, #4CAF50 100%);
+        color: white;
+        border-radius: 16px;
+        padding: 30px;
+        min-width: 350px;
+        position: relative;
+        overflow: hidden;
+    }
+    .coupon-card::before {
+        content: '';
+        position: absolute;
+        right: -30px;
+        top: -30px;
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.1);
+    }
+    .coupon-card .coupon-name {
+        font-size: 22px;
+        font-weight: 700;
+        margin-bottom: 10px;
+    }
+    .coupon-card .coupon-value {
+        font-size: 36px;
+        font-weight: 700;
+        margin-bottom: 5px;
+    }
+    .coupon-card .coupon-code-text {
+        font-size: 14px;
+        opacity: 0.8;
+    }
+    .coupon-card .coupon-validity {
+        margin-top: 15px;
+        font-size: 13px;
+        opacity: 0.7;
+    }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 16px;
+        margin-bottom: 30px;
+    }
+    .stat-box {
+        background: white;
+        border-radius: 12px;
+        padding: 20px;
+        text-align: center;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    }
+    .stat-box .value {
+        font-size: 28px;
+        font-weight: 700;
+        color: #238E23;
+    }
+    .stat-box .label {
+        font-size: 13px;
+        color: #999;
+        margin-top: 5px;
+    }
+    .stat-box:nth-child(2) .value { color: #2196F3; }
+    .stat-box:nth-child(3) .value { color: #ff9800; }
+    .stat-box:nth-child(4) .value { color: #e91e63; }
+
+    .user-table {
+        width: 100%;
+        background: white;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    }
+    .user-table .table-title {
+        font-size: 16px;
+        font-weight: 600;
+        padding: 20px;
+        border-bottom: 1px solid #eee;
+    }
+    .user-table table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    .user-table th {
+        background: #f8f9fa;
+        padding: 12px 16px;
+        text-align: left;
+        font-size: 13px;
+        color: #666;
+        font-weight: 600;
+    }
+    .user-table td {
+        padding: 12px 16px;
+        border-bottom: 1px solid #f0f0f0;
+        font-size: 14px;
+    }
+    .badge {
+        display: inline-block;
+        padding: 3px 10px;
+        border-radius: 12px;
+        font-size: 12px;
+        font-weight: 500;
+    }
+    .badge-unused { background: #e8f5e9; color: #2e7d32; }
+    .badge-used { background: #f5f5f5; color: #999; }
+    .badge-expired { background: #ffebee; color: #c62828; }
+
+    .back-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        color: #238E23;
+        text-decoration: none;
+        font-size: 14px;
+        margin-bottom: 20px;
+    }
+</style>
+
+<a href="{% url 'coupon_list' %}" class="back-link">← 返回优惠券列表</a>
+
+<div class="detail-header">
+    <div class="coupon-card">
+        <div class="coupon-name">{{ coupon.name }}</div>
+        <div class="coupon-value">
+            {% if coupon.coupon_type == 'percentage' %}
+                {{ coupon.discount_rate }}折
+            {% else %}
+                ¥{{ coupon.discount_amount }}
+            {% endif %}
+        </div>
+        <div class="coupon-code-text">优惠码：{{ coupon.code }}</div>
+        <div class="coupon-validity">
+            有效期：{{ coupon.valid_from|date:"Y-m-d H:i" }} ~ {{ coupon.valid_until|date:"Y-m-d H:i" }}
+        </div>
+    </div>
+</div>
+
+<!-- 统计信息 -->
+<div class="stats-grid">
+    <div class="stat-box">
+        <div class="value">{{ total_claimed }}</div>
+        <div class="label">总领取数</div>
+    </div>
+    <div class="stat-box">
+        <div class="value">{{ unused_count }}</div>
+        <div class="label">未使用</div>
+    </div>
+    <div class="stat-box">
+        <div class="value">{{ used_count }}</div>
+        <div class="label">已使用</div>
+    </div>
+    <div class="stat-box">
+        <div class="value">{{ expired_count }}</div>
+        <div class="label">已过期</div>
+    </div>
+</div>
+
+<!-- 领取用户列表 -->
+<div class="user-table">
+    <div class="table-title">📋 领取用户列表</div>
+    {% if user_coupons %}
+    <table>
+        <thead>
+            <tr>
+                <th>用户ID</th>
+                <th>用户名</th>
+                <th>昵称</th>
+                <th>状态</th>
+                <th>领取时间</th>
+                <th>使用时间</th>
+                <th>关联订单</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for uc in user_coupons %}
+            <tr>
+                <td>{{ uc.user.id }}</td>
+                <td>{{ uc.user.username }}</td>
+                <td>{{ uc.user.nickname|default:'-' }}</td>
+                <td>
+                    {% if uc.status == 'unused' %}
+                        <span class="badge badge-unused">未使用</span>
+                    {% elif uc.status == 'used' %}
+                        <span class="badge badge-used">已使用</span>
+                    {% else %}
+                        <span class="badge badge-expired">已过期</span>
+                    {% endif %}
+                </td>
+                <td>{{ uc.obtained_at|date:"Y-m-d H:i" }}</td>
+                <td>{{ uc.used_at|date:"Y-m-d H:i"|default:'-' }}</td>
+                <td>{{ uc.order_id|default:'-' }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <div style="text-align:center;padding:40px;color:#999;">暂无用户领取</div>
+    {% endif %}
+</div>
+{% endblock %}

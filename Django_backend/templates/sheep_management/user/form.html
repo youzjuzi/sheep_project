@@ -1,0 +1,58 @@
+{% extends 'sheep_management/base.html' %}
+
+{% block content %}
+<div class="card" style="max-width: 760px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h2>{{ title }}</h2>
+        <a href="{% url 'user_list' %}" class="btn" style="background: #95a5a6;">返回列表</a>
+    </div>
+
+    <form method="post">
+        {% csrf_token %}
+
+        <div class="form-group">
+            <label for="username">用户名 *</label>
+            <input id="username" type="text" name="username" required
+                   value="{% if target_user %}{{ target_user.username }}{% endif %}" placeholder="请输入用户名">
+        </div>
+
+        <div class="form-group">
+            <label for="password">{% if is_create %}密码 *{% else %}新密码（留空则不修改）{% endif %}</label>
+            <input id="password" type="password" name="password" {% if is_create %}required{% endif %}
+                   placeholder="{% if is_create %}请输入密码{% else %}如需重置密码请填写{% endif %}">
+        </div>
+
+        <div class="form-group">
+            <label for="nickname">昵称</label>
+            <input id="nickname" type="text" name="nickname"
+                   value="{% if target_user %}{{ target_user.nickname|default:'' }}{% endif %}" placeholder="请输入昵称">
+        </div>
+
+        <div class="form-group">
+            <label for="mobile">手机号</label>
+            <input id="mobile" type="text" name="mobile"
+                   value="{% if target_user %}{{ target_user.mobile|default:'' }}{% endif %}" placeholder="请输入手机号">
+        </div>
+
+        <div class="form-group">
+            <label for="role">角色</label>
+            <select id="role" name="role">
+                <option value="0" {% if target_user and target_user.role == 0 %}selected{% endif %}>普通用户</option>
+                <option value="1" {% if target_user and target_user.role == 1 %}selected{% endif %}>养殖户</option>
+                <option value="2" {% if target_user and target_user.role == 2 %}selected{% endif %}>管理员</option>
+            </select>
+        </div>
+
+        <div class="form-group" style="display: flex; align-items: center; gap: 8px;">
+            <input id="is_verified" type="checkbox" name="is_verified" style="width: auto;"
+                   {% if target_user and target_user.is_verified %}checked{% endif %}>
+            <label for="is_verified" style="margin: 0;">养殖户审核通过</label>
+        </div>
+
+        <div style="display: flex; gap: 10px; margin-top: 24px;">
+            <button type="submit" class="btn btn-success">保存</button>
+            <a href="{% url 'user_list' %}" class="btn" style="background: #95a5a6;">取消</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

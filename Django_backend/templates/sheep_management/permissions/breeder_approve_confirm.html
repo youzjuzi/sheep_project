@@ -1,0 +1,24 @@
+{% extends 'sheep_management/base.html' %}
+
+{% block page_title %}确认通过申请{% endblock %}
+
+{% block content %}
+<div class="card" style="max-width: 640px;">
+    <h2 style="margin-bottom: 16px;">确认通过养殖户申请</h2>
+    <p>你即将批准以下用户的养殖户认证申请：</p>
+
+    <table style="margin: 16px 0;">
+        <tr><th style="width:140px;">用户名</th><td>{{ breeder.username }}</td></tr>
+        <tr><th>昵称</th><td>{{ breeder.nickname|default:"未设置" }}</td></tr>
+        <tr><th>手机号</th><td>{{ breeder.mobile|default:"未设置" }}</td></tr>
+    </table>
+
+    <p style="color: #27ae60; margin-bottom: 18px;">通过后该用户将获得养殖户权限，可以管理羊只档案。</p>
+
+    <form method="post" style="display: flex; gap: 10px;">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-success">✅ 确认通过</button>
+        <a href="{% url 'breeder_audit_detail' breeder.pk %}" class="btn" style="background:#95a5a6;">取消</a>
+    </form>
+</div>
+{% endblock %}

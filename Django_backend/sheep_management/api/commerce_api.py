@@ -216,3 +216,49 @@ def api_order_history(request):
         return _error_response(e)
     except Exception as e:
         return _error_response(e)
+
+
+@csrf_exempt
+@require_http_methods(["GET"])
+def api_breeder_orders(request):
+    """
+    获取养殖户的订单列表（用户发起的领养申请）
+    GET /api/breeder/orders  → 返回养殖户羊只的订单列表
+    """
+    try:
+        token = _get_token(request)
+        result = CommerceService.get_breeder_orders(token)
+        return JsonResponse({'code': 0, 'msg': 'ok', 'data': result})
+    except CommerceError as e:
+        return _error_response(e)
+    except Exception as e:
+        return _error_response(e)
+
+
+@csrf_exempt
+@require_http_methods(["PUT"])
+def api_update_order_status(request, order_id):
+    """
+    更新订单状态（确认或拒绝领养请求，更新发货状态等）
+    PUT /api/breeder/orders/<order_id>/status  → 更新订单状态
+    请求体: { 
+        "token": "...", 
+        "status": "paid|shipping|completed|cancelled",
+        "logistics_info": {"logistics_company": "...", "logistics_tracking_number": "..."}  # 发货时需要
+    }
+    """
+    if request.method != 'PUT':
+        return JsonResponse({'code': 405, 'msg': '不支持的请求方法', 'data': None}, status=405)
+
+    try:
+        data = json.loads(request.body)
+        token = data.get('token', '') or _get_token(request)
+        status = data.get('status')
+        logistics_info = data.get('logistics_info')
+        
+        result = CommerceService.update_order_status(token, order_id, status, logistics_info)
+        return JsonResponse({'code': 0, 'msg': '订单状态更新成功', 'data': result})
+    except CommerceError as e:
+        return _error_response(e)
+    except Exception as e:
+        return _error_response(e)

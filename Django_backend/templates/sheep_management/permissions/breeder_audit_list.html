@@ -1,0 +1,97 @@
+{% extends 'sheep_management/base.html' %}
+
+{% block page_title %}养殖户申请审核{% endblock %}
+
+{% block content %}
+<!-- 统计卡片 -->
+<div class="stats" style="margin-bottom: 24px;">
+    <div class="stat-card">
+        <h3>{{ stats.total }}</h3>
+        <p>养殖户总数</p>
+    </div>
+    <div class="stat-card">
+        <h3 style="color: #e67e22;">{{ stats.pending }}</h3>
+        <p>待审核</p>
+    </div>
+    <div class="stat-card">
+        <h3 style="color: #27ae60;">{{ stats.verified }}</h3>
+        <p>已认证</p>
+    </div>
+</div>
+
+<div class="card">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+        <h2>养殖户申请审核</h2>
+        <a href="{% url 'breeder_list' %}" class="btn" style="background: #95a5a6;">← 养殖户列表</a>
+    </div>
+
+    <!-- Tab 筛选 -->
+    <div class="nav-tabs">
+        <a href="?status=pending{% if search %}&search={{ search }}{% endif %}"
+           class="nav-tab {% if filter_status == 'pending' %}active{% endif %}">
+            待审核 {% if stats.pending > 0 %}<span style="background:#e74c3c;color:white;border-radius:10px;padding:1px 7px;font-size:12px;margin-left:4px;">{{ stats.pending }}</span>{% endif %}
+        </a>
+        <a href="?status=verified{% if search %}&search={{ search }}{% endif %}"
+           class="nav-tab {% if filter_status == 'verified' %}active{% endif %}">已认证</a>
+        <a href="?status=all{% if search %}&search={{ search }}{% endif %}"
+           class="nav-tab {% if filter_status == 'all' %}active{% endif %}">全部</a>
+    </div>
+
+    <!-- 搜索 -->
+    <div class="search-box">
+        <form method="get">
+            <input type="hidden" name="status" value="{{ filter_status }}">
+            <input type="text" name="search" placeholder="搜索用户名、昵称或手机号..." value="{{ search }}">
+            <button type="submit" class="btn">搜索</button>
+            {% if search %}<a href="?status={{ filter_status }}" class="btn" style="background:#95a5a6;">重置</a>{% endif %}
+        </form>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>用户名</th>
+                <th>昵称</th>
+                <th>手机号</th>
+                <th>审核状态</th>
+                <th>申请时间</th>
+                <th>操作</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for breeder in breeders %}
+            <tr>
+                <td>{{ breeder.id }}</td>
+                <td>{{ breeder.username }}</td>
+                <td>{{ breeder.nickname|default:"未设置" }}</td>
+                <td>{{ breeder.mobile|default:"未设置" }}</td>
+                <td>
+                    {% if breeder.is_verified %}
+                    <span style="color:#27ae60;font-weight:600;">✅ 已认证</span>
+                    {% else %}
+                    <span style="color:#e67e22;font-weight:600;">⏳ 待审核</span>
+                    {% endif %}
+                </td>
+                <td>{{ breeder.created_at|date:"Y-m-d H:i" }}</td>
+                <td style="white-space: nowrap;">
+                    <a href="{% url 'breeder_audit_detail' breeder.pk %}" class="btn" style="padding:5px 10px;font-size:12px;">详情</a>
+                    {% if not breeder.is_verified %}
+                    <a href="{% url 'breeder_approve' breeder.pk %}" class="btn btn-success" style="padding:5px 10px;font-size:12px;">通过</a>
+                    <a href="{% url 'breeder_reject' breeder.pk %}" class="btn btn-danger" style="padding:5px 10px;font-size:12px;">拒绝</a>
+                    {% else %}
+                    <a href="{% url 'breeder_reject' breeder.pk %}" class="btn" style="padding:5px 10px;font-size:12px;background:#95a5a6;">撤销认证</a>
+                    {% endif %}
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="7" style="text-align:center;padding:40px;color:#999;">
+                    {% if filter_status == 'pending' %}暂无待审核申请{% else %}暂无数据{% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

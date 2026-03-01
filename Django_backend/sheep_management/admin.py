@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Sheep, GrowthRecord, FeedingRecord, VaccineType, VaccinationHistory, User, CartItem, Order, OrderItem
+from .models import Sheep, GrowthRecord, FeedingRecord, VaccineType, VaccinationHistory, User, CartItem, Order, OrderItem, PromotionActivity, Coupon, UserCoupon
 from django.utils.html import format_html
 
 
@@ -123,4 +123,49 @@ class OrderItemAdmin(admin.ModelAdmin):
     list_filter = ['order__status']
     search_fields = ['order__order_no', 'sheep__id', 'sheep__ear_tag']
     list_per_page = 20
+
+
+@admin.register(PromotionActivity)
+class PromotionActivityAdmin(admin.ModelAdmin):
+    list_display = ['id', 'title', 'activity_type', 'status', 'start_time', 'end_time', 'discount_rate', 'discount_amount', 'sold_count', 'total_limit']
+    list_filter = ['status', 'activity_type', 'start_time']
+    search_fields = ['title', 'description']
+    list_editable = ['status']
+    date_hierarchy = 'start_time'
+    list_per_page = 20
+    fieldsets = (
+        ('基本信息', {'fields': ('title', 'description', 'activity_type', 'status', 'image_url')}),
+        ('优惠设置', {'fields': ('discount_rate', 'discount_amount', 'min_purchase_amount', 'max_discount_amount')}),
+        ('时间设置', {'fields': ('start_time', 'end_time')}),
+        ('数量限制', {'fields': ('total_limit', 'user_limit', 'sold_count')}),
+        ('适用范围', {'fields': ('applicable_sheep_ids',)}),
+    )
+
+
+@admin.register(Coupon)
+class CouponAdmin(admin.ModelAdmin):
+    list_display = ['id', 'name', 'code', 'coupon_type', 'status', 'discount_amount', 'discount_rate', 'min_purchase_amount', 'total_count', 'used_count', 'valid_from', 'valid_until']
+    list_filter = ['status', 'coupon_type', 'valid_from']
+    search_fields = ['name', 'code', 'description']
+    list_editable = ['status']
+    date_hierarchy = 'created_at'
+    list_per_page = 20
+    readonly_fields = ['used_count', 'created_at', 'updated_at']
+    fieldsets = (
+        ('基本信息', {'fields': ('name', 'code', 'coupon_type', 'status', 'description')}),
+        ('优惠设置', {'fields': ('discount_amount', 'discount_rate', 'min_purchase_amount', 'max_discount_amount')}),
+        ('有效期', {'fields': ('valid_from', 'valid_until')}),
+        ('数量限制', {'fields': ('total_count', 'used_count', 'user_limit')}),
+        ('时间信息', {'fields': ('created_at', 'updated_at')}),
+    )
+
+
+@admin.register(UserCoupon)
+class UserCouponAdmin(admin.ModelAdmin):
+    list_display = ['id', 'user', 'coupon', 'status', 'obtained_at', 'used_at', 'order_id']
+    list_filter = ['status', 'obtained_at']
+    search_fields = ['user__username', 'user__nickname', 'coupon__name', 'coupon__code']
+    date_hierarchy = 'obtained_at'
+    list_per_page = 20
+    readonly_fields = ['obtained_at']
 

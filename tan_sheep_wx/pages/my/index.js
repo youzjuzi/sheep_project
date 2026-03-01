@@ -1,142 +1,142 @@
-// pages/my/index.js
+// pages/my/index.js - 重新设计版
 const AUTH = require('../../utils/auth');
 const API = require('../../utils/api.js');
 
 Page({
   data: {
-    userinfo: {},  // 用户基本信息
-    apiUserInfoMap: null, // 存储用户详情
-    balance: 90,  // 初始余额
-    freeze: 0,      // 初始冻结金额
-    score: 0,       // 初始积分
-    growth: 0,      // 初始关注农户
-    isMock: false,  // 是否开启模拟充值
-    tabs: ['资金明细', '提现记录', '押金记录'],  // 标签页
-    active: 0,  // 当前激活的标签索引
-    cashlogs: [], // 资金明细日志
-    withDrawlogs: [], // 提现记录日志
-    depositlogs: [], // 押金记录日志
-    // 我的服务菜单
-    serviceMenus: [
+    userinfo: {},
+    apiUserInfoMap: null,
+    balance: '0.00',
+    freeze: '0.00',
+    score: 0,
+    couponCount: 0,
+    adoptedCount: 0,
+    
+    // 核心功能入口（2x4网格）
+    coreFunctions: [
       {
-        text: '个人资料',
-        url: '/pages/my/info',
-        icon: '/pages/my/images/user1.png',
+        text: '我的订单',
+        icon: 'orders-o',
+        bgColor: '#FCE4EC',
+        iconColor: '#E91E63',
+        url: '/pages/cart/history/index',
+        type: 'order',
         badge: ''
       },
       {
         text: '优惠券',
-        url: './youhui/youhui',
-        icon: '/pages/my/images/youhui.png',
+        icon: 'coupon-o',
+        bgColor: '#FFEBEE',
+        iconColor: '#F44336',
+        url: '/pages/my/youhui/youhui',
+        type: 'coupon',
+        badge: ''
+      },
+      {
+        text: '个人中心',
+        icon: 'user-o',
+        bgColor: '#E6F5ED',
+        iconColor: '#238E23',
+        url: '/pages/my/info',
+        type: 'profile',
+        badge: ''
+      },
+      {
+        text: '智能问答',
+        icon: 'service-o',
+        bgColor: '#E0F7FA',
+        iconColor: '#2196F3',
+        url: '/pages/qa/index',
+        type: 'qa_page',
         badge: ''
       }
     ],
-    // 其他功能菜单
-    otherMenus: [
-      {
-        text: '设置',
-        url: './setting',
-        icon: 'setting-o',
-        color: '#666',
-        badge: ''
-      },
-      {
-        text: '申请养殖户',
-        url: '',
-        icon: 'friends-o',
-        color: '#666',
-        badge: ''
-      },
+    
+    // 服务与工具区（列表形式）
+    toolsMenus: [
       {
         text: '意见反馈',
-        url: './feedback',
         icon: 'chat-o',
-        color: '#666',
-        badge: ''
+        color: '#666666',
+        url: '/pages/my/feedback',
+        type: 'feedback'
       },
       {
         text: '关于我们',
-        url: '',
         icon: 'info-o',
-        color: '#666',
-        badge: ''
+        color: '#666666',
+        url: '',
+        type: 'about'
+      },
+      {
+        text: '设置',
+        icon: 'setting-o',
+        color: '#666666',
+        url: '/pages/my/setting',
+        type: 'setting'
       }
     ],
-    withdrawal: '1', // 是否允许提现，'1'表示允许
-    nickShow: false, // 是否显示编辑昵称弹窗
-    newNick: '', // 新的昵称
-
-    applyBreederShow: false, // 申请养殖户弹窗
-    applyMobile: '', // 申请手机号
+    
+    nickShow: false,
+    newNick: '',
+    // 移除申请养殖户相关状态
   },
 
   onLoad() {
-    // 从本地存储读取数据
-    var balance = wx.getStorageSync('balance') || 90;
-    var freeze = wx.getStorageSync('freeze') || 0;
+    this.loadUserData();
+  },
+
+  onShow() {
+    this.loadUserData();
+    this.refreshUserInfo();
+    
+    if (typeof this.getTabBar === 'function' && this.getTabBar()) {
+      const tabBar = this.getTabBar();
+      // 确保tabBar已初始化
+      tabBar.initTabBar();
+      // 等待tabBar数据更新
+      setTimeout(() => {
+        if (tabBar.data.list && tabBar.data.list.length > 0) {
+          const index = tabBar.data.list.findIndex(item => item.pagePath === "/pages/my/index");
+          if (index > -1) {
+            tabBar.setData({ selected: index });
+          }
+        }
+      }, 100);
+    }
+  },
+
+  loadUserData() {
+    var balance = wx.getStorageSync('balance') || '0.00';
     var score = wx.getStorageSync('score') || 0;
-    var growth = wx.getStorageSync('growth') || 0;
-    var cashlogs = wx.getStorageSync('cashlogs') || [];
-    var withDrawlogs = wx.getStorageSync('withDrawlogs') || [];
-    var depositlogs = wx.getStorageSync('depositlogs') || [];
+    var couponCount = wx.getStorageSync('couponCount') || 0;
+    var adoptedCount = wx.getStorageSync('adoptedCount') || 0;
     var apiUserInfoMap = wx.getStorageSync('apiUserInfoMap') || null;
 
     this.setData({
       balance: balance,
-      freeze: freeze,
       score: score,
-      growth: growth,
-      cashlogs: cashlogs,
-      withDrawlogs: withDrawlogs,
-      depositlogs: depositlogs,
+      couponCount: couponCount,
+      adoptedCount: adoptedCount,
       apiUserInfoMap: apiUserInfoMap
     });
+    this.updateCoreBadges();
 
-    // 检查用户是否已经登录
-    AUTH.checkHasLogined().then(isLogined => {
-      if (isLogined) {
-        this.getUserApiInfo();
-      } else {
-        getApp().loginOK = () => {
-          this.getUserApiInfo();
-        }
-      }
-    });
-  },
-
-  onShow() {
-    // 每次显示页面时刷新数据
-    var balance = wx.getStorageSync('balance') || 90;
-    var freeze = wx.getStorageSync('freeze') || 0;
-    var score = wx.getStorageSync('score') || 0;
-    var growth = wx.getStorageSync('growth') || 0;
-
-    this.setData({
-      balance: balance,
-      freeze: freeze,
-      score: score,
-      growth: growth,
-    });
-
-    // 每次显示都刷新用户信息（解决登录后切回仍显示未登录的问题）
     var token = wx.getStorageSync('token');
     if (token) {
       this.getUserApiInfo();
-    } else {
-      this.setData({ apiUserInfoMap: null });
-    }
-
-    if (typeof this.getTabBar === 'function' && this.getTabBar()) {
-      const tabBar = this.getTabBar();
-      tabBar.initTabBar();
-      const index = tabBar.data.list.findIndex(item => item.pagePath === "/pages/my/index");
-      if (index > -1) {
-        tabBar.setData({ selected: index });
-      }
     }
   },
 
-  // 获取用户的详细信息
+  async refreshUserInfo() {
+    var token = wx.getStorageSync('token');
+    if (token) {
+      await this.getUserApiInfo();
+    } else {
+      this.setData({ apiUserInfoMap: null });
+    }
+  },
+
   async getUserApiInfo() {
     var token = wx.getStorageSync('token');
     if (token) {
@@ -144,9 +144,7 @@ Page({
         const res = await API.getUserInfo(token);
         if (res.code === 0) {
           const info = res.data;
-          // 同时缓存到本地，保持同步
-          wx.setStorageSync('userInfo', info);
-
+          
           var userInfoMap = {
             base: {
               id: info.id || '',
@@ -161,20 +159,25 @@ Page({
 
           wx.setStorageSync('apiUserInfoMap', userInfoMap);
 
-          // 真实获取余额和累计消费
           var realBalance = info.balance !== undefined ? parseFloat(info.balance).toFixed(2) : '0.00';
-          var realConsumed = info.total_consumed !== undefined ? parseFloat(info.total_consumed).toFixed(2) : '0.00';
+          var realScore = info.score !== undefined ? parseInt(info.score) : 0;
+          var realCouponCount = info.coupon_count !== undefined ? parseInt(info.coupon_count) : 0;
+          var realAdoptedCount = info.adopted_count !== undefined ? parseInt(info.adopted_count) : 0;
 
           wx.setStorageSync('balance', realBalance);
-          wx.setStorageSync('freeze', realConsumed);
+          wx.setStorageSync('score', realScore);
+          wx.setStorageSync('couponCount', realCouponCount);
+          wx.setStorageSync('adoptedCount', realAdoptedCount);
 
           this.setData({
             apiUserInfoMap: userInfoMap,
             userinfo: userInfoMap.base,
-            nick: userInfoMap.base.nick,
             balance: realBalance,
-            freeze: realConsumed
+            score: realScore,
+            couponCount: realCouponCount,
+            adoptedCount: realAdoptedCount
           });
+          this.updateCoreBadges();
         }
       } catch (e) {
         console.error('获取用户信息失败', e);
@@ -182,89 +185,64 @@ Page({
     }
   },
 
-  // 申请养殖户 手机号输入变更
-  onApplyMobileInput(e) {
-    this.setData({ applyMobile: e.detail.value });
-  },
-
-  // 取消申请养殖户
-  cancelApplyBreeder() {
-    this.setData({ applyBreederShow: false });
-  },
-
-  // 提交申请养殖户
-  async submitApplyBreeder() {
-    const mobile = this.data.applyMobile;
-    if (!mobile || mobile.length !== 11) {
-      wx.showToast({ title: '请输入正确的手机号', icon: 'none' });
-      return;
-    }
-
-    const token = wx.getStorageSync('token');
-    wx.showLoading({ title: '提交中' });
-    try {
-      const res = await API.applyBreeder(token, mobile);
-      wx.hideLoading();
-      if (res.code === 0) {
-        wx.showToast({ title: '申请已提交', icon: 'success' });
-        this.setData({ applyBreederShow: false });
-        // 刷新状态
-        this.getUserApiInfo();
-      } else {
-        wx.showToast({ title: res.msg || '提交失败', icon: 'none' });
+  updateCoreBadges() {
+    var adoptedCount = parseInt(this.data.adoptedCount || 0);
+    var couponCount = parseInt(this.data.couponCount || 0);
+    var newCore = (this.data.coreFunctions || []).map(item => {
+      var badge = item.badge || '';
+      if (item.type === 'adopt') {
+        badge = adoptedCount > 0 ? (adoptedCount + '') : '';
+      } else if (item.type === 'coupon') {
+        badge = couponCount > 0 ? (couponCount + '') : '';
       }
-    } catch (e) {
-      wx.hideLoading();
-      wx.showToast({ title: '网络错误', icon: 'none' });
-    }
+      return { ...item, badge };
+    });
+    this.setData({ coreFunctions: newCore });
   },
 
-  // 处理菜单项点击
-  handleItemTap(e) {
+  handleFunctionTap(e) {
     var url = e.currentTarget.dataset.url;
+    var type = e.currentTarget.dataset.type;
+    
     if (url && url !== '') {
-      wx.navigateTo({
-        url: url
-      });
+      wx.navigateTo({ url: url });
     } else {
-      // 处理特殊功能
-      var text = e.currentTarget.dataset.text || '';
-      if (text === '申请养殖户') {
-        const info = this.data.apiUserInfoMap ? this.data.apiUserInfoMap.base : {};
-        if (info.role === 1 || info.role === 2) {
-          if (info.role === 1 && !info.is_verified) {
-            wx.showToast({ title: '申请正在审核中', icon: 'none' });
-          } else if (info.role === 1 && info.is_verified) {
-            wx.showToast({ title: '您已是养殖户', icon: 'none' });
-          } else {
-            wx.showToast({ title: '您是管理员', icon: 'none' });
-          }
-        } else {
-          // 普通用户且未申请，弹窗输入手机号
-          this.setData({
-            applyBreederShow: true,
-            applyMobile: info.mobile || ''
-          });
-        }
-      } else if (text === '关于我们') {
-        wx.showModal({
-          title: '关于我们',
-          content: '滩羊智品小程序\n版本：1.0.0\n\n致力于提供优质的滩羊产品和服务',
-          showCancel: false,
-          confirmText: '知道了'
-        });
-      }
+      wx.showToast({ title: '功能开发中', icon: 'none' });
     }
   },
 
-  // 导航到登录页面
-  toLogin() {
+  handleToolTap(e) {
+    var url = e.currentTarget.dataset.url;
+    var type = e.currentTarget.dataset.type;
+    
+    if (type === 'about') {
+      this.showAboutDialog();
+    } else if (url && url !== '') {
+      wx.navigateTo({ url: url });
+    }
+  },
+
+  showAboutDialog() {
+    wx.showModal({
+      title: '关于我们',
+      content: '滩羊智品小程序\n版本：1.0.0\n\n致力于提供优质的滩羊产品和服务\n\n隐私政策：本平台严格保护用户隐私，不会泄露任何个人信息。',
+      showCancel: false,
+      confirmText: '知道了'
+    });
+  },
+
+  goAsset() {
+    wx.navigateTo({
+      url: "/pages/asset/index"
+    });
+  },
+
+  login() {
     wx.navigateTo({
       url: '/pages/login/index'
     });
   },
 
-  // 选择头像并直传 R2
   async onChooseAvatar(e) {
     var avatarUrl = e.detail.avatarUrl;
     var token = wx.getStorageSync('token');
@@ -276,7 +254,6 @@ Page({
     wx.showLoading({ title: '正在上传' });
 
     try {
-      // 1. 获取预签名 URL
       var extMatch = avatarUrl.match(/\.([^.]+)$/);
       var ext = extMatch ? '.' + extMatch[1].toLowerCase() : '.jpg';
       var contentType = ext === '.png' ? 'image/png' : 'image/jpeg';
@@ -288,7 +265,6 @@ Page({
 
       const { upload_url, object_key } = signRes.data;
 
-      // 2. 读取文件为 ArrayBuffer
       const fs = wx.getFileSystemManager();
       const fileData = await new Promise((resolve, reject) => {
         fs.readFile({
@@ -298,7 +274,6 @@ Page({
         });
       });
 
-      // 3. PUT 请求直传到 R2
       await new Promise((resolve, reject) => {
         wx.request({
           url: upload_url,
@@ -309,23 +284,19 @@ Page({
           },
           success: (res) => {
             if (res.statusCode === 200) resolve();
-            else reject(new Error('直传 R2 失败, HTTP状态码: ' + res.statusCode));
+            else reject(new Error('直传 R2 失败'));
           },
           fail: (err) => reject(new Error('直传请求失败'))
         });
       });
 
-      // 4. 确认上传并更新个人资料
       const confirmRes = await API.confirmAvatarUpload(token, object_key);
       if (confirmRes.code !== 0) {
         throw new Error(confirmRes.msg || '确认上传失败');
       }
 
-      // 5. 更新本地缓存和页面显示
       var updatedUser = confirmRes.data;
       var apiUserInfoMap = this.data.apiUserInfoMap || {};
-
-      // 手动复制对象属性，避免浅拷贝问题
       var updatedApiUserInfoMap = {};
       for (var key in apiUserInfoMap) {
         if (apiUserInfoMap.hasOwnProperty(key)) {
@@ -340,7 +311,6 @@ Page({
         }
       }
 
-      // 设置新的头像
       updatedApiUserInfoMap.base.avatarUrl = updatedUser.avatar_url;
 
       this.setData({
@@ -348,7 +318,6 @@ Page({
       });
       wx.setStorageSync('apiUserInfoMap', updatedApiUserInfoMap);
 
-      // 同时更新 userInfo storage
       var storedInfo = wx.getStorageSync('userInfo') || {};
       storedInfo.avatar_url = updatedUser.avatar_url;
       wx.setStorageSync('userInfo', storedInfo);
@@ -363,7 +332,6 @@ Page({
     }
   },
 
-  // 复制用户ID
   copyUid() {
     wx.setClipboardData({
       data: this.data.apiUserInfoMap.base.id + '',
@@ -376,7 +344,6 @@ Page({
     });
   },
 
-  // 编辑昵称
   editNick() {
     this.setData({
       nickShow: true,
@@ -384,14 +351,12 @@ Page({
     });
   },
 
-  // 监听昵称输入
   onNickInput(e) {
     this.setData({
       newNick: e.detail.value
     });
   },
 
-  // 微信直接获取昵称回调（失焦时触发）
   onNickBlur(e) {
     if (e.detail.value) {
       this.setData({
@@ -400,7 +365,6 @@ Page({
     }
   },
 
-  // 保存昵称
   async saveNick() {
     var newNick = this.data.newNick.trim();
     if (!newNick) {
@@ -420,13 +384,11 @@ Page({
     wx.showLoading({ title: '保存中' });
 
     try {
-      // 1. 调用后端更新资料接口
       const res = await API.updateUserInfo(token, newNick);
       if (res.code !== 0) {
         throw new Error(res.msg || '更新昵称失败');
       }
 
-      // 2. 更新本地缓存
       var updatedUser = res.data;
       var apiUserInfoMap = this.data.apiUserInfoMap || {};
 
@@ -468,7 +430,6 @@ Page({
     }
   },
 
-  // 取消编辑昵称
   cancelEditNick() {
     this.setData({
       nickShow: false,
@@ -476,58 +437,20 @@ Page({
     });
   },
 
-  // 跳转到用户二维码页面
-  goUserCode() {
-    wx.navigateTo({
-      url: '/pages/my/user-code',
-    });
-  },
-
-  // 跳转到资产页面
-  goAsset() {
-    wx.navigateTo({
-      url: "/pages/asset/index"
-    });
-  },
-
-  // 跳转到积分页面
-  goScore() {
-    wx.navigateTo({
-      url: "/pages/score/index"
-    });
-  },
-
-  // 跳转到关注农户页面
-  gogrowth() {
-    wx.navigateTo({
-      url: '/pages/score/growth',
-    });
-  },
-
-  // 跳转到登录页面
-  login() {
-    wx.navigateTo({
-      url: '/pages/login/index',
-    });
-  },
-
-  // 退出登录
   onLogout() {
     wx.showModal({
       title: '提示',
       content: '确定退出登录吗？',
       success: (res) => {
         if (res.confirm) {
-          // 清除所有登录相关缓存
           wx.removeStorageSync('token');
           wx.removeStorageSync('uid');
           wx.removeStorageSync('userInfo');
           wx.removeStorageSync('apiUserInfoMap');
 
-          // 刷新页面为未登录状态
           this.setData({
             apiUserInfoMap: null,
-            userinfo: {},
+            userinfo: {}
           });
 
           wx.showToast({ title: '已退出登录', icon: 'success' });

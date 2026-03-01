@@ -1,0 +1,274 @@
+{% extends 'sheep_management/base.html' %}
+
+{% block title %}优惠券管理 - 羊只管理系统{% endblock %}
+{% block page_title %}优惠券管理{% endblock %}
+
+{% block content %}
+<style>
+    .coupon-stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 20px;
+        margin-bottom: 30px;
+    }
+    .stat-card {
+        background: white;
+        border-radius: 12px;
+        padding: 20px;
+        text-align: center;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    }
+    .stat-card .stat-value {
+        font-size: 32px;
+        font-weight: 700;
+        color: #238E23;
+    }
+    .stat-card .stat-label {
+        font-size: 14px;
+        color: #999;
+        margin-top: 5px;
+    }
+    .stat-card:nth-child(2) .stat-value { color: #2196F3; }
+    .stat-card:nth-child(3) .stat-value { color: #ff9800; }
+    .stat-card:nth-child(4) .stat-value { color: #E91E63; }
+    .stat-card:nth-child(5) .stat-value { color: #9C27B0; }
+
+    .toolbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+    .toolbar-left {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+    .filter-select, .search-input {
+        padding: 8px 14px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        font-size: 14px;
+        background: white;
+        outline: none;
+    }
+    .filter-select:focus, .search-input:focus {
+        border-color: #238E23;
+    }
+    .btn-create {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 10px 20px;
+        background: linear-gradient(135deg, #238E23 0%, #4CAF50 100%);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        text-decoration: none;
+    }
+    .btn-create:hover {
+        box-shadow: 0 4px 12px rgba(35, 142, 35, 0.3);
+    }
+
+    .coupon-table {
+        width: 100%;
+        background: white;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    }
+    .coupon-table table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    .coupon-table th {
+        background: #f8f9fa;
+        padding: 14px 16px;
+        text-align: left;
+        font-size: 13px;
+        color: #666;
+        font-weight: 600;
+        border-bottom: 2px solid #eee;
+    }
+    .coupon-table td {
+        padding: 14px 16px;
+        border-bottom: 1px solid #f0f0f0;
+        font-size: 14px;
+        color: #333;
+    }
+    .coupon-table tr:hover {
+        background: #f8fff8;
+    }
+
+    .badge {
+        display: inline-block;
+        padding: 3px 10px;
+        border-radius: 12px;
+        font-size: 12px;
+        font-weight: 500;
+    }
+    .badge-active { background: #e8f5e9; color: #2e7d32; }
+    .badge-inactive { background: #f5f5f5; color: #999; }
+    .badge-expired { background: #ffebee; color: #c62828; }
+    .badge-discount { background: #fff3e0; color: #e65100; }
+    .badge-percentage { background: #e3f2fd; color: #1565c0; }
+    .badge-cash { background: #fce4ec; color: #c62828; }
+
+    .action-btns {
+        display: flex;
+        gap: 6px;
+    }
+    .action-btns a, .action-btns button {
+        padding: 5px 12px;
+        border-radius: 6px;
+        font-size: 12px;
+        cursor: pointer;
+        text-decoration: none;
+        border: none;
+    }
+    .btn-view { background: #e3f2fd; color: #1565c0; }
+    .btn-edit { background: #fff3e0; color: #e65100; }
+    .btn-del { background: #ffebee; color: #c62828; }
+
+    .coupon-amount-display {
+        font-weight: 700;
+        font-size: 16px;
+        color: #238E23;
+    }
+    .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+        color: #999;
+    }
+    .empty-state .icon { font-size: 48px; margin-bottom: 10px; }
+</style>
+
+<!-- 统计卡片 -->
+<div class="coupon-stats">
+    <div class="stat-card">
+        <div class="stat-value">{{ stats.total }}</div>
+        <div class="stat-label">优惠券总数</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-value">{{ stats.active }}</div>
+        <div class="stat-label">可用优惠券</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-value">{{ stats.expired }}</div>
+        <div class="stat-label">已过期</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-value">{{ stats.total_claimed }}</div>
+        <div class="stat-label">总领取数</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-value">{{ stats.total_used }}</div>
+        <div class="stat-label">已使用数</div>
+    </div>
+</div>
+
+<!-- 工具栏 -->
+<div class="toolbar">
+    <div class="toolbar-left">
+        <form method="get" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+            <select name="status" class="filter-select" onchange="this.form.submit()">
+                <option value="">全部状态</option>
+                <option value="active" {% if status_filter == 'active' %}selected{% endif %}>可用</option>
+                <option value="inactive" {% if status_filter == 'inactive' %}selected{% endif %}>不可用</option>
+                <option value="expired" {% if status_filter == 'expired' %}selected{% endif %}>已过期</option>
+            </select>
+            <select name="coupon_type" class="filter-select" onchange="this.form.submit()">
+                <option value="">全部类型</option>
+                <option value="discount" {% if coupon_type_filter == 'discount' %}selected{% endif %}>满减券</option>
+                <option value="percentage" {% if coupon_type_filter == 'percentage' %}selected{% endif %}>折扣券</option>
+                <option value="cash" {% if coupon_type_filter == 'cash' %}selected{% endif %}>现金券</option>
+            </select>
+            <input type="text" name="search" class="search-input" placeholder="搜索优惠券名称/代码" value="{{ search }}">
+            <button type="submit" class="btn-create" style="padding:8px 14px;background:#2196F3;">🔍 搜索</button>
+        </form>
+    </div>
+    <a href="{% url 'coupon_create' %}" class="btn-create">➕ 发布优惠券</a>
+</div>
+
+<!-- 优惠券列表 -->
+<div class="coupon-table">
+    {% if coupons %}
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>名称</th>
+                <th>代码</th>
+                <th>类型</th>
+                <th>优惠</th>
+                <th>最低消费</th>
+                <th>状态</th>
+                <th>有效期</th>
+                <th>领取/总量</th>
+                <th>已使用</th>
+                <th>操作</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for coupon in coupons %}
+            <tr>
+                <td>{{ coupon.id }}</td>
+                <td><strong>{{ coupon.name }}</strong></td>
+                <td><code>{{ coupon.code }}</code></td>
+                <td>
+                    {% if coupon.coupon_type == 'discount' %}
+                        <span class="badge badge-discount">满减券</span>
+                    {% elif coupon.coupon_type == 'percentage' %}
+                        <span class="badge badge-percentage">折扣券</span>
+                    {% elif coupon.coupon_type == 'cash' %}
+                        <span class="badge badge-cash">现金券</span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if coupon.coupon_type == 'percentage' %}
+                        <span class="coupon-amount-display">{{ coupon.discount_rate|floatformat:1 }}折</span>
+                    {% else %}
+                        <span class="coupon-amount-display">¥{{ coupon.discount_amount }}</span>
+                    {% endif %}
+                </td>
+                <td>¥{{ coupon.min_purchase_amount }}</td>
+                <td>
+                    {% if coupon.status == 'active' %}
+                        <span class="badge badge-active">可用</span>
+                    {% elif coupon.status == 'inactive' %}
+                        <span class="badge badge-inactive">不可用</span>
+                    {% elif coupon.status == 'expired' %}
+                        <span class="badge badge-expired">已过期</span>
+                    {% endif %}
+                </td>
+                <td style="font-size:12px;">
+                    {{ coupon.valid_from|date:"Y-m-d H:i" }}<br>
+                    ~ {{ coupon.valid_until|date:"Y-m-d H:i" }}
+                </td>
+                <td>{{ coupon.claimed_count }} / {{ coupon.remaining }}</td>
+                <td>{{ coupon.actual_used_count }}</td>
+                <td>
+                    <div class="action-btns">
+                        <a href="{% url 'coupon_detail' coupon.id %}" class="btn-view">详情</a>
+                        <a href="{% url 'coupon_edit' coupon.id %}" class="btn-edit">编辑</a>
+                        <a href="{% url 'coupon_delete' coupon.id %}" class="btn-del" onclick="return confirm('确定删除优惠券「{{ coupon.name }}」吗？')">删除</a>
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <div class="empty-state">
+        <div class="icon">🎫</div>
+        <p>暂无优惠券，<a href="{% url 'coupon_create' %}">立即创建</a></p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

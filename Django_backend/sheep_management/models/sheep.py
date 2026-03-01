@@ -7,14 +7,33 @@ class Sheep(models.Model):
         (0, '母'),
         (1, '公'),
     ]
+    BREED_CHOICES = [
+        ('滩羊', '滩羊'),
+        ('小尾寒羊', '小尾寒羊'),
+        ('杜泊羊', '杜泊羊'),
+        ('萨福克羊', '萨福克羊'),
+        ('特克塞尔羊', '特克塞尔羊'),
+        ('其他', '其他'),
+    ]
+    HEALTH_STATUS_CHOICES = [
+        ('健康', '健康'),
+        ('良好', '良好'),
+        ('一般', '一般'),
+        ('需关注', '需关注'),
+        ('生病', '生病'),
+    ]
     ear_tag = models.CharField(max_length=50, null=True, blank=True, verbose_name='耳标编号')
     gender = models.IntegerField(choices=GENDER_CHOICES, verbose_name='性别')
+    breed = models.CharField(max_length=50, choices=BREED_CHOICES, default='滩羊', verbose_name='品种')
+    health_status = models.CharField(max_length=20, choices=HEALTH_STATUS_CHOICES, default='健康', verbose_name='健康状况')
+    batch_no = models.CharField(max_length=50, null=True, blank=True, verbose_name='批次号')
     weight = models.FloatField(verbose_name='体重（kg）')
     height = models.FloatField(verbose_name='身高（cm）')
     length = models.FloatField(verbose_name='体长（cm）')
     birth_date = models.DateField(null=True, blank=True, verbose_name='出生日期')
     farm_name = models.CharField(max_length=200, null=True, blank=True, verbose_name='农场名称')
     image = models.ImageField(upload_to='sheep_images/', null=True, blank=True, verbose_name='羊只照片')
+    video = models.FileField(upload_to='sheep_videos/', null=True, blank=True, verbose_name='羊只视频')
     owner = models.ForeignKey(
         'User',                            # 跨文件引用 User 模型 (用字符串避免循环引用)
         on_delete=models.CASCADE,          # 如果这个养殖户被删了，他的羊也跟着删掉
@@ -112,3 +131,42 @@ class VaccinationHistory(models.Model):
 
     def __str__(self):
         return f"{self.sheep} - {self.vaccine} - {self.vaccination_date}"
+
+
+class EnvironmentAlert(models.Model):
+    """环境预警表"""
+    ALERT_TYPE_CHOICES = [
+        ('temperature', '温度异常'),
+        ('humidity', '湿度异常'),
+        ('air_quality', '空气质量异常'),
+        ('motion', '异常移动'),
+        ('other', '其他'),
+    ]
+    SEVERITY_CHOICES = [
+        ('low', '低'),
+        ('medium', '中'),
+        ('high', '高'),
+    ]
+    
+    owner = models.ForeignKey(
+        'User',
+        on_delete=models.CASCADE,
+        related_name='environment_alerts',
+        verbose_name='所属养殖户'
+    )
+    alert_type = models.CharField(max_length=20, choices=ALERT_TYPE_CHOICES, verbose_name='预警类型')
+    severity = models.CharField(max_length=10, choices=SEVERITY_CHOICES, default='medium', verbose_name='严重程度')
+    message = models.TextField(verbose_name='预警信息')
+    location = models.CharField(max_length=200, null=True, blank=True, verbose_name='位置')
+    is_resolved = models.BooleanField(default=False, verbose_name='是否已处理')
+    resolved_at = models.DateTimeField(null=True, blank=True, verbose_name='处理时间')
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name='创建时间')
+
+    class Meta:
+        db_table = 'environment_alerts'
+        verbose_name = '环境预警'
+        verbose_name_plural = '环境预警'
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"{self.get_alert_type_display()} - {self.get_severity_display()} - {self.created_at.strftime('%Y-%m-%d %H:%M')}"

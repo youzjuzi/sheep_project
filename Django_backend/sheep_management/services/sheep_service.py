@@ -41,9 +41,9 @@ class SheepService:
 
         if gender:
             # 支持数字和中文关键词
-            if gender in ['公', '雄性', 'male', '1', 1]:
+            if gender in ['公', 'male', '1', 1]:
                 query &= Q(gender=1)
-            elif gender in ['母', '雌性', 'female', '0', 0]:
+            elif gender in ['母', 'female', '0', 0]:
                 query &= Q(gender=0)
             else:
                 # 尝试转换为整数
@@ -111,6 +111,7 @@ class SheepService:
             'farm_name': sheep.farm_name or '宁夏盐池滩羊核心产区',  # 如果真实农场没填给个默认
             'breeder_name': sheep.owner.nickname or sheep.owner.username if sheep.owner else '官方牧场',
             'image': sheep.image.url if sheep.image else '',
+            'video': sheep.video.url if sheep.video else '',
         }
 
     @staticmethod
@@ -248,6 +249,254 @@ class SheepService:
                 'phone': sheep.breeder.phone if sheep.breeder else None,
             } if sheep.breeder else None
         }
+        return result
+
+    @staticmethod
+    def create_sheep(owner, data, image=None, video=None):
+        """
+        创建羊只
+        :param owner: 养殖户用户对象
+        :param data: 羊只数据
+        :param image: 羊只照片
+        :param video: 羊只视频
+        :return: dict
+        """
+        required_fields = ['gender', 'weight', 'height', 'length']
+        for field in required_fields:
+            if field not in data:
+                raise SheepError(f'缺少必填字段: {field}')
+
+        try:
+            sheep = Sheep.objects.create(
+                ear_tag=data.get('ear_tag'),
+                gender=int(data['gender']),
+                breed=data.get('breed', '滩羊'),
+                health_status=data.get('health_status', '健康'),
+                weight=float(data['weight']),
+                height=float(data['height']),
+                length=float(data['length']),
+                birth_date=data.get('birth_date'),
+                farm_name=data.get('farm_name'),
+                price=float(data.get('price', 0)),
+                owner=owner
+            )
+
+            if image:
+                sheep.image = image
+            if video:
+                sheep.video = video
+            sheep.save()
+
+            return SheepService.get_sheep_by_id(sheep.id)
+        except Exception as e:
+            raise SheepError(f'创建羊只失败: {str(e)}')
+
+    @staticmethod
+    def update_sheep(sheep_id, owner, data, image=None, video=None):
+        """
+        更新羊只信息
+        :param sheep_id: 羊只ID
+        :param owner: 养殖户用户对象
+        :param data: 羊只数据
+        :param image: 羊只照片
+        :param video: 羊只视频
+        :return: dict
+        """
+        try:
+            sheep = Sheep.objects.get(pk=sheep_id)
+        except Sheep.DoesNotExist:
+            raise SheepError('羊只不存在', code=404, http_status=404)
+
+        # 验证权限：只能修改自己的羊只
+        if sheep.owner != owner:
+            raise SheepError('无权修改其他养殖户的羊只', code=403, http_status=403)
+
+        # 更新字段
+        update_fields = ['ear_tag', 'gender', 'breed', 'health_status', 'weight', 'height', 'length', 'birth_date', 'farm_name', 'price']
+        for field in update_fields:
+            if field in data:
+                if field in ['gender', 'weight', 'height', 'length', 'price']:
+                    setattr(sheep, field, float(data[field]) if field != 'gender' else int(data[field]))
+                else:
+                    setattr(sheep, field, data[field])
+
+        if image:
+            sheep.image = image
+        if video:
+            sheep.video = video
+
+        sheep.save()
+        return SheepService.get_sheep_by_id(sheep.id)
+
+    @staticmethod
+    def delete_sheep(sheep_id, owner):
+        """
+        删除羊只
+        :param sheep_id: 羊只ID
+        :param owner: 养殖户用户对象
+        :return: dict
+        """
+        try:
+            sheep = Sheep.objects.get(pk=sheep_id)
+        except Sheep.DoesNotExist:
+            raise SheepError('羊只不存在', code=404, http_status=404)
+
+        # 验证权限：只能删除自己的羊只
+        if sheep.owner != owner:
+            raise SheepError('无权删除其他养殖户的羊只', code=403, http_status=403)
+
+        sheep.delete()
+        return {'code': 0, 'msg': '删除成功', 'data': None}
+
+    @staticmethod
+    def get_breeder_sheep_list(owner):
+        """
+        获取养殖户自己的羊只列表
+        :param owner: 养殖户用户对象
+        :return: list[dict]
+        """
+        sheep_list = Sheep.objects.filter(owner=owner)
+        result = []
+        for sheep in sheep_list:
+            result.append({
+                'id': sheep.id,
+                'ear_tag': sheep.ear_tag or '',
+                'gender': sheep.get_gender_display(),
+                'weight': float(sheep.weight),
+                'height': float(sheep.height),
+                'length': float(sheep.length),
+                'birth_date': sheep.birth_date.strftime('%Y-%m-%d') if sheep.birth_date else '',
+                'farm_name': sheep.farm_name or '',
+                'price': float(sheep.price),
+                'image': sheep.image.url if sheep.image else '',
+                'video': sheep.video.url if sheep.video else '',
+            })
+        return result
+
+    @staticmethod
+    def count_sheep(gender=None, weights=None, heights=None, lengths=None):
+        """
+        获取符合条件的羊只数量（支持多选筛选）
+        :param gender: 性别筛选（支持中文/英文/数字）
+        :param weights: 体重范围列表（如 ['20-30kg', '30-40kg']）
+        :param heights: 体高范围列表（如 ['55-65cm', '65-75cm']）
+        :param lengths: 体长范围列表（如 ['60-70cm', '70-80cm']）
+        :return: int 符合条件的羊只数量
+        """
+        query = Q()
+        
+        # 性别筛选（单选）
+        if gender:
+            if gender in ['公', 'male', '雄性', '1', 1]:
+                query &= Q(gender=1)
+            elif gender in ['母', 'female', '雌性', '0', 0]:
+                query &= Q(gender=0)
+            else:
+                try:
+                    gender_int = int(gender)
+                    if gender_int in [0, 1]:
+                        query &= Q(gender=gender_int)
+                except (ValueError, TypeError):
+                    pass
+        
+        # 体重筛选（多选 - OR关系）
+        if weights and len(weights) > 0:
+            weight_query = Q()
+            for weight in weights:
+                weight_range = SheepService._parse_range(weight)
+                if weight_range:
+                    weight_query |= Q(weight__gte=weight_range[0], weight__lte=weight_range[1])
+            query &= weight_query
+        
+        # 体高筛选（多选 - OR关系）
+        if heights and len(heights) > 0:
+            height_query = Q()
+            for height in heights:
+                height_range = SheepService._parse_range(height)
+                if height_range:
+                    height_query |= Q(height__gte=height_range[0], height__lte=height_range[1])
+            query &= height_query
+        
+        # 体长筛选（多选 - OR关系）
+        if lengths and len(lengths) > 0:
+            length_query = Q()
+            for length in lengths:
+                length_range = SheepService._parse_range(length)
+                if length_range:
+                    length_query |= Q(length__gte=length_range[0], length__lte=length_range[1])
+            query &= length_query
+        
+        return Sheep.objects.filter(query).count()
+
+    @staticmethod
+    def search_sheep_multi(gender=None, weights=None, heights=None, lengths=None):
+        """
+        多选筛选搜索羊只（支持体重、体高、体长多选）
+        :param gender: 性别筛选
+        :param weights: 体重范围列表
+        :param heights: 体高范围列表
+        :param lengths: 体长范围列表
+        :return: list[dict] 羊只列表
+        """
+        query = Q()
+        
+        # 性别筛选
+        if gender:
+            if gender in ['公', 'male', '雄性', '1', 1]:
+                query &= Q(gender=1)
+            elif gender in ['母', 'female', '雌性', '0', 0]:
+                query &= Q(gender=0)
+            else:
+                try:
+                    gender_int = int(gender)
+                    if gender_int in [0, 1]:
+                        query &= Q(gender=gender_int)
+                except (ValueError, TypeError):
+                    pass
+        
+        # 体重筛选（多选 - OR关系）
+        if weights and len(weights) > 0:
+            weight_query = Q()
+            for weight in weights:
+                weight_range = SheepService._parse_range(weight)
+                if weight_range:
+                    weight_query |= Q(weight__gte=weight_range[0], weight__lte=weight_range[1])
+            query &= weight_query
+        
+        # 体高筛选（多选 - OR关系）
+        if heights and len(heights) > 0:
+            height_query = Q()
+            for height in heights:
+                height_range = SheepService._parse_range(height)
+                if height_range:
+                    height_query |= Q(height__gte=height_range[0], height__lte=height_range[1])
+            query &= height_query
+        
+        # 体长筛选（多选 - OR关系）
+        if lengths and len(lengths) > 0:
+            length_query = Q()
+            for length in lengths:
+                length_range = SheepService._parse_range(length)
+                if length_range:
+                    length_query |= Q(length__gte=length_range[0], length__lte=length_range[1])
+            query &= length_query
+        
+        sheep_list = Sheep.objects.filter(query)
+        
+        result = []
+        for sheep in sheep_list:
+            result.append({
+                'id': sheep.id,
+                'ear_tag': sheep.ear_tag or '',
+                'gender': sheep.get_gender_display(),
+                'weight': float(sheep.weight),
+                'height': float(sheep.height),
+                'length': float(sheep.length),
+                'price': float(sheep.price),
+                'image': sheep.image.url if sheep.image else '',
+                'farm_name': sheep.farm_name or '宁夏盐池滩羊核心产区',
+                'breeder_name': sheep.owner.nickname or sheep.owner.username if sheep.owner else '官方牧场',
+            })
         return result
 
     # ========================

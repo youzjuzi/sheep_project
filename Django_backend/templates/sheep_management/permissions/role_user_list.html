@@ -1,0 +1,133 @@
+{% extends 'sheep_management/base.html' %}
+
+{% block page_title %}角色管理{% endblock %}
+
+{% block content %}
+<!-- 统计卡片 -->
+<div class="stats" style="margin-bottom: 24px;">
+    <div class="stat-card" style="cursor:pointer;" onclick="filterRole('')">
+        <h3>{{ stats.total }}</h3>
+        <p>全部用户</p>
+    </div>
+    <div class="stat-card" style="cursor:pointer;" onclick="filterRole('2')">
+        <h3 style="color:#764ba2;">{{ stats.admin }}</h3>
+        <p>管理员</p>
+    </div>
+    <div class="stat-card" style="cursor:pointer;" onclick="filterRole('1')">
+        <h3 style="color:#667eea;">{{ stats.breeder }}</h3>
+        <p>养殖户</p>
+    </div>
+    <div class="stat-card" style="cursor:pointer;" onclick="filterRole('0')">
+        <h3 style="color:#95a5a6;">{{ stats.user }}</h3>
+        <p>普通用户</p>
+    </div>
+</div>
+
+<div class="card">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+        <h2>
+            角色管理
+            {% if role_filter == '0' %}<span style="font-size:14px;color:#95a5a6;margin-left:8px;">· 普通用户</span>
+            {% elif role_filter == '1' %}<span style="font-size:14px;color:#667eea;margin-left:8px;">· 养殖户</span>
+            {% elif role_filter == '2' %}<span style="font-size:14px;color:#764ba2;margin-left:8px;">· 管理员</span>
+            {% endif %}
+        </h2>
+        <a href="{% url 'permission_overview' %}" class="btn" style="background:#95a5a6;">权限说明</a>
+    </div>
+
+    <!-- 角色快捷筛选 Tab -->
+    <div class="nav-tabs" style="margin-bottom:0;">
+        <a href="?role={% if search %}&search={{ search }}{% endif %}"
+           class="nav-tab {% if role_filter == '' %}active{% endif %}">全部</a>
+        <a href="?role=2{% if search %}&search={{ search }}{% endif %}"
+           class="nav-tab {% if role_filter == '2' %}active{% endif %}">
+            <span style="display:inline-block;width:10px;height:10px;background:#764ba2;border-radius:50%;margin-right:5px;"></span>管理员
+        </a>
+        <a href="?role=1{% if search %}&search={{ search }}{% endif %}"
+           class="nav-tab {% if role_filter == '1' %}active{% endif %}">
+            <span style="display:inline-block;width:10px;height:10px;background:#667eea;border-radius:50%;margin-right:5px;"></span>养殖户
+        </a>
+        <a href="?role=0{% if search %}&search={{ search }}{% endif %}"
+           class="nav-tab {% if role_filter == '0' %}active{% endif %}">
+            <span style="display:inline-block;width:10px;height:10px;background:#95a5a6;border-radius:50%;margin-right:5px;"></span>普通用户
+        </a>
+    </div>
+
+    <!-- 搜索栏 -->
+    <div class="search-box" style="margin-top:16px;">
+        <form method="get">
+            <input type="hidden" name="role" value="{{ role_filter }}">
+            <input type="text" name="search" placeholder="搜索用户名、昵称或手机号..." value="{{ search }}">
+            <button type="submit" class="btn">搜索</button>
+            {% if search %}<a href="?role={{ role_filter }}" class="btn" style="background:#95a5a6;">重置</a>{% endif %}
+        </form>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>用户名</th>
+                <th>昵称</th>
+                <th>手机号</th>
+                <th>当前角色</th>
+                <th>养殖户状态</th>
+                <th>注册时间</th>
+                <th>操作</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for u in users %}
+            <tr>
+                <td>{{ u.id }}</td>
+                <td>
+                    {{ u.username }}
+                    {% if u.pk == request.user.pk %}
+                    <span style="font-size:11px;background:#667eea;color:white;border-radius:8px;padding:1px 6px;margin-left:4px;">我</span>
+                    {% endif %}
+                </td>
+                <td>{{ u.nickname|default:"—" }}</td>
+                <td>{{ u.mobile|default:"—" }}</td>
+                <td>
+                    {% if u.role == 2 %}
+                    <span style="background:#f3e8ff;color:#764ba2;padding:3px 10px;border-radius:12px;font-size:13px;font-weight:600;">管理员</span>
+                    {% elif u.role == 1 %}
+                    <span style="background:#ede9fe;color:#667eea;padding:3px 10px;border-radius:12px;font-size:13px;font-weight:600;">养殖户</span>
+                    {% else %}
+                    <span style="background:#f1f5f9;color:#64748b;padding:3px 10px;border-radius:12px;font-size:13px;">普通用户</span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if u.role == 1 %}
+                        {% if u.is_verified %}
+                        <span style="color:#27ae60;font-size:13px;">✅ 已认证</span>
+                        {% else %}
+                        <span style="color:#e67e22;font-size:13px;">⏳ 待审核</span>
+                        {% endif %}
+                    {% else %}—{% endif %}
+                </td>
+                <td>{{ u.created_at|date:"Y-m-d" }}</td>
+                <td>
+                    {% if u.pk != request.user.pk %}
+                    <a href="{% url 'role_user_edit' u.pk %}" class="btn" style="padding:5px 12px;font-size:12px;background:#f39c12;">修改角色</a>
+                    {% else %}
+                    <span style="color:#aaa;font-size:12px;">当前账号</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="8" style="text-align:center;padding:40px;color:#999;">暂无数据</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<script>
+function filterRole(role) {
+    const search = new URLSearchParams(window.location.search).get('search') || '';
+    window.location.href = '?role=' + role + (search ? '&search=' + search : '');
+}
+</script>
+{% endblock %}

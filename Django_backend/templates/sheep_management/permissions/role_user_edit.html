@@ -1,0 +1,81 @@
+{% extends 'sheep_management/base.html' %}
+
+{% block page_title %}修改用户角色{% endblock %}
+
+{% block extra_css %}
+<style>
+    .role-card{display:flex;align-items:center;gap:12px;padding:14px 18px;border:2px solid #e5e7eb;border-radius:10px;cursor:pointer;background:#fff;transition:all .2s;}
+    .role-card.active{border-color:#667eea;background:#f5f3ff;}
+    .role-card:hover{border-color:#a5b4fc;}
+    .role-badge-admin{background:#f3e8ff;color:#764ba2;padding:3px 10px;border-radius:12px;font-size:13px;font-weight:600;}
+    .role-badge-breeder{background:#ede9fe;color:#667eea;padding:3px 10px;border-radius:12px;font-size:13px;font-weight:600;}
+    .role-badge-user{background:#f1f5f9;color:#64748b;padding:3px 10px;border-radius:12px;font-size:13px;}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="card" style="max-width: 640px;">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+        <h2>修改用户角色</h2>
+        <a href="{% url 'role_user_list' %}" class="btn" style="background:#95a5a6;">← 返回列表</a>
+    </div>
+
+    <!-- 用户信息 -->
+    <table style="margin-bottom: 24px;">
+        <tr><th style="width:140px;">用户ID</th><td>{{ target_user.id }}</td></tr>
+        <tr><th>用户名</th><td>{{ target_user.username }}</td></tr>
+        <tr><th>昵称</th><td>{{ target_user.nickname|default:"未设置" }}</td></tr>
+        <tr><th>手机号</th><td>{{ target_user.mobile|default:"未设置" }}</td></tr>
+        <tr>
+            <th>当前角色</th>
+            <td>
+                {% if target_user.role == 2 %}
+                <span class="role-badge-admin">管理员</span>
+                {% elif target_user.role == 1 %}
+                <span class="role-badge-breeder">养殖户</span>
+                {% else %}
+                <span class="role-badge-user">普通用户</span>
+                {% endif %}
+            </td>
+        </tr>
+    </table>
+
+    <form method="post">
+        {% csrf_token %}
+        <div class="form-group">
+            <label>修改为角色</label>
+            <div style="display:flex; flex-direction:column; gap:12px; margin-top:8px;">
+                {% for value, label in role_choices %}
+                <label class="role-card {% if target_user.role == value %}active{% endif %}" onclick="document.querySelectorAll('.role-card').forEach(c=>c.classList.remove('active'));this.classList.add('active');">
+                    <input type="radio" name="role" value="{{ value }}" {% if target_user.role == value %}checked{% endif %}
+                           style="width:18px;height:18px;accent-color:#667eea;">
+                    <div>
+                        <div style="font-weight:600; font-size:15px;">
+                            {% if value == 2 %}🛡️ 管理员
+                            {% elif value == 1 %}🌾 养殖户
+                            {% else %}👤 普通用户
+                            {% endif %}
+                        </div>
+                        <div style="font-size:12px;color:#999;margin-top:2px;">
+                            {% if value == 2 %}拥有全部后台管理权限
+                            {% elif value == 1 %}可管理羊只档案及订单，需审核认证
+                            {% else %}仅可查看个人资料及订单
+                            {% endif %}
+                        </div>
+                    </div>
+                </label>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div style="background:#fff8e1;border:1px solid #ffe082;border-radius:8px;padding:12px 16px;margin:16px 0;font-size:13px;color:#856404;">
+            ⚠ 如果将用户改为"养殖户"，需要额外在养殖户审核页完成认证。
+        </div>
+
+        <div style="display:flex; gap:10px; margin-top:20px;">
+            <button type="submit" class="btn btn-success">保存修改</button>
+            <a href="{% url 'role_user_list' %}" class="btn" style="background:#95a5a6;">取消</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

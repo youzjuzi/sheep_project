@@ -1,0 +1,33 @@
+{% extends 'sheep_management/base.html' %}
+
+{% block page_title %}拒绝/撤销申请{% endblock %}
+
+{% block content %}
+<div class="card" style="max-width: 640px;">
+    <h2 style="margin-bottom: 16px;">
+        {% if breeder.is_verified %}撤销养殖户认证{% else %}拒绝养殖户申请{% endif %}
+    </h2>
+
+    <table style="margin: 16px 0;">
+        <tr><th style="width:140px;">用户名</th><td>{{ breeder.username }}</td></tr>
+        <tr><th>昵称</th><td>{{ breeder.nickname|default:"未设置" }}</td></tr>
+        <tr><th>手机号</th><td>{{ breeder.mobile|default:"未设置" }}</td></tr>
+    </table>
+
+    <p style="color:#e74c3c; margin-bottom: 18px;">
+        ⚠ 操作后该用户将变回普通用户，失去养殖户权限。
+    </p>
+
+    <form method="post">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="reason">拒绝原因（选填）</label>
+            <textarea id="reason" name="reason" rows="3" placeholder="请填写原因，以便用户了解..."></textarea>
+        </div>
+        <div style="display: flex; gap: 10px; margin-top: 16px;">
+            <button type="submit" class="btn btn-danger">❌ 确认拒绝/撤销</button>
+            <a href="{% url 'breeder_audit_detail' breeder.pk %}" class="btn" style="background:#95a5a6;">取消</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

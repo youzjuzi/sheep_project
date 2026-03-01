@@ -3,7 +3,7 @@
   <!-- 顶部：头像与昵称 -->
   <view class="card top-card">
     <button class="avatar-btn" open-type="chooseAvatar" bind:chooseavatar="onChooseAvatar">
-      <image class="avatar-img" src="{{ avatarUrl ? avatarUrl : '/images/default.png' }}" mode="aspectFill"></image>
+      <image class="avatar-img" src="{{ avatarUrl ? avatarUrl : '/pages/my/images/user.png' }}" mode="aspectFill"></image>
     </button>
     
     <view class="nick-input-box">

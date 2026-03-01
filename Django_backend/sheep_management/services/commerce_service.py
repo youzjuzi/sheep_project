@@ -305,6 +305,108 @@ class CommerceService:
         return result
 
     # ========================
+    #  养殖户订单管理
+    # ========================
+
+    @staticmethod
+    def get_breeder_orders(token):
+        """
+        获取养殖户的订单列表（用户发起的领养申请）
+        :param token: 养殖户 JWT token
+        :return: list[dict]
+        """
+        breeder = CommerceService._resolve_user(token)
+        
+        # 检查是否为养殖户
+        if breeder.role != 1:
+            raise CommerceError('只有养殖户可以查看订单', code=403, http_status=403)
+        
+        # 获取养殖户羊只的订单
+        sheep_ids = Sheep.objects.filter(owner=breeder).values_list('id', flat=True)
+        order_items = OrderItem.objects.filter(
+            sheep_id__in=sheep_ids
+        ).select_related('order__user', 'sheep').order_by('-order__created_at')
+        
+        result = []
+        for oi in order_items:
+            order = oi.order
+            result.append({
+                'id': order.id,
+                'order_no': order.order_no,
+                'total_amount': float(order.total_amount),
+                'status': order.status,
+                'status_display': order.get_status_display(),
+                'created_at': order.created_at.strftime('%Y-%m-%d %H:%M') if order.created_at else '',
+                'user': {
+                    'id': order.user.id,
+                    'nickname': order.user.nickname or order.user.username,
+                    'mobile': order.user.mobile or '',
+                },
+                'sheep': {
+                    'id': oi.sheep.id,
+                    'ear_tag': oi.sheep.ear_tag,
+                    'gender': oi.sheep.get_gender_display(),
+                    'weight': float(oi.sheep.weight),
+                    'price': float(oi.price),
+                },
+            })
+        return result
+
+    @staticmethod
+    def update_order_status(token, order_id, status, logistics_info=None):
+        """
+        更新订单状态（确认或拒绝领养请求，更新发货状态等）
+        :param token: 养殖户 JWT token
+        :param order_id: 订单ID
+        :param status: 新状态 ('paid', 'shipping', 'completed', 'cancelled')
+        :param logistics_info: 物流信息 dict，包含 logistics_company, logistics_tracking_number
+        :return: dict
+        """
+        from django.utils import timezone
+        
+        breeder = CommerceService._resolve_user(token)
+        
+        # 检查是否为养殖户
+        if breeder.role != 1:
+            raise CommerceError('只有养殖户可以更新订单状态', code=403, http_status=403)
+        
+        # 获取订单
+        try:
+            order = Order.objects.get(pk=order_id)
+        except Order.DoesNotExist:
+            raise CommerceError('订单不存在', code=404, http_status=404)
+        
+        # 检查订单是否包含养殖户的羊只
+        order_items = order.items.select_related('sheep').all()
+        sheep_ids = [oi.sheep.id for oi in order_items]
+        breeder_sheep_ids = Sheep.objects.filter(owner=breeder).values_list('id', flat=True)
+        
+        if not any(sheep_id in breeder_sheep_ids for sheep_id in sheep_ids):
+            raise CommerceError('无权操作此订单', code=403, http_status=403)
+        
+        # 更新订单状态
+        valid_statuses = ['paid', 'shipping', 'completed', 'cancelled']
+        if status not in valid_statuses:
+            raise CommerceError(f'无效的状态值，可选: {", ".join(valid_statuses)}')
+        
+        order.status = status
+        
+        # 处理发货状态
+        if status == 'shipping':
+            if logistics_info:
+                order.logistics_company = logistics_info.get('logistics_company')
+                order.logistics_tracking_number = logistics_info.get('logistics_tracking_number')
+            order.shipping_date = timezone.now()
+        
+        # 处理完成状态
+        elif status == 'completed' and not order.delivery_date:
+            order.delivery_date = timezone.now()
+        
+        order.save()
+        
+        return CommerceService._build_order(order)
+
+    # ========================
     #  私有方法
     # ========================
 
@@ -348,6 +450,10 @@ class CommerceService:
             'status': order.status,
             'status_display': order.get_status_display(),
             'pay_time': order.pay_time.strftime('%Y-%m-%d %H:%M:%S') if order.pay_time else '',
+            'shipping_date': order.shipping_date.strftime('%Y-%m-%d %H:%M:%S') if order.shipping_date else '',
+            'delivery_date': order.delivery_date.strftime('%Y-%m-%d %H:%M:%S') if order.delivery_date else '',
+            'logistics_company': order.logistics_company or '',
+            'logistics_tracking_number': order.logistics_tracking_number or '',
             'created_at': order.created_at.strftime('%Y-%m-%d %H:%M:%S') if order.created_at else '',
             'items': [{
                 'sheep_id': oi.sheep.id,

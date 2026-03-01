@@ -88,7 +88,7 @@
 }
 
 .search-button {
-  width: 100%;
+  flex: 1;
   height: 88rpx;
   background: linear-gradient(135deg, #238E23 0%, #2db82d 100%);
   color: #fff;
@@ -97,9 +97,6 @@
   font-weight: 500;
   border: none;
   box-shadow: 0 4rpx 12rpx rgba(35, 142, 35, 0.3);
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 
 .search-button:active {
@@ -119,10 +116,6 @@
   margin-bottom: 20rpx;
 }
 
-.button-group .search-button {
-  flex: 1;
-}
-
 .direct-nav-button {
   flex: 1;
   height: 88rpx;
@@ -133,9 +126,6 @@
   font-weight: 500;
   border: none;
   box-shadow: 0 4rpx 12rpx rgba(24, 144, 255, 0.3);
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 
 .direct-nav-button:active {
@@ -147,55 +137,6 @@
   background: #ccc;
   box-shadow: none;
   opacity: 0.6;
-}
-
-.direct-nav-button.recommended {
-  background: linear-gradient(135deg, #52c41a 0%, #73d13d 100%);
-  box-shadow: 0 4rpx 12rpx rgba(82, 196, 26, 0.4);
-  animation: pulse 2s ease-in-out infinite;
-}
-
-@keyframes pulse {
-  0%, 100% {
-    box-shadow: 0 4rpx 12rpx rgba(82, 196, 26, 0.4);
-  }
-  50% {
-    box-shadow: 0 6rpx 20rpx rgba(82, 196, 26, 0.6);
-  }
-}
-
-.search-button.disabled-hint {
-  background: #f5f5f5;
-  color: #999;
-  border: 2rpx dashed #ccc;
-}
-
-/* API状态提示 */
-.api-status-hint {
-  margin-top: 20rpx;
-  padding: 24rpx;
-  background: linear-gradient(135deg, #fff7e6 0%, #fffbe6 100%);
-  border-left: 6rpx solid #faad14;
-  border-radius: 12rpx;
-  box-shadow: 0 2rpx 8rpx rgba(250, 173, 20, 0.1);
-}
-
-.hint-content {
-  display: flex;
-  align-items: flex-start;
-  margin-bottom: 16rpx;
-}
-
-.hint-icon {
-  font-size: 32rpx;
-  margin-right: 12rpx;
-  flex-shrink: 0;
-}
-
-.hint-text-wrapper {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
 }
 
 .hint-title {

@@ -1,95 +1,106 @@
 <!--pages/adopt/index.wxml-->
 <view class="container">
-    <!-- 头部装饰 -->
-    <view class="header-banner"></view>
+    <!-- 顶部品牌横幅 -->
+    <view class="brand-banner">
+        <view class="brand-content">
+            <text class="brand-title">滩羊定制领养</text>
+            <text class="brand-subtitle">源自宁夏盐池 生态散养 品质保证</text>
+        </view>
+    </view>
     
-    <!-- 筛选卡片 -->
+    <!-- 筛选卡片 - 悬浮感 -->
     <view class="filter-card">
-        <view class="card-title">
-            <text class="title-icon">🐑</text>
-            <text class="title-text">筛选条件</text>
+        <!-- 卡片标题 -->
+        <view class="card-header">
+            <text class="card-title">筛选您的专属滩羊</text>
         </view>
         
-        <!-- 性别选择 - Tag按钮 -->
-        <view class="filter-item">
-            <view class="filter-label">
-                <text class="label-icon">⚧️</text>
-                <text class="label-text">性别</text>
+        <!-- 性别选择 - 单选 -->
+        <view class="filter-section">
+            <view class="section-title">
+                <view class="title-icon gender-icon"></view>
+                <text>性别</text>
             </view>
-            <view class="tag-group">
-                <view class="tag-item {{selectedCategory === '雄性' ? 'tag-active' : ''}}" 
+            <view class="tag-row">
+                <view class="tag-item {{selectedGender === '雄性' ? 'tag-active' : ''}}" 
                       bindtap="selectGender" data-value="雄性">
-                    <text>雄性</text>
+                    <text class="tag-text">公羊</text>
                 </view>
-                <view class="tag-item {{selectedCategory === '雌性' ? 'tag-active' : ''}}" 
+                <view class="tag-item {{selectedGender === '雌性' ? 'tag-active' : ''}}" 
                       bindtap="selectGender" data-value="雌性">
-                    <text>雌性</text>
+                    <text class="tag-text">母羊</text>
                 </view>
             </view>
         </view>
         
-        <!-- 体重选择 - Tag标签 -->
-        <view class="filter-item">
-            <view class="filter-label">
-                <text class="label-icon">⚖️</text>
-                <text class="label-text">体重</text>
+        <!-- 体重选择 - 网格布局，多选 -->
+        <view class="filter-section">
+            <view class="section-title">
+                <view class="title-icon weight-icon"></view>
+                <text>体重</text>
             </view>
-            <view class="tag-group tag-group-wrap">
-                <view class="tag-item {{selectedWeight === item ? 'tag-active' : ''}}" 
-                      wx:for="{{weightOptions}}" wx:key="index"
-                      bindtap="selectWeight" data-value="{{item}}">
+            <view class="weight-grid">
+                <view class="weight-card {{selectedWeights[index] ? 'tag-active' : ''}}" 
+                      wx:for="{{weightOptions}}" wx:key="value"
+                      bindtap="toggleWeight" data-index="{{index}}">
+                    <text class="weight-value">{{item.label}}</text>
+                    <text class="weight-desc">{{item.desc}}</text>
+                </view>
+            </view>
+        </view>
+        
+        <!-- 体高选择 - 胶囊流式布局，多选 -->
+        <view class="filter-section">
+            <view class="section-title">
+                <view class="title-icon height-icon"></view>
+                <text>体高</text>
+            </view>
+            <view class="capsule-flow">
+                <view class="capsule {{selectedHeights[index] ? 'capsule-active' : ''}}" 
+                      wx:for="{{heightOptions}}" wx:key="*this"
+                      bindtap="toggleHeight" data-index="{{index}}">
                     <text>{{item}}</text>
                 </view>
             </view>
         </view>
         
-        <!-- 身高选择 - Tag标签 -->
-        <view class="filter-item">
-            <view class="filter-label">
-                <text class="label-icon">📏</text>
-                <text class="label-text">身高</text>
+        <!-- 体长选择 - 胶囊流式布局，多选 -->
+        <view class="filter-section">
+            <view class="section-title">
+                <view class="title-icon length-icon"></view>
+                <text>体长</text>
             </view>
-            <view class="tag-group tag-group-wrap">
-                <view class="tag-item {{selectedHeight === item ? 'tag-active' : ''}}" 
-                      wx:for="{{heightOptions}}" wx:key="index"
-                      bindtap="selectHeight" data-value="{{item}}">
+            <view class="capsule-flow">
+                <view class="capsule {{selectedLengths[index] ? 'capsule-active' : ''}}" 
+                      wx:for="{{lengthOptions}}" wx:key="*this"
+                      bindtap="toggleLength" data-index="{{index}}">
                     <text>{{item}}</text>
                 </view>
             </view>
         </view>
-        
-        <!-- 体长选择 - Tag标签 -->
-        <view class="filter-item">
-            <view class="filter-label">
-                <text class="label-icon">📐</text>
-                <text class="label-text">体长</text>
+    </view>
+    
+    <!-- 底部安全区域占位 -->
+    <view class="safe-area-placeholder"></view>
+    
+    <!-- 底部悬浮操作栏 -->
+    <view class="action-bar">
+        <view class="action-content">
+            <view class="reset-btn" bindtap="resetFilter">
+                <text>重置</text>
             </view>
-            <view class="tag-group tag-group-wrap">
-                <view class="tag-item {{selectedLength === item ? 'tag-active' : ''}}" 
-                      wx:for="{{lengthOptions}}" wx:key="index"
-                      bindtap="selectLength" data-value="{{item}}">
-                    <text>{{item}}</text>
-                </view>
+            <view class="confirm-btn" bindtap="searchSheep">
+                <text>查看 {{sheepCount}} 只符合条件的滩羊</text>
             </view>
         </view>
+        <view class="safe-area-bottom"></view>
     </view>
     
     <!-- 加载中提示 -->
-    <view class="loading-toast" wx:if="{{loading}}">
-        <view class="loading-content">
-            <view class="loading-icon">⏳</view>
-            <text class="loading-text">搜索中...</text>
-        </view>
-    </view>
-    
-    <!-- 底部固定按钮组 -->
-    <view class="action-buttons-fixed">
-        <view class="button-wrapper">
-            <button class="search-btn" bindtap="searchSheep" disabled="{{loading}}">
-                <text wx:if="{{loading}}">搜索中...</text>
-                <text wx:else>🔍 搜索</text>
-            </button>
-            <button class="reset-btn" bindtap="resetFilter">重置</button>
+    <view class="loading-mask" wx:if="{{loading}}">
+        <view class="loading-box">
+            <view class="loading-spinner"></view>
+            <text class="loading-text">正在寻找优质滩羊...</text>
         </view>
     </view>
 </view>

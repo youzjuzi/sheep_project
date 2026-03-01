@@ -1,17 +1,27 @@
 {% extends 'sheep_management/base.html' %}
 
+{% block page_title %}确认删除养殖户{% endblock %}
+
 {% block content %}
-<div class="card">
-    <h2>确认删除</h2>
-    <p style="margin: 20px 0;">确定要删除养殖户 {{ breeder.name }} ({{ breeder.phone }}) 吗？</p>
-    <p style="color: #e74c3c; margin-bottom: 20px;">此操作不可恢复！</p>
-    <form method="post">
+<div class="card" style="max-width: 680px;">
+    <h2 style="margin-bottom: 16px;">确认删除养殖户</h2>
+
+    <table>
+        <tr><th style="width:140px;">用户ID</th><td>{{ breeder.id }}</td></tr>
+        <tr><th>用户名</th><td>{{ breeder.username }}</td></tr>
+        <tr><th>昵称</th><td>{{ breeder.nickname|default:"未设置" }}</td></tr>
+        <tr><th>手机号</th><td>{{ breeder.mobile|default:"未设置" }}</td></tr>
+        <tr><th>旗下羊只</th><td>{{ breeder.sheep_list.count }} 只</td></tr>
+    </table>
+
+    <p style="color: #e74c3c; margin: 18px 0;">⚠ 删除后无法恢复，与该养殖户关联的数据也将受影响，请谨慎操作。</p>
+
+    <form method="post" style="display: flex; gap: 10px;">
         {% csrf_token %}
-        <div style="display: flex; gap: 10px;">
-            <button type="submit" class="btn btn-danger">确认删除</button>
-            <a href="{% url 'breeder_list' %}" class="btn" style="background: #95a5a6;">取消</a>
-        </div>
+        <button type="submit" class="btn btn-danger">确认删除</button>
+        <a href="{% url 'breeder_detail' breeder.pk %}" class="btn" style="background: #95a5a6;">取消</a>
     </form>
 </div>
 {% endblock %}
+
 

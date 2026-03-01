@@ -54,7 +54,10 @@
           <view class="message-content">
             <view class="message-bubble {{item.type}}">
               <text class="message-text">{{item.content}}</text>
-              <view class="message-time">{{item.time}}</view>
+              <view class="message-meta">
+                <text class="message-time">{{item.time}}</text>
+                <text class="message-model" wx:if="{{item.modelInfo}}">{{item.modelInfo}}</text>
+              </view>
             </view>
           </view>
         </view>

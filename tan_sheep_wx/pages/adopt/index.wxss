@@ -1,224 +1,417 @@
 /* pages/adopt/index.wxss */
+/* 高端生鲜电商风格 - 滩羊定制领养筛选页 */
+
+/* 页面容器 */
 .container {
     min-height: 100vh;
-    background-color: #F7F8FA;
-    padding-bottom: 40rpx;
+    background: linear-gradient(180deg, #E8F5E9 0%, #F7F8FA 30%);
 }
 
-/* 头部装饰 */
-.header-banner {
+/* 顶部品牌横幅 */
+.brand-banner {
     width: 100%;
-    height: 150rpx;
-    background: linear-gradient(135deg, #238E23 0%, #2BA02B 100%);
+    height: 200rpx;
+    background: linear-gradient(135deg, #238E23 0%, #2BA02B 50%, #34C759 100%);
     position: relative;
+    overflow: hidden;
 }
 
-/* 筛选卡片 */
+.brand-banner::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -20%;
+    width: 400rpx;
+    height: 400rpx;
+    background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, transparent 70%);
+    border-radius: 50%;
+}
+
+.brand-content {
+    position: relative;
+    z-index: 1;
+    padding: 50rpx 40rpx;
+}
+
+.brand-title {
+    display: block;
+    font-size: 44rpx;
+    font-weight: 700;
+    color: #FFFFFF;
+    letter-spacing: 2rpx;
+    margin-bottom: 12rpx;
+}
+
+.brand-subtitle {
+    display: block;
+    font-size: 24rpx;
+    color: rgba(255,255,255,0.9);
+    letter-spacing: 1rpx;
+}
+
+/* 筛选卡片 - 悬浮感 */
 .filter-card {
     background-color: #FFFFFF;
-    border-radius: 20rpx;
-    margin: -60rpx 30rpx 30rpx;
-    padding: 40rpx 30rpx 120rpx;
-    box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.08);
+    border-radius: 32rpx 32rpx 0 0;
+    margin-top: -40rpx;
+    padding: 40rpx 32rpx 180rpx;
     position: relative;
     z-index: 10;
+    box-shadow: 0 -8rpx 32rpx rgba(0, 0, 0, 0.06);
+}
+
+/* 卡片标题 - 去掉竖线装饰 */
+.card-header {
+    margin-bottom: 40rpx;
 }
 
 .card-title {
-    display: flex;
-    align-items: center;
-    margin-bottom: 40rpx;
-    padding-bottom: 30rpx;
-    border-bottom: 1rpx solid #F0F0F0;
-}
-
-.title-icon {
-    font-size: 36rpx;
-    margin-right: 12rpx;
-}
-
-.title-text {
-    font-size: 32rpx;
-    font-weight: bold;
+    font-size: 34rpx;
+    font-weight: 600;
     color: #333333;
 }
 
-/* 筛选项 */
-.filter-item {
-    margin-bottom: 35rpx;
+/* 筛选区块 */
+.filter-section {
+    margin-bottom: 36rpx;
 }
 
-.filter-item:last-child {
+.filter-section:last-child {
     margin-bottom: 0;
 }
 
-.filter-label {
+/* 区块标题 */
+.section-title {
     display: flex;
     align-items: center;
     margin-bottom: 20rpx;
 }
 
-.label-icon {
+.section-title text {
     font-size: 28rpx;
-    margin-right: 8rpx;
-}
-
-.label-text {
-    font-size: 28rpx;
-    color: #333333;
     font-weight: 500;
+    color: #333333;
 }
 
-/* Tag按钮组 */
-.tag-group {
+/* 图标样式 */
+.title-icon {
+    width: 36rpx;
+    height: 36rpx;
+    margin-right: 10rpx;
+    position: relative;
+}
+
+/* 性别图标 */
+.gender-icon::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 20rpx;
+    height: 20rpx;
+    border: 3rpx solid #07C160;
+    border-radius: 50%;
+}
+
+.gender-icon::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 8rpx;
+    height: 8rpx;
+    background: #07C160;
+    border-radius: 50%;
+}
+
+/* 体重图标 */
+.weight-icon::before {
+    content: '';
+    position: absolute;
+    top: 60%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 24rpx;
+    height: 16rpx;
+    border: 3rpx solid #07C160;
+    border-radius: 4rpx;
+    border-top: none;
+}
+
+.weight-icon::after {
+    content: '';
+    position: absolute;
+    top: 25%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 4rpx;
+    height: 12rpx;
+    background: #07C160;
+    border-radius: 2rpx;
+}
+
+/* 体高图标 - 双竖线 */
+.height-icon::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 30%;
+    transform: translate(-50%, -50%);
+    width: 3rpx;
+    height: 24rpx;
+    background: #07C160;
+    border-radius: 2rpx;
+}
+
+.height-icon::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 70%;
+    transform: translate(-50%, -50%);
+    width: 3rpx;
+    height: 24rpx;
+    background: #07C160;
+    border-radius: 2rpx;
+}
+
+/* 体长图标 - 水平双向箭头 */
+.length-icon::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 6rpx;
+    transform: translateY(-50%);
+    width: 0;
+    height: 0;
+    border-top: 5rpx solid transparent;
+    border-bottom: 5rpx solid transparent;
+    border-right: 8rpx solid #07C160;
+}
+
+.length-icon::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    right: 6rpx;
+    transform: translateY(-50%);
+    width: 0;
+    height: 0;
+    border-top: 5rpx solid transparent;
+    border-bottom: 5rpx solid transparent;
+    border-left: 8rpx solid #07C160;
+}
+
+/* 性别标签行 */
+.tag-row {
     display: flex;
     gap: 20rpx;
 }
 
-/* 可换行的标签组 */
-.tag-group-wrap {
-    flex-wrap: wrap;
-}
-
+/* 通用标签样式 */
 .tag-item {
     flex: 1;
-    height: 70rpx;
-    line-height: 70rpx;
-    text-align: center;
-    border-radius: 12rpx;
-    background-color: #F5F5F5;
-    border: 2rpx solid #E0E0E0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 80rpx;
+    background-color: #F5F6F8;
+    border-radius: 16rpx;
+    transition: all 0.25s ease;
+}
+
+.tag-text {
     font-size: 28rpx;
-    color: #999999;
-    transition: all 0.3s;
+    color: #666666;
 }
 
-/* 换行标签组中的标签项 - 一行3个 */
-.tag-group-wrap .tag-item {
-    flex: 0 0 30%;
-    min-width: 0;
-    margin-bottom: 20rpx;
-}
-
+/* 标签选中状态 */
 .tag-active {
-    background-color: #E8F9F0;
-    border-color: #07C160;
-    border-width: 2rpx;
+    background-color: #E6F5ED;
+    border: 2rpx solid #07C160;
+}
+
+.tag-active .tag-text,
+.tag-active .weight-value {
     color: #07C160;
     font-weight: 500;
 }
 
-/* Picker包装器 */
-.picker-wrapper {
+.tag-active .weight-desc {
+    color: rgba(7, 193, 96, 0.7);
+}
+
+/* 体重网格布局 - 一行两列 */
+.weight-grid {
     display: flex;
-    align-items: center;
+    flex-wrap: wrap;
     justify-content: space-between;
-    height: 70rpx;
-    padding: 0 24rpx;
-    background-color: #F5F5F5;
-    border-radius: 12rpx;
-    border: 2rpx solid #E0E0E0;
+    gap: 16rpx;
 }
 
-.picker-text {
+.weight-card {
+    width: 48%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20rpx 0;
+    background-color: #F5F6F8;
+    border-radius: 16rpx;
+    transition: all 0.25s ease;
+}
+
+.weight-value {
     font-size: 28rpx;
-    color: #333333;
-    flex: 1;
+    color: #666666;
+    margin-bottom: 4rpx;
 }
 
-.picker-placeholder {
+.weight-desc {
+    font-size: 22rpx;
     color: #999999;
 }
 
-.picker-arrow {
-    font-size: 36rpx;
-    color: #CCCCCC;
-    font-weight: 300;
-    margin-left: 20rpx;
+/* 胶囊流式布局 - 体高/体长 */
+.capsule-flow {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16rpx;
 }
 
-/* 底部固定按钮组 */
-.action-buttons-fixed {
+.capsule {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12rpx 28rpx;
+    background-color: #F5F6F8;
+    border-radius: 100rpx;
+    transition: all 0.25s ease;
+}
+
+.capsule text {
+    font-size: 26rpx;
+    color: #666666;
+}
+
+/* 胶囊选中状态 */
+.capsule-active {
+    background-color: #E6F5ED;
+    border: 2rpx solid #07C160;
+}
+
+.capsule-active text {
+    color: #07C160;
+    font-weight: 500;
+}
+
+/* 底部安全区域占位 */
+.safe-area-placeholder {
+    height: 180rpx;
+}
+
+/* 底部悬浮操作栏 */
+.action-bar {
     position: fixed;
     bottom: 0;
     left: 0;
     right: 0;
     background-color: #FFFFFF;
-    padding: 20rpx 30rpx;
-    padding-bottom: calc(20rpx + env(safe-area-inset-bottom));
-    box-shadow: 0 -4rpx 20rpx rgba(0, 0, 0, 0.08);
+    box-shadow: 0 -8rpx 40rpx rgba(0, 0, 0, 0.08);
     z-index: 100;
 }
 
-.button-wrapper {
+.action-content {
     display: flex;
+    align-items: center;
+    padding: 24rpx 32rpx;
     gap: 20rpx;
 }
 
-.search-btn {
-    flex: 2;
-    height: 88rpx;
-    line-height: 88rpx;
-    border-radius: 16rpx;
-    background: linear-gradient(135deg, #238E23 0%, #2BA02B 100%);
-    color: #FFFFFF;
-    font-size: 32rpx;
-    font-weight: 500;
-    border: none;
-    box-shadow: 0 4rpx 12rpx rgba(35, 142, 35, 0.3);
-}
-
-.search-btn[disabled] {
-    background: linear-gradient(135deg, #CCCCCC 0%, #BBBBBB 100%);
-    box-shadow: none;
-}
-
+/* 重置按钮 - 黄金比例 1:3 */
 .reset-btn {
     flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     height: 88rpx;
-    line-height: 88rpx;
+    background-color: #F5F6F8;
     border-radius: 16rpx;
-    background-color: #FFFFFF;
-    color: #666666;
+}
+
+.reset-btn text {
     font-size: 28rpx;
-    border: 2rpx solid #E0E0E0;
+    color: #999999;
 }
 
-/* 加载提示 */
-.loading-toast {
+/* 确认按钮 - 主操作 */
+.confirm-btn {
+    flex: 3;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 88rpx;
+    background: linear-gradient(135deg, #07C160 0%, #10B981 100%);
+    border-radius: 16rpx;
+    box-shadow: 0 8rpx 24rpx rgba(7, 193, 96, 0.35);
+}
+
+.confirm-btn text {
+    font-size: 30rpx;
+    color: #FFFFFF;
+    font-weight: 500;
+}
+
+.confirm-btn:active {
+    transform: scale(0.98);
+    box-shadow: 0 4rpx 12rpx rgba(7, 193, 96, 0.25);
+}
+
+/* iPhone底部安全区 */
+.safe-area-bottom {
+    height: constant(safe-area-inset-bottom);
+    height: env(safe-area-inset-bottom);
+}
+
+/* 加载中遮罩 */
+.loading-mask {
     position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    z-index: 200;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(255, 255, 255, 0.9);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
 }
 
-.loading-content {
+.loading-box {
     display: flex;
     flex-direction: column;
     align-items: center;
-    background-color: rgba(0, 0, 0, 0.7);
-    padding: 30rpx 50rpx;
-    border-radius: 12rpx;
 }
 
-.loading-content .loading-icon {
-    font-size: 60rpx;
-    margin-bottom: 10rpx;
-    animation: rotate 1s linear infinite;
+.loading-spinner {
+    width: 60rpx;
+    height: 60rpx;
+    border: 4rpx solid #F0F0F0;
+    border-top-color: #07C160;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
 }
 
-.loading-content .loading-text {
-    font-size: 28rpx;
-    color: #FFFFFF;
-}
-
-@keyframes rotate {
-    from {
-        transform: rotate(0deg);
-    }
+@keyframes spin {
     to {
         transform: rotate(360deg);
     }
 }
 
+.loading-text {
+    margin-top: 20rpx;
+    font-size: 28rpx;
+    color: #666666;
+}

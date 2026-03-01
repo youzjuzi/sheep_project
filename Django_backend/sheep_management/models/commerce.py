@@ -155,6 +155,7 @@ class Order(models.Model):
     STATUS_CHOICES = [
         ('pending', '待支付'),
         ('paid', '已支付/认养中'),
+        ('shipping', '已发货'),
         ('completed', '已完成'),
         ('cancelled', '已取消'),
     ]
@@ -163,6 +164,12 @@ class Order(models.Model):
     order_no = models.CharField(max_length=50, unique=True, verbose_name='订单编号')
     total_amount = models.DecimalField(max_digits=10, decimal_places=2, verbose_name='订单总金额')
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending', verbose_name='订单状态')
+
+    # 物流信息
+    logistics_company = models.CharField(max_length=100, null=True, blank=True, verbose_name='物流公司')
+    logistics_tracking_number = models.CharField(max_length=100, null=True, blank=True, verbose_name='物流单号')
+    shipping_date = models.DateTimeField(null=True, blank=True, verbose_name='发货日期')
+    delivery_date = models.DateTimeField(null=True, blank=True, verbose_name='送达日期')
 
     # 以后如果你要接微信支付，这里还可以加上 transaction_id(微信流水号)
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='创建时间')

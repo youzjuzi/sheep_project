@@ -1,44 +1,57 @@
 {% extends 'sheep_management/base.html' %}
 
+{% block page_title %}{{ title }}{% endblock %}
+
 {% block content %}
-<div class="card">
-    <h2>{{ title }}</h2>
-    <form method="post" style="margin-top: 20px;">
+<div class="card" style="max-width: 760px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h2>{{ title }}</h2>
+        <a href="{% url 'breeder_list' %}" class="btn" style="background: #95a5a6;">返回列表</a>
+    </div>
+
+    {% if messages %}
+    {% for message in messages %}
+    <div class="message {% if message.tags == 'error' %}error{% else %}success{% endif %}" style="margin-bottom:16px;">
+        {{ message }}
+    </div>
+    {% endfor %}
+    {% endif %}
+
+    <form method="post">
         {% csrf_token %}
+
         <div class="form-group">
-            <label>姓名 *</label>
-            <input type="text" name="name" required value="{% if breeder %}{{ breeder.name }}{% endif %}">
+            <label for="username">用户名 *</label>
+            <input id="username" type="text" name="username" required
+                   value="{% if breeder %}{{ breeder.username }}{% endif %}" placeholder="请输入用户名">
         </div>
+
         <div class="form-group">
-            <label>性别 *</label>
-            <select name="gender" required>
-                <option value="">请选择</option>
-                <option value="男" {% if breeder.gender == '男' %}selected{% endif %}>男</option>
-                <option value="女" {% if breeder.gender == '女' %}selected{% endif %}>女</option>
-            </select>
+            <label for="password">{% if is_create %}密码 *{% else %}新密码（留空则不修改）{% endif %}</label>
+            <input id="password" type="password" name="password" {% if is_create %}required{% endif %}
+                   placeholder="{% if is_create %}请输入密码{% else %}如需重置密码请填写{% endif %}">
         </div>
+
         <div class="form-group">
-            <label>联系电话 *</label>
-            <input type="text" name="phone" required value="{% if breeder %}{{ breeder.phone }}{% endif %}">
+            <label for="nickname">昵称</label>
+            <input id="nickname" type="text" name="nickname"
+                   value="{% if breeder %}{{ breeder.nickname|default:'' }}{% endif %}" placeholder="请输入昵称">
         </div>
+
         <div class="form-group">
-            <label>羊只总数 *</label>
-            <input type="number" name="sheep_count" required value="{% if breeder %}{{ breeder.sheep_count }}{% endif %}">
+            <label for="mobile">手机号</label>
+            <input id="mobile" type="text" name="mobile"
+                   value="{% if breeder %}{{ breeder.mobile|default:'' }}{% endif %}" placeholder="请输入手机号">
         </div>
-        <div class="form-group">
-            <label>羊只编号 *</label>
-            <input type="text" name="sheep_id" required value="{% if breeder %}{{ breeder.sheep_id }}{% endif %}">
+
+        <div class="form-group" style="display: flex; align-items: center; gap: 8px;">
+            <input id="is_verified" type="checkbox" name="is_verified" style="width: auto;"
+                   {% if breeder and breeder.is_verified %}checked{% endif %}>
+            <label for="is_verified" style="margin: 0;">审核通过（勾选即立即认证）</label>
         </div>
-        <div class="form-group">
-            <label>母羊数量 *</label>
-            <input type="number" name="female_count" required value="{% if breeder %}{{ breeder.female_count }}{% endif %}">
-        </div>
-        <div class="form-group">
-            <label>公羊数量 *</label>
-            <input type="number" name="male_count" required value="{% if breeder %}{{ breeder.male_count }}{% endif %}">
-        </div>
-        <div style="display: flex; gap: 10px;">
-            <button type="submit" class="btn">保存</button>
+
+        <div style="display: flex; gap: 10px; margin-top: 24px;">
+            <button type="submit" class="btn btn-success">保存</button>
             <a href="{% url 'breeder_list' %}" class="btn" style="background: #95a5a6;">取消</a>
         </div>
     </form>

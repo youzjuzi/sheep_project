@@ -2,7 +2,10 @@
 
 {% block content %}
 <div class="card">
-    <h2>用户列表</h2>
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+        <h2>用户列表</h2>
+        <a href="{% url 'user_create' %}" class="btn btn-success">+ 新增用户</a>
+    </div>
     
     <div class="search-box">
         <form method="get">
@@ -22,6 +25,7 @@
                 <th>性别</th>
                 <th>创建时间</th>
                 <th>最后登录</th>
+                <th>角色</th>
                 <th>操作</th>
             </tr>
         </thead>
@@ -35,14 +39,19 @@
                 <td>{{ user.mobile|default:"未设置" }}</td>
                 <td>{{ user.get_gender_display|default:"未知" }}</td>
                 <td>{{ user.created_at|date:"Y-m-d H:i" }}</td>
-                <td>{{ user.last_login_at|date:"Y-m-d H:i"|default:"从未登录" }}</td>
+                <td>{{ user.last_login|date:"Y-m-d H:i"|default:"从未登录" }}</td>
+                <td>{{ user.get_role_display }}</td>
                 <td>
                     <a href="{% url 'user_detail' user.pk %}" class="btn" style="padding: 5px 10px; font-size: 12px;">查看</a>
+                    <a href="{% url 'user_update' user.pk %}" class="btn" style="padding: 5px 10px; font-size: 12px; background: #f39c12;">编辑</a>
+                    {% if request.user.pk != user.pk %}
+                    <a href="{% url 'user_delete' user.pk %}" class="btn btn-danger" style="padding: 5px 10px; font-size: 12px;">删除</a>
+                    {% endif %}
                 </td>
             </tr>
             {% empty %}
             <tr>
-                <td colspan="9" style="text-align: center; padding: 40px;">暂无数据</td>
+                <td colspan="10" style="text-align: center; padding: 40px;">暂无数据</td>
             </tr>
             {% endfor %}
         </tbody>

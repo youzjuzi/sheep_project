@@ -1,27 +1,62 @@
 {% extends 'sheep_management/base.html' %}
 
+{% block page_title %}羊只档案{% endblock %}
+
 {% block content %}
 <div class="card">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-        <h2>羊只列表</h2>
-        <a href="{% url 'sheep_create' %}" class="btn">添加羊只</a>
+        <h2 style="margin: 0;">🐑 羊只档案管理</h2>
+        <a href="{% url 'sheep_create' %}" class="btn">➕ 添加羊只</a>
     </div>
     
-    <div class="search-box">
-        <form method="get">
-            <input type="text" name="search" placeholder="搜索ID或性别..." value="{{ search }}">
-            <button type="submit" class="btn">搜索</button>
+    <!-- 筛选区域 -->
+    <div class="filter-bar">
+        <form method="get" style="display: flex; gap: 15px; flex-wrap: wrap; align-items: center;">
+            <input type="text" name="search" placeholder="搜索ID或耳标号..." value="{{ search }}" style="width: 200px;">
+            
+            <select name="breed">
+                <option value="">全部品种</option>
+                {% for value, label in breed_choices %}
+                <option value="{{ value }}" {% if breed == value %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+            
+            <select name="health_status">
+                <option value="">全部健康状态</option>
+                {% for value, label in health_choices %}
+                <option value="{{ value }}" {% if health_status == value %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+            
+            <select name="gender">
+                <option value="">全部性别</option>
+                {% for value, label in gender_choices %}
+                <option value="{{ value }}" {% if gender == value|stringformat:"i" %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+            
+            <select name="batch_no">
+                <option value="">全部批次</option>
+                {% for batch in batch_list %}
+                <option value="{{ batch }}" {% if batch_no == batch %}selected{% endif %}>{{ batch }}</option>
+                {% endfor %}
+            </select>
+            
+            <button type="submit" class="btn">🔍 筛选</button>
+            <a href="{% url 'sheep_list' %}" class="btn" style="background: #95a5a6;">重置</a>
         </form>
     </div>
     
     <table>
         <thead>
             <tr>
-                <th>ID</th>
+                <th>编号</th>
+                <th>耳标号</th>
                 <th>性别</th>
+                <th>品种</th>
+                <th>健康状态</th>
                 <th>体重(kg)</th>
                 <th>身高(cm)</th>
-                <th>体长(cm)</th>
                 <th>操作</th>
             </tr>
         </thead>
@@ -29,23 +64,35 @@
             {% for sheep in sheep_list %}
             <tr>
                 <td>{{ sheep.id }}</td>
-                <td>{{ sheep.gender }}</td>
+                <td>{{ sheep.ear_tag|default:'-' }}</td>
+                <td>{{ sheep.get_gender_display }}</td>
+                <td>{{ sheep.breed }}</td>
+                <td>
+                    <span class="health-badge health-{% if sheep.health_status == '健康' %}healthy{% elif sheep.health_status == '良好' %}good{% elif sheep.health_status == '一般' %}normal{% elif sheep.health_status == '需关注' %}warning{% else %}danger{% endif %}">
+                        {{ sheep.health_status }}
+                    </span>
+                </td>
                 <td>{{ sheep.weight }}</td>
                 <td>{{ sheep.height }}</td>
-                <td>{{ sheep.length }}</td>
                 <td>
-                    <a href="{% url 'sheep_detail' sheep.pk %}" class="btn" style="padding: 5px 10px; font-size: 12px;">查看</a>
-                    <a href="{% url 'sheep_edit' sheep.pk %}" class="btn" style="padding: 5px 10px; font-size: 12px;">编辑</a>
-                    <a href="{% url 'sheep_delete' sheep.pk %}" class="btn btn-danger" style="padding: 5px 10px; font-size: 12px;">删除</a>
+                    <a href="{% url 'sheep_detail' sheep.pk %}" class="btn" style="padding: 5px 10px; font-size: 12px;">查看档案</a>
+                    <a href="{% url 'sheep_edit' sheep.pk %}" class="btn" style="padding: 5px 10px; font-size: 12px; background: #f39c12;">编辑</a>
                 </td>
             </tr>
             {% empty %}
             <tr>
-                <td colspan="6" style="text-align: center; padding: 40px;">暂无数据</td>
+                <td colspan="8" style="text-align: center; padding: 40px;">
+                    <div style="color: #999;">
+                        <div style="font-size: 48px; margin-bottom: 10px;">🐑</div>
+                        <div>暂无羊只数据</div>
+                        <div style="margin-top: 10px;">
+                            <a href="{% url 'sheep_create' %}" class="btn">添加第一只羊</a>
+                        </div>
+                    </div>
+                </td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
 </div>
 {% endblock %}
-

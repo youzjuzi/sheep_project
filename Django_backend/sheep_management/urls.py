@@ -4,8 +4,16 @@ from .api import auth_api  # 认证 API（已重构）
 from .api import user_api  # 用户 API
 from .api import sheep_api  # 羊只 API（已重构）
 from .api import commerce_api  # 商业模块 API（购物车）
+from . import views  # 复用旧视图中的工具接口
 
 urlpatterns = [
+    # ==========================
+    # 后台登录 / 登出
+    # ==========================
+    path('login/', views.login_view, name='login'),
+    path('logout/', views.logout_view, name='logout'),
+    path('register/', views.register_view, name='register'),
+
     # ==========================
     # 认证接口（已迁移到 api/auth_api.py）
     # ==========================
@@ -44,6 +52,10 @@ urlpatterns = [
     # 羊只API（已迁移到 api/sheep_api.py）
     path('api/sheep/search', sheep_api.api_search_sheep, name='api_search_sheep'),
     path('search_sheep', sheep_api.api_search_sheep, name='search_sheep_compat'),
+    
+    # 定制领养筛选API（支持多选）
+    path('api/sheep/count', sheep_api.api_count_sheep, name='api_count_sheep'),
+    path('api/sheep/search-multi', sheep_api.api_search_sheep_multi, name='api_search_sheep_multi'),
     path('api/sheep/<int:sheep_id>', sheep_api.api_get_sheep_by_id, name='api_get_sheep_by_id'),
     path('search_sheep_by_id', sheep_api.api_get_sheep_by_id, name='search_sheep_by_id_compat'),
 
@@ -69,6 +81,90 @@ urlpatterns = [
     # 溯源查询（已迁移到 api/sheep_api.py）
     path('api/sheep/trace', sheep_api.api_get_sheep_by_ear_tag, name='api_get_sheep_by_ear_tag'),
 
+    # 养殖户羊只管理接口
+    path('api/sheep/create', sheep_api.api_create_sheep, name='api_create_sheep'),
+    path('api/sheep/update/<int:sheep_id>', sheep_api.api_update_sheep, name='api_update_sheep'),
+    path('api/sheep/delete/<int:sheep_id>', sheep_api.api_delete_sheep, name='api_delete_sheep'),
+    path('api/sheep/breeder', sheep_api.api_get_breeder_sheep, name='api_get_breeder_sheep'),
+
+    # 健康检查
+    path('health', views.api_health, name='api_health'),
+
+    # 传统视图路由
+    path('sheep/', views.sheep_list, name='sheep_list'),
+    path('sheep/<int:pk>/', views.sheep_detail, name='sheep_detail'),
+    path('sheep/create/', views.sheep_create, name='sheep_create'),
+    path('sheep/<int:pk>/edit/', views.sheep_edit, name='sheep_edit'),
+    path('sheep/<int:pk>/delete/', views.sheep_delete, name='sheep_delete'),
+    # 羊只记录管理路由
+    path('sheep/<int:pk>/add-growth/', views.sheep_add_growth, name='sheep_add_growth'),
+    path('sheep/<int:pk>/growth/<int:record_id>/delete/', views.sheep_delete_growth, name='sheep_delete_growth'),
+    path('sheep/<int:pk>/add-feeding/', views.sheep_add_feeding, name='sheep_add_feeding'),
+    path('sheep/<int:pk>/feeding/<int:record_id>/delete/', views.sheep_delete_feeding, name='sheep_delete_feeding'),
+    path('sheep/<int:pk>/add-vaccination/', views.sheep_add_vaccination, name='sheep_add_vaccination'),
+    path('sheep/<int:pk>/vaccination/<int:record_id>/delete/', views.sheep_delete_vaccination, name='sheep_delete_vaccination'),
+    path('breeders/', views.breeder_list, name='breeder_list'),
+    path('breeders/<int:pk>/', views.breeder_detail, name='breeder_detail'),
+    path('breeders/create/', views.breeder_create, name='breeder_create'),
+    path('breeders/<int:pk>/edit/', views.breeder_edit, name='breeder_edit'),
+    path('breeders/<int:pk>/delete/', views.breeder_delete, name='breeder_delete'),
+    path('growth/', views.growth_record_list, name='growth_record_list'),
+    path('growth/create/', views.growth_record_create, name='growth_record_create'),
+    path('feeding/', views.feeding_record_list, name='feeding_record_list'),
+    path('feeding/create/', views.feeding_record_create, name='feeding_record_create'),
+    path('vaccination/', views.vaccination_list, name='vaccination_list'),
+    path('vaccination/create/', views.vaccination_create, name='vaccination_create'),
+    path('users/', views.user_list, name='user_list'),
+    path('users/<int:pk>/', views.user_detail, name='user_detail'),
+    path('users/create/', views.user_create, name='user_create'),
+    path('users/<int:pk>/edit/', views.user_update, name='user_update'),
+    path('users/<int:pk>/delete/', views.user_delete, name='user_delete'),
+    # 订单管理路由
+    path('orders/', views.order_list, name='order_list'),
+    path('orders/<int:pk>/', views.order_detail, name='order_detail'),
+    path('orders/<int:pk>/update-status/', views.order_update_status, name='order_update_status'),
+    
+    # 养殖户个人中心路由
+    path('breeder/dashboard/', views.breeder_dashboard, name='breeder_dashboard'),
+    path('breeder/profile/', views.breeder_profile, name='breeder_profile'),
+    
+    # 环境预警路由
+    path('alerts/<int:pk>/resolve/', views.resolve_alert, name='resolve_alert'),
+    
+    # 智慧牧场路由
+    path('smart-farm/', views.smart_farm, name='smart_farm'),
+
+    # 优惠券管理路由（Web端）
+    path('coupons/', views.coupon_list, name='coupon_list'),
+    path('coupons/create/', views.coupon_create, name='coupon_create'),
+    path('coupons/<int:pk>/edit/', views.coupon_edit, name='coupon_edit'),
+    path('coupons/<int:pk>/delete/', views.coupon_delete, name='coupon_delete'),
+    path('coupons/<int:pk>/', views.coupon_detail, name='coupon_detail'),
+    
+    # ==========================
+    # 权限管理路由（仅管理员）
+    # ==========================
+    # 养殖户审核
+    path('permissions/breeder-audit/', views.breeder_audit_list, name='breeder_audit_list'),
+    path('permissions/breeder-audit/<int:pk>/', views.breeder_audit_detail, name='breeder_audit_detail'),
+    path('permissions/breeder-audit/<int:pk>/approve/', views.breeder_approve, name='breeder_approve'),
+    path('permissions/breeder-audit/<int:pk>/reject/', views.breeder_reject, name='breeder_reject'),
+    
+    # 用户角色管理
+    path('permissions/roles/', views.role_user_list, name='role_user_list'),
+    path('permissions/roles/<int:pk>/edit/', views.role_user_edit, name='role_user_edit'),
+    
+    # 权限概览
+    path('permissions/overview/', views.permission_overview, name='permission_overview'),
+    
+    # ==========================
+    # 优惠活动/优惠券接口
+    # ==========================
+    path('api/promotions/activities', views.api_promotion_activities, name='api_promotion_activities'),
+    path('api/promotions/activities/<int:activity_id>', views.api_promotion_activity_detail, name='api_promotion_activity_detail'),
+    path('api/promotions/coupons', views.api_coupons, name='api_coupons'),
+    path('api/promotions/coupons/claim', views.api_claim_coupon, name='api_claim_coupon'),
+
     # ==========================
     # 购物车接口（api/commerce_api.py）
     # ==========================
@@ -78,4 +174,5 @@ urlpatterns = [
     path('api/my/sheep', commerce_api.api_my_sheep, name='api_my_sheep'),
     path('api/sheep/<int:sheep_id>/status', commerce_api.api_sheep_status, name='api_sheep_status'),
     path('api/orders', commerce_api.api_order_history, name='api_order_history'),
-]
+    path('api/breeder/orders', commerce_api.api_breeder_orders, name='api_breeder_orders'),
+    path('api/breeder/orders/<int:order_id>/status', commerce_api.api_update_order_status, name='api_update_order_status')]

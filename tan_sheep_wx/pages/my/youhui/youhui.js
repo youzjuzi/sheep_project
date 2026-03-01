@@ -1,30 +1,23 @@
 // pages/my/youhui/youhui.js
-const API = require('../../utils/api.js');
-const AUTH = require('../../utils/auth.js');
+const API = require('../../../utils/api.js');
 
 Page({
     data: {
-        coupons: [],  // 用户已领取的优惠券列表
-        unusedCoupons: [],  // 未使用的优惠券
-        usedCoupons: [],  // 已使用的优惠券
-        expiredCoupons: [],  // 已过期的优惠券
-        currentCoupons: [],  // 当前显示的优惠券
+        coupons: [],
+        unusedCoupons: [],
+        usedCoupons: [],
+        expiredCoupons: [],
+        currentCoupons: [],
         loading: false,
-        userInfo: null,
-        activeTab: 'unused',  // unused: 未使用, used: 已使用, expired: 已过期
+        activeTab: 'unused',
     },
 
     onLoad(options) {
-        this.loadUserInfo();
+        this.loadUserCoupons();
     },
 
     onShow() {
-        // 每次显示页面时刷新数据
-        if (this.data.userInfo && this.data.userInfo.uid) {
-            this.loadUserCoupons();
-        } else {
-            this.loadUserInfo();
-        }
+        this.loadUserCoupons();
     },
 
     onPullDownRefresh() {
@@ -33,40 +26,27 @@ Page({
         });
     },
 
-    // 加载用户信息
-    loadUserInfo() {
-        const userInfo = AUTH.getUserInfo();
-        if (userInfo && userInfo.uid) {
-            this.setData({ userInfo });
-            // 加载用户优惠券
-            this.loadUserCoupons();
-        } else {
+    // 加载用户优惠券
+    loadUserCoupons() {
+        var token = wx.getStorageSync('token');
+        if (!token) {
             wx.showModal({
                 title: '提示',
                 content: '请先登录',
-                success: (res) => {
+                success: function (res) {
                     if (res.confirm) {
-                        wx.navigateTo({
-                            url: '/pages/login/index'
-                        });
+                        wx.navigateTo({ url: '/pages/login/index' });
                     } else {
                         wx.navigateBack();
                     }
                 }
             });
-        }
-    },
-
-    // 加载用户优惠券
-    loadUserCoupons() {
-        const userInfo = this.data.userInfo;
-        if (!userInfo || !userInfo.uid) {
             return Promise.resolve();
         }
 
         this.setData({ loading: true });
 
-        return API.request(`/api/promotions/coupons?user_id=${userInfo.uid}`, 'GET')
+        return API.getUserCoupons(token)
             .then(res => {
                 console.log('用户优惠券数据:', res);
                 if (res.code === 0 && res.data) {

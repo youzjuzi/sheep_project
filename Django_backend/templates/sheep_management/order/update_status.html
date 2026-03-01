@@ -1,0 +1,51 @@
+{% extends 'sheep_management/base.html' %}
+
+{% block content %}
+<div class="card">
+    <h2>更新订单状态</h2>
+    
+    <form method="post" style="margin-top: 20px;">
+        {% csrf_token %}
+        
+        <div class="form-group">
+            <label for="status">订单状态</label>
+            <select name="status" id="status" required>
+                <option value="pending" {% if order.status == 'pending' %}selected{% endif %}>待支付</option>
+                <option value="paid" {% if order.status == 'paid' %}selected{% endif %}>已支付/认养中</option>
+                <option value="shipping" {% if order.status == 'shipping' %}selected{% endif %}>已发货</option>
+                <option value="completed" {% if order.status == 'completed' %}selected{% endif %}>已完成</option>
+                <option value="cancelled" {% if order.status == 'cancelled' %}selected{% endif %}>已取消</option>
+            </select>
+        </div>
+        
+        <div class="form-group" id="logistics-info" style="{% if order.status != 'shipping' %}display: none;{% endif %}">
+            <h4>物流信息</h4>
+            <div class="form-group">
+                <label for="logistics_company">物流公司</label>
+                <input type="text" name="logistics_company" id="logistics_company" value="{{ order.logistics_company }}" placeholder="请输入物流公司名称">
+            </div>
+            <div class="form-group">
+                <label for="logistics_tracking_number">物流单号</label>
+                <input type="text" name="logistics_tracking_number" id="logistics_tracking_number" value="{{ order.logistics_tracking_number }}" placeholder="请输入物流单号">
+            </div>
+        </div>
+        
+        <div style="margin-top: 30px;">
+            <button type="submit" class="btn btn-success">保存更新</button>
+            <a href="{% url 'order_detail' order.pk %}" class="btn" style="margin-left: 10px;">取消</a>
+        </div>
+    </form>
+</div>
+
+<script>
+    // 当状态选择为shipping时显示物流信息
+    document.getElementById('status').addEventListener('change', function() {
+        const logisticsInfo = document.getElementById('logistics-info');
+        if (this.value === 'shipping') {
+            logisticsInfo.style.display = 'block';
+        } else {
+            logisticsInfo.style.display = 'none';
+        }
+    });
+</script>
+{% endblock %}

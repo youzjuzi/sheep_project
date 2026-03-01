@@ -1,18 +1,16 @@
-// pages/feature4/feature4.js
+// pages/promotion/index.js
 const API = require('../../utils/api.js');
-const AUTH = require('../../utils/auth.js');
 
 Page({
     data: {
-        activities: [],  // 优惠活动列表
-        coupons: [],     // 可领取的优惠券列表
-        activeTab: 'activities',  // 当前激活的标签：activities(活动) 或 coupons(优惠券)
+        activities: [],
+        coupons: [],
+        activeTab: 'activities',
         loading: false,
-        userInfo: null,  // 用户信息
+        userInfo: null,
     },
 
     onLoad(options) {
-        this.loadUserInfo();
         this.loadActivities();
         this.loadCoupons();
     },
@@ -24,24 +22,15 @@ Page({
     },
 
     onPullDownRefresh() {
-        this.loadActivities();
-        this.loadCoupons().finally(() => {
+        Promise.all([this.loadActivities(), this.loadCoupons()]).finally(() => {
             wx.stopPullDownRefresh();
         });
-    },
-
-    // 加载用户信息
-    loadUserInfo() {
-        const userInfo = AUTH.getUserInfo();
-        if (userInfo) {
-            this.setData({ userInfo });
-        }
     },
 
     // 加载优惠活动列表
     loadActivities() {
         this.setData({ loading: true });
-        API.request('/api/promotions/activities', 'GET')
+        return API.getPromotionActivities()
             .then(res => {
                 console.log('优惠活动数据:', res);
                 if (res.code === 0 && res.data) {
@@ -78,7 +67,7 @@ Page({
 
     // 加载优惠券列表
     loadCoupons() {
-        return API.request('/api/promotions/coupons', 'GET')
+        return API.getAvailableCoupons()
             .then(res => {
                 console.log('优惠券数据:', res);
                 if (res.code === 0 && res.data) {
@@ -137,22 +126,18 @@ Page({
     claimCoupon(e) {
         const couponId = e.currentTarget.dataset.id;
         const coupon = this.data.coupons.find(c => c.id === couponId);
-        
-        if (!coupon) {
-            return;
-        }
+        if (!coupon) return;
 
         // 检查用户是否登录
-        const userInfo = AUTH.getUserInfo();
-        if (!userInfo || !userInfo.uid) {
+        const token = wx.getStorageSync('token');
+        if (!token) {
             wx.showModal({
                 title: '提示',
-                content: '请先登录',
+                content: '请先登录后领取优惠券',
+                confirmText: '去登录',
                 success: (res) => {
                     if (res.confirm) {
-                        wx.navigateTo({
-                            url: '/pages/login/index'
-                        });
+                        wx.navigateTo({ url: '/pages/login/index' });
                     }
                 }
             });
@@ -161,10 +146,7 @@ Page({
 
         wx.showLoading({ title: '领取中...', mask: true });
 
-        API.request('/api/promotions/coupons/claim', 'POST', {
-            user_id: userInfo.uid,
-            coupon_id: couponId
-        })
+        API.claimCoupon(token, couponId)
             .then(res => {
                 wx.hideLoading();
                 console.log('领取优惠券响应:', res);
@@ -175,8 +157,6 @@ Page({
                     });
                     // 刷新优惠券列表
                     this.loadCoupons();
-                    // 通知优惠券页面更新
-                    this.notifyCouponPageUpdate();
                 } else {
                     wx.showToast({
                         title: res.msg || '领取失败',
@@ -194,38 +174,6 @@ Page({
                     duration: 2000
                 });
             });
-    },
-
-    // 通知优惠券页面更新
-    notifyCouponPageUpdate() {
-        try {
-            // 获取页面栈
-            const pages = getCurrentPages();
-            // 查找优惠券页面（youhui页面）
-            const couponPage = pages.find(page => {
-                const route = page.route || '';
-                return route.includes('youhui') || route.includes('my/youhui');
-            });
-            
-            // 如果找到了优惠券页面，调用其刷新方法
-            if (couponPage && typeof couponPage.loadUserCoupons === 'function') {
-                console.log('通知优惠券页面更新');
-                couponPage.loadUserCoupons();
-            }
-        } catch (error) {
-            console.error('通知优惠券页面更新失败:', error);
-        }
-    },
-
-    // 格式化时间
-    formatTime(timeStr) {
-        if (!timeStr) return '';
-        const date = new Date(timeStr);
-        const month = (date.getMonth() + 1).toString().padStart(2, '0');
-        const day = date.getDate().toString().padStart(2, '0');
-        const hours = date.getHours().toString().padStart(2, '0');
-        const minutes = date.getMinutes().toString().padStart(2, '0');
-        return `${month}-${day} ${hours}:${minutes}`;
     },
 
     // 计算剩余时间

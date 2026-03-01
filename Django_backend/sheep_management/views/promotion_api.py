@@ -135,19 +135,28 @@ def api_coupons(request):
     """
     try:
         user_id = request.GET.get('user_id', '').strip()
-        
-        if user_id:
-            # 返回用户已领取的优惠券
+        token = request.GET.get('token', '').strip()
+
+        # 优先通过token获取用户
+        resolved_user = None
+        if token:
+            payload = verify_token(token)
+            if payload:
+                try:
+                    resolved_user = User.objects.get(pk=payload.get('user_id'))
+                    user_id = str(resolved_user.id)
+                except User.DoesNotExist:
+                    pass
+
+        if not resolved_user and user_id:
             try:
-                user = User.objects.get(pk=user_id)
+                resolved_user = User.objects.get(pk=user_id)
             except User.DoesNotExist:
-                return JsonResponse({
-                    'code': 404,
-                    'msg': '用户不存在',
-                    'data': None
-                }, status=404)
-            
-            user_coupons = UserCoupon.objects.filter(user=user).select_related('coupon')
+                pass
+        
+        if resolved_user:
+            # 返回用户已领取的优惠券
+            user_coupons = UserCoupon.objects.filter(user=resolved_user).select_related('coupon')
             result = []
             for uc in user_coupons:
                 coupon = uc.coupon
@@ -235,30 +244,47 @@ def api_claim_coupon(request):
     POST /api/promotions/coupons/claim
     请求体：
         {
-            "user_id": 1,
+            "token": "xxx",    // JWT token（优先）
+            "user_id": 1,      // 或直接传user_id
             "coupon_id": 1
         }
     """
     try:
         data = json.loads(request.body)
-        user_id = data.get('user_id')
         coupon_id = data.get('coupon_id')
-        
-        if not user_id or not coupon_id:
+        token = data.get('token', '')
+        user_id = data.get('user_id')
+
+        if not coupon_id:
             return JsonResponse({
                 'code': 400,
-                'msg': '用户ID和优惠券ID不能为空',
+                'msg': '优惠券ID不能为空',
                 'data': None
             }, status=400)
-        
-        try:
-            user = User.objects.get(pk=user_id)
-        except User.DoesNotExist:
+
+        # 优先通过token获取用户
+        user = None
+        if token:
+            payload = verify_token(token)
+            if payload:
+                try:
+                    user = User.objects.get(pk=payload.get('user_id'))
+                except User.DoesNotExist:
+                    pass
+
+        # 回退到user_id
+        if not user and user_id:
+            try:
+                user = User.objects.get(pk=user_id)
+            except User.DoesNotExist:
+                pass
+
+        if not user:
             return JsonResponse({
-                'code': 404,
-                'msg': '用户不存在',
+                'code': 401,
+                'msg': '用户未登录或不存在',
                 'data': None
-            }, status=404)
+            }, status=401)
         
         try:
             coupon = Coupon.objects.get(pk=coupon_id)

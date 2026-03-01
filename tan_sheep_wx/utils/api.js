@@ -278,6 +278,41 @@ function getOrderHistory(token) {
   return request('/api/orders?token=' + token, 'GET')
 }
 
+/**
+ * 获取优惠活动列表
+ */
+function getPromotionActivities(status) {
+  var url = '/api/promotions/activities'
+  if (status) {
+    url += '?status=' + status
+  }
+  return request(url, 'GET')
+}
+
+/**
+ * 获取可领取的优惠券列表
+ */
+function getAvailableCoupons() {
+  return request('/api/promotions/coupons', 'GET')
+}
+
+/**
+ * 获取用户已领取的优惠券
+ */
+function getUserCoupons(token) {
+  return request('/api/promotions/coupons?token=' + token, 'GET')
+}
+
+/**
+ * 领取优惠券
+ */
+function claimCoupon(token, couponId) {
+  return request('/api/promotions/coupons/claim', 'POST', {
+    token: token,
+    coupon_id: couponId
+  })
+}
+
 module.exports = {
   request,
   login,
@@ -298,5 +333,9 @@ module.exports = {
   checkout,
   getMySheep,
   getOrderHistory,
+  getPromotionActivities,
+  getAvailableCoupons,
+  getUserCoupons,
+  claimCoupon,
   API_BASE_URL
 }

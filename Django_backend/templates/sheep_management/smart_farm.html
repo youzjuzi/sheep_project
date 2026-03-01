@@ -1,0 +1,377 @@
+{% extends 'sheep_management/base.html' %}
+
+{% block title %}视频监控 - 羊只管理系统{% endblock %}
+{% block page_title %}视频监控中心{% endblock %}
+
+{% block content %}
+<!-- 视频监控区 -->
+<div class="card">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h3 style="margin: 0;">📹 实时监控画面</h3>
+        <div style="display: flex; gap: 10px;">
+            <button class="btn" onclick="refreshAllVideos()">🔄 全部刷新</button>
+            <button class="btn" style="background: #27ae60;" onclick="startAllRecord()">⏺️ 开始全部录像</button>
+        </div>
+    </div>
+    
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(450px, 1fr)); gap: 20px;">
+        <!-- 监控画面1 -->
+        <div class="video-container">
+            <div class="video-header">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <span class="video-status live">● 直播中</span>
+                    <span>1号羊圈 - 北区</span>
+                </div>
+                <span style="font-size: 12px; opacity: 0.8;">CAM-001</span>
+            </div>
+            <div class="video-placeholder" id="video1">
+                <div class="video-icon">📹</div>
+                <div class="video-text">监控画面加载中...</div>
+                <div class="video-hint">点击下方的播放器可接入RTMP/HLS视频流</div>
+            </div>
+            <div class="video-controls">
+                <button class="video-btn" onclick="refreshVideo(1)">🔄 刷新</button>
+                <button class="video-btn" onclick="fullscreenVideo(1)">⛶ 全屏</button>
+                <button class="video-btn record" id="recordBtn1" onclick="toggleRecord(1)">⏺️ 录像</button>
+                <button class="video-btn" onclick="snapshot(1)">📷 截图</button>
+            </div>
+        </div>
+        
+        <!-- 监控画面2 -->
+        <div class="video-container">
+            <div class="video-header">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <span class="video-status live">● 直播中</span>
+                    <span>2号羊圈 - 南区</span>
+                </div>
+                <span style="font-size: 12px; opacity: 0.8;">CAM-002</span>
+            </div>
+            <div class="video-placeholder" id="video2">
+                <div class="video-icon">📹</div>
+                <div class="video-text">监控画面加载中...</div>
+                <div class="video-hint">点击下方的播放器可接入RTMP/HLS视频流</div>
+            </div>
+            <div class="video-controls">
+                <button class="video-btn" onclick="refreshVideo(2)">🔄 刷新</button>
+                <button class="video-btn" onclick="fullscreenVideo(2)">⛶ 全屏</button>
+                <button class="video-btn record" id="recordBtn2" onclick="toggleRecord(2)">⏺️ 录像</button>
+                <button class="video-btn" onclick="snapshot(2)">📷 截图</button>
+            </div>
+        </div>
+        
+        <!-- 监控画面3 -->
+        <div class="video-container">
+            <div class="video-header">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <span class="video-status offline">○ 离线</span>
+                    <span>饲料仓库</span>
+                </div>
+                <span style="font-size: 12px; opacity: 0.8;">CAM-003</span>
+            </div>
+            <div class="video-placeholder offline" id="video3">
+                <div class="video-icon">📹</div>
+                <div class="video-text">设备离线</div>
+                <div class="video-hint">请检查摄像头网络连接</div>
+            </div>
+            <div class="video-controls">
+                <button class="video-btn" onclick="refreshVideo(3)">🔄 刷新</button>
+                <button class="video-btn" disabled>⛶ 全屏</button>
+                <button class="video-btn" disabled>⏺️ 录像</button>
+                <button class="video-btn" disabled>📷 截图</button>
+            </div>
+        </div>
+        
+        <!-- 监控画面4 -->
+        <div class="video-container">
+            <div class="video-header">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <span class="video-status live">● 直播中</span>
+                    <span>出入口大门</span>
+                </div>
+                <span style="font-size: 12px; opacity: 0.8;">CAM-004</span>
+            </div>
+            <div class="video-placeholder" id="video4">
+                <div class="video-icon">📹</div>
+                <div class="video-text">监控画面加载中...</div>
+                <div class="video-hint">点击下方的播放器可接入RTMP/HLS视频流</div>
+            </div>
+            <div class="video-controls">
+                <button class="video-btn" onclick="refreshVideo(4)">🔄 刷新</button>
+                <button class="video-btn" onclick="fullscreenVideo(4)">⛶ 全屏</button>
+                <button class="video-btn record" id="recordBtn4" onclick="toggleRecord(4)">⏺️ 录像</button>
+                <button class="video-btn" onclick="snapshot(4)">📷 截图</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 设备列表 -->
+<div class="card">
+    <h3 style="margin-top: 0;">📋 监控设备列表</h3>
+    <table style="margin-top: 15px;">
+        <thead>
+            <tr>
+                <th>设备编号</th>
+                <th>设备名称</th>
+                <th>位置</th>
+                <th>IP地址</th>
+                <th>状态</th>
+                <th>运行时长</th>
+                <th>操作</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>CAM-001</td>
+                <td>高清摄像头 #1</td>
+                <td>1号羊圈 - 北区</td>
+                <td>192.168.1.101</td>
+                <td><span class="device-status online">● 在线</span></td>
+                <td>15天 3小时</td>
+                <td>
+                    <button class="btn" style="padding: 5px 10px; font-size: 12px;" onclick="viewDevice('CAM-001')">查看</button>
+                </td>
+            </tr>
+            <tr>
+                <td>CAM-002</td>
+                <td>高清摄像头 #2</td>
+                <td>2号羊圈 - 南区</td>
+                <td>192.168.1.102</td>
+                <td><span class="device-status online">● 在线</span></td>
+                <td>15天 3小时</td>
+                <td>
+                    <button class="btn" style="padding: 5px 10px; font-size: 12px;" onclick="viewDevice('CAM-002')">查看</button>
+                </td>
+            </tr>
+            <tr>
+                <td>CAM-003</td>
+                <td>红外摄像头 #3</td>
+                <td>饲料仓库</td>
+                <td>192.168.1.103</td>
+                <td><span class="device-status offline">● 离线</span></td>
+                <td>-</td>
+                <td>
+                    <button class="btn" style="padding: 5px 10px; font-size: 12px; background: #e74c3c;" onclick="reconnectDevice('CAM-003')">重连</button>
+                </td>
+            </tr>
+            <tr>
+                <td>CAM-004</td>
+                <td>高清摄像头 #4</td>
+                <td>出入口大门</td>
+                <td>192.168.1.104</td>
+                <td><span class="device-status online">● 在线</span></td>
+                <td>10天 8小时</td>
+                <td>
+                    <button class="btn" style="padding: 5px 10px; font-size: 12px;" onclick="viewDevice('CAM-004')">查看</button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<!-- 使用说明 -->
+<div class="card" style="background: #e3f2fd; border-left: 4px solid #2196f3;">
+    <h4 style="margin-top: 0; color: #1976d2;">💡 使用说明</h4>
+    <ul style="margin: 10px 0; padding-left: 20px; color: #555;">
+        <li>本页面为视频监控中心，支持接入RTMP/HLS视频流</li>
+        <li>点击"全屏"按钮可放大查看单个监控画面</li>
+        <li>点击"录像"按钮可录制当前画面保存到本地</li>
+        <li>点击"截图"按钮可截取当前画面</li>
+        <li>离线设备可点击"重连"按钮尝试重新连接</li>
+    </ul>
+</div>
+
+<style>
+.video-container {
+    background: #1a1a2e;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+}
+.video-header {
+    background: #16213e;
+    padding: 12px 15px;
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 14px;
+}
+.video-status {
+    font-size: 12px;
+    font-weight: 500;
+}
+.video-status.live {
+    color: #4ade80;
+}
+.video-status.offline {
+    color: #ef4444;
+}
+.video-placeholder {
+    aspect-ratio: 16/9;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: #666;
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    min-height: 250px;
+}
+.video-placeholder.offline {
+    background: #0f0f1a;
+}
+.video-icon {
+    font-size: 48px;
+    margin-bottom: 10px;
+    opacity: 0.5;
+}
+.video-text {
+    font-size: 16px;
+    margin-bottom: 5px;
+    color: #999;
+}
+.video-hint {
+    font-size: 12px;
+    opacity: 0.6;
+    color: #777;
+}
+.video-controls {
+    display: flex;
+    gap: 8px;
+    padding: 12px 15px;
+    background: #16213e;
+}
+.video-btn {
+    flex: 1;
+    padding: 8px 10px;
+    background: rgba(255,255,255,0.1);
+    border: none;
+    border-radius: 6px;
+    color: white;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+.video-btn:hover:not(:disabled) {
+    background: rgba(255,255,255,0.2);
+}
+.video-btn:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+.video-btn.record {
+    background: rgba(239, 68, 68, 0.2);
+    color: #ef4444;
+}
+.video-btn.record:hover {
+    background: rgba(239, 68, 68, 0.3);
+}
+.video-btn.recording {
+    background: #ef4444;
+    color: white;
+    animation: pulse 1.5s infinite;
+}
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+}
+.device-status {
+    font-size: 12px;
+    font-weight: 500;
+}
+.device-status.online {
+    color: #27ae60;
+}
+.device-status.offline {
+    color: #e74c3c;
+}
+</style>
+
+<script>
+// 录像状态
+const recordingStatus = {};
+
+// 刷新单个视频
+function refreshVideo(id) {
+    const videoEl = document.getElementById('video' + id);
+    videoEl.innerHTML = `
+        <div class="video-icon">🔄</div>
+        <div class="video-text">正在刷新...</div>
+    `;
+    
+    setTimeout(() => {
+        videoEl.innerHTML = `
+            <div class="video-icon">📹</div>
+            <div class="video-text">监控画面加载中...</div>
+            <div class="video-hint">点击下方的播放器可接入RTMP/HLS视频流</div>
+        `;
+    }, 1000);
+}
+
+// 刷新全部视频
+function refreshAllVideos() {
+    for (let i = 1; i <= 4; i++) {
+        refreshVideo(i);
+    }
+}
+
+// 全屏查看
+function fullscreenVideo(id) {
+    const videoEl = document.getElementById('video' + id);
+    if (videoEl.requestFullscreen) {
+        videoEl.requestFullscreen();
+    } else if (videoEl.webkitRequestFullscreen) {
+        videoEl.webkitRequestFullscreen();
+    } else {
+        alert('正在全屏查看监控画面 ' + id);
+    }
+}
+
+// 切换录像
+function toggleRecord(id) {
+    const btn = document.getElementById('recordBtn' + id);
+    const isRecording = recordingStatus[id];
+    
+    if (!isRecording) {
+        recordingStatus[id] = true;
+        btn.classList.add('recording');
+        btn.textContent = '⏹️ 停止';
+        alert('开始录制监控画面 ' + id);
+    } else {
+        recordingStatus[id] = false;
+        btn.classList.remove('recording');
+        btn.textContent = '⏺️ 录像';
+        alert('已停止录制监控画面 ' + id + '，视频已保存');
+    }
+}
+
+// 开始全部录像
+function startAllRecord() {
+    for (let i = 1; i <= 4; i++) {
+        const btn = document.getElementById('recordBtn' + i);
+        if (btn && !btn.disabled && !recordingStatus[i]) {
+            toggleRecord(i);
+        }
+    }
+}
+
+// 截图
+function snapshot(id) {
+    alert('已截取监控画面 ' + id + ' 的截图，图片已保存到相册');
+}
+
+// 查看设备详情
+function viewDevice(deviceId) {
+    alert('查看设备 ' + deviceId + ' 的详细信息');
+}
+
+// 重连设备
+function reconnectDevice(deviceId) {
+    alert('正在尝试重新连接设备 ' + deviceId + '...');
+    setTimeout(() => {
+        alert('设备 ' + deviceId + ' 重连成功！');
+        location.reload();
+    }, 2000);
+}
+</script>
+{% endblock %}

@@ -1,42 +1,419 @@
 {% extends 'sheep_management/base.html' %}
 
+{% block page_title %}工作台{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* ── 通用首页样式 ── */
+    .dash{padding:24px;}
+    .welcome{border-radius:14px;padding:28px 32px;margin-bottom:24px;color:#fff;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;}
+    .welcome h2{margin:0;font-size:22px;font-weight:700;}
+    .welcome p{margin:6px 0 0;opacity:.85;font-size:14px;}
+    .kpi-grid{display:grid;gap:16px;margin-bottom:24px;}
+    .kpi{background:#fff;border-radius:12px;padding:20px 18px;box-shadow:0 1px 8px rgba(0,0,0,.06);border-left:4px solid #ccc;transition:box-shadow .2s,transform .15s;text-decoration:none;display:block;}
+    .kpi:hover{box-shadow:0 6px 20px rgba(0,0,0,.10);transform:translateY(-2px);}
+    .kpi .num{font-size:32px;font-weight:700;line-height:1.1;}
+    .kpi .label{font-size:13px;color:#999;margin-bottom:8px;}
+    .kpi .hint{font-size:12px;color:#bbb;margin-top:6px;}
+    .kpi .hint .warn{color:#f39c12;font-weight:600;}
+    .kpi .hint .danger{color:#e74c3c;font-weight:600;}
+    .section-card{background:#fff;border-radius:12px;padding:20px;box-shadow:0 1px 8px rgba(0,0,0,.06);margin-bottom:20px;}
+    .section-card .sec-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;}
+    .section-card .sec-head h3{margin:0;font-size:15px;font-weight:600;color:#333;}
+    .section-card .sec-head a{font-size:12px;color:#5c6bc0;text-decoration:none;}
+    .two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+    .nav-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
+    .nav-btn{text-decoration:none;border-radius:10px;padding:16px 10px;text-align:center;border:1px solid #e0e0e0;transition:transform .15s,box-shadow .2s;display:block;}
+    .nav-btn:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,.08);}
+    .nav-btn .icon{font-size:26px;margin-bottom:6px;}
+    .nav-btn .txt{font-size:12px;font-weight:600;}
+    .badge-dot{position:absolute;top:-6px;right:-6px;background:#e74c3c;color:#fff;font-size:10px;font-weight:700;width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;}
+    .todo-item{padding:15px;border-radius:8px;border-left:4px solid #ccc;}
+    .todo-item .todo-num{font-size:28px;font-weight:700;}
+    .todo-item .todo-label{font-size:13px;margin-top:2px;}
+    .todo-item a{font-size:12px;display:inline-block;margin-top:4px;}
+    .mini-tbl{width:100%;border-collapse:collapse;}
+    .mini-tbl th{padding:8px 10px;text-align:left;font-size:12px;color:#888;font-weight:500;background:#f9fafb;}
+    .mini-tbl td{padding:9px 10px;font-size:13px;border-bottom:1px solid #f5f5f5;}
+    .status-tag{font-size:11px;padding:2px 10px;border-radius:10px;color:#fff;white-space:nowrap;}
+    .user-row{display:flex;align-items:center;padding:8px 0;border-bottom:1px solid #f5f5f5;}
+    .user-row .avatar{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;}
+    .user-row .info{margin-left:10px;flex:1;min-width:0;}
+    .user-row .name{font-size:13px;color:#333;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+    .user-row .meta{font-size:11px;color:#aaa;}
+    .role-tag{font-size:11px;padding:2px 8px;border-radius:10px;flex-shrink:0;}
+    .alert-card{border-left:3px solid #e74c3c;padding:10px 14px;border-radius:6px;margin-bottom:10px;background:#fffafa;}
+    /* ── 角色颜色 ── */
+    .avatar-admin{background:#e8eaf6;}
+    .avatar-breeder{background:#e8f5e9;}
+    .avatar-user{background:#f5f5f5;}
+    .role-admin{background:#e8eaf6;color:#3949ab;}
+    .role-breeder{background:#e8f5e9;color:#2e7d32;}
+    .role-user{background:#f5f5f5;color:#666;}
+    /* ── 订单状态 ── */
+    .st-pending{background:#f39c12;}
+    .st-paid{background:#3498db;}
+    .st-shipping{background:#9b59b6;}
+    .st-completed{background:#27ae60;}
+    .st-cancelled{background:#95a5a6;}
+    /* ── 预警严重度 ── */
+    .sev-high{background:#e74c3c;}
+    .sev-medium{background:#f39c12;}
+    .sev-low{background:#3498db;}
+    /* ── 健康状态 ── */
+    .hp-healthy{background:#27ae60;}
+    .hp-good{background:#2ecc71;}
+    .hp-normal{background:#f39c12;}
+    .hp-attention{background:#e67e22;}
+    .hp-bad{background:#e74c3c;}
+    /* ── 疫苗剩余天数 ── */
+    .days-urgent{color:#e53935;font-weight:700;}
+    .days-warn{color:#f57f17;font-weight:700;}
+    @media(max-width:900px){
+        .kpi-grid{grid-template-columns:repeat(2,1fr)!important;}
+        .two-col,.nav-grid{grid-template-columns:1fr 1fr;}
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="stats">
-    <div class="stat-card">
-        <h3>{{ sheep_count }}</h3>
-        <p>羊只总数</p>
+
+{% if is_admin %}
+{# ═══════════ 管理员仪表盘 ═══════════ #}
+<div class="dash">
+
+    <!-- ── 欢迎横幅 ── -->
+    <div class="welcome" style="background:linear-gradient(135deg,#1a237e 0%,#3949ab 100%);">
+        <div>
+            <h2>🛡️ 管理控制台</h2>
+            <p>欢迎回来，{{ request.user.nickname|default:request.user.username }} · {% now "Y年m月d日 l" %}</p>
+        </div>
+        <div style="text-align:right;opacity:.85;font-size:13px;line-height:2;">
+            <div>📌 待审核养殖户&nbsp;<strong style="font-size:22px;color:#ffeb3b;">{{ pending_breeders }}</strong></div>
+            <div>📦 待发货订单&nbsp;<strong style="font-size:22px;color:#ffeb3b;">{{ pending_orders }}</strong></div>
+        </div>
     </div>
-    <div class="stat-card">
-        <h3>{{ breeder_count }}</h3>
-        <p>养殖户数量</p>
+
+    <!-- ── 核心 KPI（4 卡） ── -->
+    <div class="kpi-grid" style="grid-template-columns:repeat(4,1fr);">
+        <a href="{% url 'user_list' %}" class="kpi" style="border-left-color:#42a5f5;">
+            <div class="label">👤 普通用户</div>
+            <div class="num" style="color:#42a5f5;">{{ total_users }}</div>
+            <div class="hint">进入用户管理 →</div>
+        </a>
+        <a href="{% url 'breeder_list' %}" class="kpi" style="border-left-color:#66bb6a;">
+            <div class="label">🌾 养殖户</div>
+            <div class="num" style="color:#66bb6a;">{{ total_breeders }}</div>
+            <div class="hint">
+                {% if pending_breeders > 0 %}
+                <span class="warn">⚠ {{ pending_breeders }} 人待审核</span>
+                {% else %}全部已审核 →{% endif %}
+            </div>
+        </a>
+        <a href="{% url 'sheep_list' %}" class="kpi" style="border-left-color:#ab47bc;">
+            <div class="label">🐑 平台羊只</div>
+            <div class="num" style="color:#ab47bc;">{{ total_sheep }}</div>
+            <div class="hint">进入羊只管理 →</div>
+        </a>
+        <a href="{% url 'order_list' %}" class="kpi" style="border-left-color:#ef5350;">
+            <div class="label">📦 平台订单</div>
+            <div class="num" style="color:#ef5350;">{{ total_orders }}</div>
+            <div class="hint">
+                {% if pending_orders > 0 %}
+                <span class="danger">⚠ {{ pending_orders }} 单待发货</span>
+                {% else %}无待处理 →{% endif %}
+            </div>
+        </a>
     </div>
-    <div class="stat-card">
-        <h3>{{ growth_record_count }}</h3>
-        <p>生长记录</p>
+
+    <!-- ── 本月营收 + 快速导航 ── -->
+    <div class="two-col" style="margin-bottom:24px;">
+        <div style="background:linear-gradient(135deg,#e8f5e9,#f1f8e9);border-radius:12px;padding:28px;box-shadow:0 1px 8px rgba(0,0,0,.06);text-align:center;">
+            <div style="font-size:13px;color:#777;margin-bottom:10px;">📈 本月已完成营收</div>
+            <div style="font-size:40px;font-weight:700;color:#2e7d32;">¥{{ monthly_revenue|floatformat:2 }}</div>
+            <div style="font-size:12px;color:#aaa;margin-top:8px;">{% now "Y年m月" %} 累计</div>
+        </div>
+        <div class="section-card" style="margin-bottom:0;">
+            <div class="sec-head"><h3>⚡ 快速导航</h3></div>
+            <div class="nav-grid">
+                <a href="{% url 'breeder_audit_list' %}" class="nav-btn" {% if pending_breeders > 0 %}style="background:#fff8e1;border-color:#ffe082;position:relative;"{% else %}style="position:relative;"{% endif %}>
+                    <div class="icon">{% if pending_breeders > 0 %}🔍{% else %}✅{% endif %}</div>
+                    <div class="txt" {% if pending_breeders > 0 %}style="color:#e65100;"{% else %}style="color:#666;"{% endif %}>养殖户审核</div>
+                    {% if pending_breeders > 0 %}<span class="badge-dot">{{ pending_breeders }}</span>{% endif %}
+                </a>
+                <a href="{% url 'user_list' %}" class="nav-btn" style="background:#e3f2fd;border-color:#90caf9;">
+                    <div class="icon">👥</div>
+                    <div class="txt" style="color:#1565c0;">用户管理</div>
+                </a>
+                <a href="{% url 'order_list' %}" class="nav-btn" style="background:#fce4ec;border-color:#f48fb1;">
+                    <div class="icon">📦</div>
+                    <div class="txt" style="color:#880e4f;">订单管理</div>
+                </a>
+                <a href="{% url 'permission_overview' %}" class="nav-btn" style="background:#ede7f6;border-color:#ce93d8;">
+                    <div class="icon">🔑</div>
+                    <div class="txt" style="color:#4a148c;">权限管理</div>
+                </a>
+            </div>
+        </div>
     </div>
-    <div class="stat-card">
-        <h3>{{ feeding_record_count }}</h3>
-        <p>喂养记录</p>
+
+    <!-- ── 待审核 + 预警 ── -->
+    {% if pending_breeder_list or environment_alerts %}
+    <div class="two-col" style="margin-bottom:24px;">
+        {% if pending_breeder_list %}
+        <div class="section-card" style="margin-bottom:0;">
+            <div class="sec-head">
+                <h3>⏳ 待审核养殖户</h3>
+                <a href="{% url 'breeder_audit_list' %}">查看全部 →</a>
+            </div>
+            {% for b in pending_breeder_list %}
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #f5f5f5;">
+                <div>
+                    <span style="font-size:13px;font-weight:500;color:#333;">{{ b.nickname|default:b.username }}</span>
+                    <span style="font-size:12px;color:#aaa;margin-left:8px;">{{ b.mobile|default:'—' }}</span>
+                </div>
+                <a href="{% url 'breeder_audit_detail' b.pk %}" class="btn" style="padding:4px 14px;font-size:12px;">审核</a>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        {% if environment_alerts %}
+        <div class="section-card" style="margin-bottom:0;">
+            <div class="sec-head"><h3>⚠️ 平台预警（{{ alert_count }} 条未处理）</h3></div>
+            {% for alert in environment_alerts %}
+            <div class="alert-card">
+                <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+                    <div>
+                        <span style="font-size:13px;font-weight:600;color:#c0392b;">{{ alert.get_alert_type_display }}</span>
+                        <span class="status-tag {% if alert.severity == 'high' %}sev-high{% elif alert.severity == 'medium' %}sev-medium{% else %}sev-low{% endif %}" style="margin-left:8px;">{{ alert.get_severity_display }}</span>
+                        <div style="font-size:12px;color:#666;margin-top:4px;">{{ alert.message }}</div>
+                        <div style="font-size:11px;color:#bbb;margin-top:2px;">养殖户：{{ alert.owner.nickname|default:alert.owner.username }} · {{ alert.created_at|date:'m-d H:i' }}</div>
+                    </div>
+                    <form method="post" action="{% url 'resolve_alert' alert.pk %}" style="margin:0;flex-shrink:0;margin-left:10px;">
+                        {% csrf_token %}
+                        <button type="submit" style="background:#27ae60;color:#fff;border:none;padding:5px 12px;border-radius:6px;font-size:11px;cursor:pointer;">已处理</button>
+                    </form>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
     </div>
-    <div class="stat-card">
-        <h3>{{ vaccination_count }}</h3>
-        <p>疫苗接种记录</p>
+    {% endif %}
+
+    <!-- ── 最近注册 + 最近订单 ── -->
+    <div style="display:grid;grid-template-columns:1fr 1.6fr;gap:16px;">
+        <!-- 最近注册用户 -->
+        <div class="section-card">
+            <div class="sec-head">
+                <h3>👤 最近注册</h3>
+                <a href="{% url 'user_list' %}">全部 →</a>
+            </div>
+            {% for u in recent_users %}
+            <div class="user-row">
+                <div class="avatar {% if u.role == 2 %}avatar-admin{% elif u.role == 1 %}avatar-breeder{% else %}avatar-user{% endif %}">
+                    {% if u.role == 2 %}🛡️{% elif u.role == 1 %}🌾{% else %}👤{% endif %}
+                </div>
+                <div class="info">
+                    <div class="name">{{ u.nickname|default:u.username }}</div>
+                    <div class="meta">{{ u.date_joined|date:'m-d H:i' }}</div>
+                </div>
+                <span class="role-tag {% if u.role == 2 %}role-admin{% elif u.role == 1 %}role-breeder{% else %}role-user{% endif %}">
+                    {% if u.role == 2 %}管理员{% elif u.role == 1 %}养殖户{% else %}用户{% endif %}
+                </span>
+            </div>
+            {% empty %}
+            <div style="text-align:center;padding:30px 0;color:#bbb;font-size:13px;">暂无用户</div>
+            {% endfor %}
+        </div>
+
+        <!-- 最近订单 -->
+        <div class="section-card">
+            <div class="sec-head">
+                <h3>📦 最近订单</h3>
+                <a href="{% url 'order_list' %}">全部 →</a>
+            </div>
+            <table class="mini-tbl">
+                <thead><tr><th>订单号</th><th>用户</th><th style="text-align:right;">金额</th><th style="text-align:center;">状态</th><th>时间</th></tr></thead>
+                <tbody>
+                    {% for order in recent_orders %}
+                    <tr>
+                        <td><a href="{% url 'order_detail' order.pk %}" style="color:#5c6bc0;font-family:monospace;font-size:12px;text-decoration:none;">{{ order.order_no|truncatechars:16 }}</a></td>
+                        <td>{{ order.user.nickname|default:order.user.username }}</td>
+                        <td style="text-align:right;font-weight:600;color:#e74c3c;">¥{{ order.total_amount }}</td>
+                        <td style="text-align:center;">
+                            <span class="status-tag {% if order.status == 'pending' %}st-pending{% elif order.status == 'paid' %}st-paid{% elif order.status == 'shipping' %}st-shipping{% elif order.status == 'completed' %}st-completed{% else %}st-cancelled{% endif %}">{{ order.get_status_display }}</span>
+                        </td>
+                        <td style="font-size:12px;color:#999;">{{ order.created_at|date:'m-d H:i' }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="5" style="text-align:center;padding:30px 0;color:#bbb;">暂无订单</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
     </div>
-    <div class="stat-card">
-        <h3>{{ user_count }}</h3>
-        <p>用户数量</p>
-    </div>
+
 </div>
 
-<div class="card">
-    <h2>快速操作</h2>
-    <div style="display: flex; gap: 10px; margin-top: 20px; flex-wrap: wrap;">
-        <a href="{% url 'sheep_create' %}" class="btn">添加羊只</a>
-        <a href="{% url 'breeder_create' %}" class="btn">添加养殖户</a>
-        <a href="{% url 'growth_record_create' %}" class="btn">添加生长记录</a>
-        <a href="{% url 'feeding_record_create' %}" class="btn">添加喂养记录</a>
-        <a href="{% url 'vaccination_create' %}" class="btn">添加疫苗接种</a>
+
+{% else %}
+{# ═══════════ 养殖户仪表盘 ═══════════ #}
+<div class="dash">
+
+    <!-- ── 欢迎横幅 ── -->
+    <div class="welcome" style="background:linear-gradient(135deg,#2e7d32 0%,#66bb6a 100%);">
+        <div>
+            <h2>👋 欢迎回来，{{ request.user.nickname|default:request.user.username }}</h2>
+            <p>今天是 {% now "Y年m月d日" %}，祝您养殖顺利！</p>
+        </div>
     </div>
+
+    <!-- ── 待办事项 ── -->
+    <div class="section-card">
+        <div class="sec-head"><h3>📋 待办事项</h3></div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;">
+            <div class="todo-item" style="background:#fff8e1;border-left-color:#ffc107;">
+                <div class="todo-num" style="color:#f57f17;">{{ pending_shipping_count }}</div>
+                <div class="todo-label" style="color:#856404;">待发货订单</div>
+                {% if pending_shipping_count > 0 %}
+                <a href="{% url 'order_list' %}" style="color:#856404;">去处理 →</a>
+                {% endif %}
+            </div>
+            <div class="todo-item" style="background:#e0f7fa;border-left-color:#00bcd4;">
+                <div class="todo-num" style="color:#006064;">{{ upcoming_vaccination_count }}</div>
+                <div class="todo-label" style="color:#006064;">需接种疫苗</div>
+            </div>
+            <div class="todo-item" style="background:#fce4ec;border-left-color:#e53935;">
+                <div class="todo-num" style="color:#b71c1c;">{{ alert_count }}</div>
+                <div class="todo-label" style="color:#b71c1c;">异常预警</div>
+            </div>
+        </div>
+
+        {% if upcoming_vaccinations %}
+        <div style="margin-top:20px;">
+            <h4 style="margin:0 0 10px;font-size:14px;color:#333;">💉 即将到期的疫苗接种</h4>
+            <table class="mini-tbl">
+                <thead><tr><th>羊只编号</th><th>疫苗名称</th><th>过期日期</th><th>剩余天数</th></tr></thead>
+                <tbody>
+                    {% for vac in upcoming_vaccinations %}
+                    <tr>
+                        <td>{{ vac.sheep.id }}</td>
+                        <td>{{ vac.vaccine.name }}</td>
+                        <td>{{ vac.expiry_date|date:'Y-m-d' }}</td>
+                        <td><span class="{% if vac.days_left <= 7 %}days-urgent{% else %}days-warn{% endif %}">{{ vac.days_left }}天</span></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% endif %}
+
+        {% if environment_alerts %}
+        <div style="margin-top:20px;">
+            <h4 style="margin:0 0 10px;font-size:14px;color:#333;">⚠️ 异常环境预警</h4>
+            {% for alert in environment_alerts %}
+            <div class="alert-card" style="display:flex;justify-content:space-between;align-items:center;">
+                <div>
+                    <div style="font-weight:600;color:#c0392b;margin-bottom:4px;">
+                        {{ alert.get_alert_type_display }}
+                        <span class="status-tag {% if alert.severity == 'high' %}sev-high{% elif alert.severity == 'medium' %}sev-medium{% else %}sev-low{% endif %}" style="margin-left:6px;">{{ alert.get_severity_display }}</span>
+                    </div>
+                    <div style="color:#555;font-size:13px;">{{ alert.message }}</div>
+                    <div style="color:#aaa;font-size:12px;margin-top:3px;">{{ alert.created_at|date:'Y-m-d H:i' }}</div>
+                </div>
+                <form method="post" action="{% url 'resolve_alert' alert.pk %}" style="margin:0;">
+                    {% csrf_token %}
+                    <button type="submit" class="btn" style="background:#27ae60;padding:5px 14px;font-size:12px;">标记已处理</button>
+                </form>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- ── 养殖统计 ── -->
+    <div class="kpi-grid" style="grid-template-columns:repeat(2,1fr);">
+        <a href="{% url 'sheep_list' %}" class="kpi" style="border-left-color:#43a047;text-align:center;">
+            <div class="num" style="color:#43a047;font-size:36px;">{{ sheep_count }}</div>
+            <div style="color:#666;font-size:14px;margin-top:4px;">🐑 我的羊只</div>
+        </a>
+        <a href="{% url 'order_list' %}" class="kpi" style="border-left-color:#1e88e5;text-align:center;">
+            <div class="num" style="color:#1e88e5;font-size:36px;">{{ order_count }}</div>
+            <div style="color:#666;font-size:14px;margin-top:4px;">📦 相关订单</div>
+        </a>
+    </div>
+
+    <!-- ── 快速操作 ── -->
+    <div class="section-card">
+        <div class="sec-head"><h3>⚡ 快速操作</h3></div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;">
+            <a href="{% url 'sheep_create' %}" class="btn">➕ 添加羊只</a>
+            <a href="{% url 'growth_record_create' %}" class="btn" style="background:#27ae60;">📈 生长记录</a>
+            <a href="{% url 'feeding_record_create' %}" class="btn" style="background:#f39c12;">🌾 喂养记录</a>
+            <a href="{% url 'vaccination_create' %}" class="btn" style="background:#9b59b6;">💉 疫苗接种</a>
+        </div>
+    </div>
+
+    <!-- ── 最近羊只 + 最近订单 ── -->
+    <div class="two-col">
+        <!-- 最近羊只 -->
+        <div class="section-card">
+            <div class="sec-head">
+                <h3>🐑 最近添加的羊只</h3>
+                <a href="{% url 'sheep_list' %}">全部 →</a>
+            </div>
+            <table class="mini-tbl">
+                <thead><tr><th>编号</th><th>耳标</th><th>性别</th><th>品种</th><th>健康</th><th></th></tr></thead>
+                <tbody>
+                    {% for sheep in sheep_list %}
+                    <tr>
+                        <td>{{ sheep.id }}</td>
+                        <td>{{ sheep.ear_tag|default:'—' }}</td>
+                        <td>{{ sheep.get_gender_display }}</td>
+                        <td>{{ sheep.breed }}</td>
+                        <td>
+                            <span class="status-tag {% if sheep.health_status == '健康' %}hp-healthy{% elif sheep.health_status == '良好' %}hp-good{% elif sheep.health_status == '一般' %}hp-normal{% elif sheep.health_status == '需关注' %}hp-attention{% else %}hp-bad{% endif %}">{{ sheep.health_status }}</span>
+                        </td>
+                        <td><a href="{% url 'sheep_detail' sheep.pk %}" class="btn" style="padding:3px 10px;font-size:12px;">查看</a></td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="6" style="text-align:center;padding:24px;color:#bbb;">暂无羊只，<a href="{% url 'sheep_create' %}">去添加</a></td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- 最近订单 -->
+        <div class="section-card">
+            <div class="sec-head">
+                <h3>📦 我的最近订单</h3>
+                <a href="{% url 'order_list' %}">全部 →</a>
+            </div>
+            <table class="mini-tbl">
+                <thead><tr><th>订单号</th><th>用户</th><th style="text-align:right;">金额</th><th style="text-align:center;">状态</th><th></th></tr></thead>
+                <tbody>
+                    {% for order in recent_orders %}
+                    <tr>
+                        <td style="font-family:monospace;font-size:12px;">{{ order.order_no|truncatechars:14 }}</td>
+                        <td>{{ order.user.nickname|default:order.user.username }}</td>
+                        <td style="text-align:right;font-weight:600;color:#e74c3c;">¥{{ order.total_amount }}</td>
+                        <td style="text-align:center;">
+                            <span class="status-tag {% if order.status == 'pending' %}st-pending{% elif order.status == 'paid' %}st-paid{% elif order.status == 'shipping' %}st-shipping{% elif order.status == 'completed' %}st-completed{% else %}st-cancelled{% endif %}">{{ order.get_status_display }}</span>
+                        </td>
+                        <td><a href="{% url 'order_detail' order.pk %}" class="btn" style="padding:3px 10px;font-size:12px;">查看</a></td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="5" style="text-align:center;padding:24px;color:#bbb;">暂无订单</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
 </div>
+{% endif %}
+
 {% endblock %}
 

@@ -178,7 +178,7 @@ Component({
       };
       this.addMessage(loadingMessage);
 
-      // 调用后端大模型API
+      // 调用后端大模型API（支持RAG）
       API.request('/api/qa/ask', 'POST', {
         question: question
       }).then(function(res) {
@@ -186,8 +186,20 @@ Component({
         messages.pop(); // 移除加载消息
         
         let answer = '抱歉，我暂时无法回答这个问题。';
+        let modelInfo = '';
+        
         if (res.code === 0 && res.data && res.data.answer) {
           answer = res.data.answer;
+          
+          // 添加模型信息
+          if (res.data.model) {
+            modelInfo = res.data.model === 'deepseek-v3' ? '（AI回答）' : '（本地回答）';
+          }
+          
+          // 添加RAG上下文使用标识
+          if (res.data.context_used === true) {
+            modelInfo += ' [基于真实数据]';
+          }
         } else if (res.answer) {
           // 兼容旧格式
           answer = res.answer;
@@ -197,7 +209,8 @@ Component({
           type: 'bot',
           content: answer,
           time: that.getCurrentTime(),
-          isLoading: false
+          isLoading: false,
+          modelInfo: modelInfo
         });
         
         that.setData({

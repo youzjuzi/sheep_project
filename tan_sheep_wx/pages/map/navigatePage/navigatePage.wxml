@@ -46,35 +46,19 @@
     </view>
     <view class="button-group">
       <button
-        class="direct-nav-button {{apiDisabled ? 'recommended' : ''}}"
+        class="search-button"
+        bindtap="searchLocations"
+        disabled="{{isLoading}}"
+      >
+        {{isLoading ? '规划中...' : '📍 规划路线'}}
+      </button>
+      <button
+        class="direct-nav-button"
         bindtap="directNavigation"
         disabled="{{!endLocation}}"
       >
-        🗺️ 直接导航{{apiDisabled ? '（推荐）' : ''}}
+        🗺️ 直接导航
       </button>
-      <button
-        class="search-button {{apiDisabled ? 'disabled-hint' : ''}}"
-        bindtap="searchLocations"
-        disabled="{{isLoading || apiDisabled}}"
-        wx:if="{{!apiDisabled}}"
-      >
-        {{isLoading ? '规划中...' : '开始导航'}}
-      </button>
-    </view>
-    <view class="api-status-hint" wx:if="{{apiDisabled}}">
-      <view class="hint-content">
-        <text class="hint-icon">⚠️</text>
-        <view class="hint-text-wrapper">
-          <text class="hint-title">API服务已禁用</text>
-          <text class="hint-text">建议使用"🗺️ 直接导航"功能（无需API）</text>
-        </view>
-      </view>
-      <view class="hint-steps" wx:if="{{!endLocation}}">
-        <text class="step-text">📌 使用步骤：</text>
-        <text class="step-item">1. 点击📍按钮选择终点</text>
-        <text class="step-item">2. 点击"🗺️ 直接导航"按钮</text>
-        <text class="step-item">3. 使用微信导航</text>
-      </view>
     </view>
     <view class="location-actions">
       <button class="back-to-location-btn" bindtap="backToMyLocation">
@@ -100,8 +84,8 @@
         <text class="route-text">预计时间：{{routeInfo.duration}}</text>
       </view>
     </view>
-    <button class="nav-button" bindtap="openWeChatNavigation">
-      🗺️ 使用微信导航
+    <button class="nav-button" bindtap="directNavigation">
+      🗺️ 开始导航
     </button>
   </view>
 </view>

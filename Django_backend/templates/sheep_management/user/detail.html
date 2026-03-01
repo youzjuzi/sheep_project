@@ -3,70 +3,76 @@
 {% block content %}
 <div class="card">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-        <h2>用户详情 #{{ user.id }}</h2>
-        <a href="{% url 'user_list' %}" class="btn" style="background: #95a5a6;">返回列表</a>
+        <h2>用户详情 #{{ target_user.id }}</h2>
+        <div style="display: flex; gap: 8px;">
+            <a href="{% url 'user_update' target_user.pk %}" class="btn" style="background: #f39c12;">编辑</a>
+            {% if request.user.pk != target_user.pk %}
+            <a href="{% url 'user_delete' target_user.pk %}" class="btn btn-danger">删除</a>
+            {% endif %}
+            <a href="{% url 'user_list' %}" class="btn" style="background: #95a5a6;">返回列表</a>
+        </div>
     </div>
     
     <table>
         <tr>
-            <th>ID</th>
-            <td>{{ user.id }}</td>
+            <th>用户ID</th>
+            <td>{{ target_user.id }}</td>
         </tr>
         <tr>
             <th>用户名</th>
-            <td>{{ user.username|default:"未设置" }}</td>
-        </tr>
-        <tr>
-            <th>密码</th>
-            <td>{% if user.password %}{{ user.password|truncatechars:20 }}...{% else %}未设置{% endif %}</td>
+            <td>{{ target_user.username|default:"未设置" }}</td>
         </tr>
         <tr>
             <th>OpenID</th>
-            <td>{{ user.openid }}</td>
+            <td>{{ target_user.openid|default:"未设置" }}</td>
         </tr>
         <tr>
             <th>UnionID</th>
-            <td>{{ user.unionid|default:"未设置" }}</td>
+            <td>{{ target_user.unionid|default:"未设置" }}</td>
         </tr>
         <tr>
             <th>昵称</th>
-            <td>{{ user.nickname|default:"未设置" }}</td>
-        </tr>
-        <tr>
-            <th>头像URL</th>
-            <td>{{ user.avatar_url|default:"未设置"|truncatechars:50 }}</td>
+            <td>{{ target_user.nickname|default:"未设置" }}</td>
         </tr>
         <tr>
             <th>手机号</th>
-            <td>{{ user.mobile|default:"未设置" }}</td>
+            <td>{{ target_user.mobile|default:"未设置" }}</td>
+        </tr>
+        <tr>
+            <th>角色</th>
+            <td>{{ target_user.get_role_display }}</td>
+        </tr>
+        <tr>
+            <th>养殖户认证</th>
+            <td>{% if target_user.is_verified %}✅ 已认证{% else %}未认证{% endif %}</td>
         </tr>
         <tr>
             <th>性别</th>
-            <td>{{ user.get_gender_display|default:"未知" }}</td>
+            <td>{{ target_user.get_gender_display|default:"未知" }}</td>
         </tr>
         <tr>
             <th>国家</th>
-            <td>{{ user.country|default:"未设置" }}</td>
+            <td>{{ target_user.country|default:"未设置" }}</td>
         </tr>
         <tr>
             <th>省份</th>
-            <td>{{ user.province|default:"未设置" }}</td>
+            <td>{{ target_user.province|default:"未设置" }}</td>
         </tr>
         <tr>
             <th>城市</th>
-            <td>{{ user.city|default:"未设置" }}</td>
+            <td>{{ target_user.city|default:"未设置" }}</td>
         </tr>
         <tr>
             <th>创建时间</th>
-            <td>{{ user.created_at|date:"Y-m-d H:i:s" }}</td>
+            <td>{{ target_user.created_at|date:"Y-m-d H:i:s" }}</td>
         </tr>
         <tr>
             <th>更新时间</th>
-            <td>{{ user.updated_at|date:"Y-m-d H:i:s" }}</td>
+            <td>{{ target_user.updated_at|date:"Y-m-d H:i:s" }}</td>
         </tr>
         <tr>
-            <th>最后登录时间</th>
-            <td>{{ user.last_login_at|date:"Y-m-d H:i:s"|default:"从未登录" }}</td>
+            <th>最后登录</th>
+            <td>{{ target_user.last_login|date:"Y-m-d H:i:s"|default:"从未登录" }}</td>
         </tr>
     </table>
 </div>

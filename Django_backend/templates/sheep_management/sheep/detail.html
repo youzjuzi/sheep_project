@@ -10,116 +10,504 @@
         </div>
     </div>
     
-    <table>
-        <tr>
-            <th>ID</th>
-            <td>{{ sheep.id }}</td>
-        </tr>
-        <tr>
-            <th>性别</th>
-            <td>{{ sheep.gender }}</td>
-        </tr>
-        <tr>
-            <th>体重</th>
-            <td>{{ sheep.weight }} kg</td>
-        </tr>
-        <tr>
-            <th>身高</th>
-            <td>{{ sheep.height }} cm</td>
-        </tr>
-        <tr>
-            <th>体长</th>
-            <td>{{ sheep.length }} cm</td>
-        </tr>
-    </table>
+    <div style="display: flex; gap: 30px; margin-bottom: 20px;">
+        <div style="flex: 0 0 200px;">
+            <div style="width: 200px; height: 200px; background: #f5f5f5; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 80px;">
+                🐑
+            </div>
+        </div>
+        <div style="flex: 1;">
+            <table style="margin: 0;">
+                <tr>
+                    <th>ID</th>
+                    <td><strong>#{{ sheep.id }}</strong></td>
+                    <th>耳标号</th>
+                    <td>{{ sheep.ear_tag|default:'未设置' }}</td>
+                </tr>
+                <tr>
+                    <th>性别</th>
+                    <td>{{ sheep.get_gender_display }}</td>
+                    <th>品种</th>
+                    <td>{{ sheep.breed }}</td>
+                </tr>
+                <tr>
+                    <th>健康状态</th>
+                    <td>
+                        <span class="health-badge health-{% if sheep.health_status == '健康' %}healthy{% elif sheep.health_status == '良好' %}good{% elif sheep.health_status == '一般' %}normal{% elif sheep.health_status == '需关注' %}warning{% else %}danger{% endif %}">
+                            {{ sheep.health_status }}
+                        </span>
+                    </td>
+                    <th>出生日期</th>
+                    <td>{{ sheep.birth_date|date:'Y-m-d'|default:'未设置' }}</td>
+                </tr>
+                <tr>
+                    <th>体重</th>
+                    <td>{{ sheep.weight }} kg</td>
+                    <th>身高</th>
+                    <td>{{ sheep.height }} cm</td>
+                </tr>
+                <tr>
+                    <th>体长</th>
+                    <td>{{ sheep.length }} cm</td>
+                    <th>所属养殖户</th>
+                    <td>{{ sheep.owner.username }}</td>
+                </tr>
+            </table>
+        </div>
+    </div>
 </div>
 
-<div class="card">
-    <h3>生长记录 ({{ growth_records.count }})</h3>
-    <table>
-        <thead>
-            <tr>
-                <th>日期</th>
-                <th>体重(kg)</th>
-                <th>身高(cm)</th>
-                <th>体长(cm)</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for record in growth_records %}
-            <tr>
-                <td>{{ record.record_date }}</td>
-                <td>{{ record.weight }}</td>
-                <td>{{ record.height }}</td>
-                <td>{{ record.length }}</td>
-            </tr>
-            {% empty %}
-            <tr>
-                <td colspan="4" style="text-align: center;">暂无记录</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+<!-- Tab 导航 -->
+<div class="nav-tabs">
+    <button class="nav-tab active" onclick="switchTab('growth-records')">
+        📈 生长记录 ({{ growth_records.count }})
+    </button>
+    <button class="nav-tab" onclick="switchTab('feeding-records')">
+        🌾 喂养记录 ({{ feeding_records.count }})
+    </button>
+    <button class="nav-tab" onclick="switchTab('vaccination-records')">
+        💉 疫苗接种 ({{ vaccination_records.count }})
+    </button>
+    <button class="nav-tab" onclick="switchTab('traceability')">
+        🔍 溯源信息
+    </button>
 </div>
 
-<div class="card">
-    <h3>喂养记录 ({{ feeding_records.count }})</h3>
-    <table>
-        <thead>
-            <tr>
-                <th>饲料类型</th>
-                <th>开始日期</th>
-                <th>结束日期</th>
-                <th>数量</th>
-                <th>单位</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for record in feeding_records %}
-            <tr>
-                <td>{{ record.feed_type }}</td>
-                <td>{{ record.start_date }}</td>
-                <td>{{ record.end_date|default:"进行中" }}</td>
-                <td>{{ record.amount }}</td>
-                <td>{{ record.unit }}</td>
-            </tr>
-            {% empty %}
-            <tr>
-                <td colspan="5" style="text-align: center;">暂无记录</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+<!-- 生长记录 Tab -->
+<div id="growth-records" class="tab-content active">
+    <div class="card">
+        <h3>生长记录</h3>
+        <form method="post" action="{% url 'sheep_add_growth' sheep.pk %}" style="margin-bottom: 20px;">
+            {% csrf_token %}
+            <div style="display: flex; gap: 10px; align-items: flex-end;">
+                <div style="flex: 1;">
+                    <label style="font-size: 12px;">日期</label>
+                    <input type="date" name="record_date" required>
+                </div>
+                <div style="flex: 1;">
+                    <label style="font-size: 12px;">体重(kg)</label>
+                    <input type="number" name="weight" step="0.1" required>
+                </div>
+                <div style="flex: 1;">
+                    <label style="font-size: 12px;">身高(cm)</label>
+                    <input type="number" name="height" step="0.1" required>
+                </div>
+                <div style="flex: 1;">
+                    <label style="font-size: 12px;">体长(cm)</label>
+                    <input type="number" name="length" step="0.1" required>
+                </div>
+                <button type="submit" class="btn btn-success" style="padding: 10px 20px;">添加</button>
+            </div>
+        </form>
+        
+        {% if growth_records %}
+        <div style="margin-bottom: 20px;">
+            <canvas id="growthChart" height="100"></canvas>
+        </div>
+        {% endif %}
+        
+        <table>
+            <thead>
+                <tr>
+                    <th>日期</th>
+                    <th>体重(kg)</th>
+                    <th>身高(cm)</th>
+                    <th>体长(cm)</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for record in growth_records %}
+                <tr>
+                    <td>{{ record.record_date|date:'Y-m-d' }}</td>
+                    <td>{{ record.weight }}</td>
+                    <td>{{ record.height }}</td>
+                    <td>{{ record.length }}</td>
+                    <td>
+                        <form method="post" action="{% url 'sheep_delete_growth' sheep.pk record.pk %}" style="display: inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-danger" style="padding: 3px 8px; font-size: 12px;" onclick="return confirm('确定删除这条记录吗？')">删除</button>
+                        </form>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" style="text-align: center; padding: 40px;">
+                        <div style="color: #999;">
+                            <div style="font-size: 36px; margin-bottom: 10px;">📊</div>
+                            <div>暂无生长记录</div>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </div>
 
-<div class="card">
-    <h3>疫苗接种记录 ({{ vaccination_records.count }})</h3>
-    <table>
-        <thead>
-            <tr>
-                <th>疫苗类型</th>
-                <th>接种日期</th>
-                <th>过期日期</th>
-                <th>剂量(ml)</th>
-                <th>接种人</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for record in vaccination_records %}
-            <tr>
-                <td>{{ record.get_vaccination_id_display }}</td>
-                <td>{{ record.vaccination_date }}</td>
-                <td>{{ record.expiry_date }}</td>
-                <td>{{ record.dosage }}</td>
-                <td>{{ record.administered_by }}</td>
-            </tr>
-            {% empty %}
-            <tr>
-                <td colspan="5" style="text-align: center;">暂无记录</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+<!-- 喂养记录 Tab -->
+<div id="feeding-records" class="tab-content">
+    <div class="card">
+        <h3>喂养记录</h3>
+        <form method="post" action="{% url 'sheep_add_feeding' sheep.pk %}" style="margin-bottom: 20px;">
+            {% csrf_token %}
+            <div style="display: flex; gap: 10px; align-items: flex-end;">
+                <div style="flex: 1;">
+                    <label style="font-size: 12px;">饲料类型</label>
+                    <input type="text" name="feed_type" required>
+                </div>
+                <div style="flex: 1;">
+                    <label style="font-size: 12px;">开始日期</label>
+                    <input type="date" name="start_date" required>
+                </div>
+                <div style="flex: 1;">
+                    <label style="font-size: 12px;">结束日期</label>
+                    <input type="date" name="end_date">
+                </div>
+                <div style="flex: 1;">
+                    <label style="font-size: 12px;">数量</label>
+                    <input type="number" name="amount" step="0.1" required>
+                </div>
+                <div style="flex: 1;">
+                    <label style="font-size: 12px;">单位</label>
+                    <input type="text" name="unit" required>
+                </div>
+                <button type="submit" class="btn btn-success" style="padding: 10px 20px;">添加</button>
+            </div>
+        </form>
+        <table>
+            <thead>
+                <tr>
+                    <th>饲料类型</th>
+                    <th>开始日期</th>
+                    <th>结束日期</th>
+                    <th>数量</th>
+                    <th>单位</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for record in feeding_records %}
+                <tr>
+                    <td>{{ record.feed_type }}</td>
+                    <td>{{ record.start_date|date:'Y-m-d' }}</td>
+                    <td>{{ record.end_date|date:'Y-m-d'|default:"进行中" }}</td>
+                    <td>{{ record.amount }}</td>
+                    <td>{{ record.unit }}</td>
+                    <td>
+                        <form method="post" action="{% url 'sheep_delete_feeding' sheep.pk record.pk %}" style="display: inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-danger" style="padding: 3px 8px; font-size: 12px;" onclick="return confirm('确定删除这条记录吗？')">删除</button>
+                        </form>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" style="text-align: center; padding: 40px;">
+                        <div style="color: #999;">
+                            <div style="font-size: 36px; margin-bottom: 10px;">🌾</div>
+                            <div>暂无喂养记录</div>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </div>
+
+<!-- 疫苗接种 Tab -->
+<div id="vaccination-records" class="tab-content">
+    <div class="card">
+        <h3>疫苗接种记录</h3>
+        <form method="post" action="{% url 'sheep_add_vaccination' sheep.pk %}" style="margin-bottom: 20px;">
+            {% csrf_token %}
+            <div style="display: flex; gap: 10px; align-items: flex-end;">
+                <div style="flex: 1;">
+                    <label style="font-size: 12px;">疫苗类型</label>
+                    <select name="vaccine_id" required>
+                        <option value="">请选择</option>
+                        {% for vaccine in vaccines %}
+                        <option value="{{ vaccine.id }}">{{ vaccine.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div style="flex: 1;">
+                    <label style="font-size: 12px;">接种日期</label>
+                    <input type="date" name="vaccination_date" required>
+                </div>
+                <div style="flex: 1;">
+                    <label style="font-size: 12px;">过期日期</label>
+                    <input type="date" name="expiry_date" required>
+                </div>
+                <div style="flex: 1;">
+                    <label style="font-size: 12px;">剂量(ml)</label>
+                    <input type="number" name="dosage" step="0.1" required>
+                </div>
+                <div style="flex: 1;">
+                    <label style="font-size: 12px;">接种人</label>
+                    <input type="text" name="administered_by" required>
+                </div>
+                <button type="submit" class="btn btn-success" style="padding: 10px 20px;">添加</button>
+            </div>
+        </form>
+        <table>
+            <thead>
+                <tr>
+                    <th>疫苗类型</th>
+                    <th>接种日期</th>
+                    <th>过期日期</th>
+                    <th>剂量(ml)</th>
+                    <th>接种人</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for record in vaccination_records %}
+                <tr>
+                    <td>{{ record.vaccine.name }}</td>
+                    <td>{{ record.vaccination_date|date:'Y-m-d' }}</td>
+                    <td>{{ record.expiry_date|date:'Y-m-d' }}</td>
+                    <td>{{ record.dosage }}</td>
+                    <td>{{ record.administered_by }}</td>
+                    <td>
+                        <form method="post" action="{% url 'sheep_delete_vaccination' sheep.pk record.pk %}" style="display: inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-danger" style="padding: 3px 8px; font-size: 12px;" onclick="return confirm('确定删除这条记录吗？')">删除</button>
+                        </form>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" style="text-align: center; padding: 40px;">
+                        <div style="color: #999;">
+                            <div style="font-size: 36px; margin-bottom: 10px;">💉</div>
+                            <div>暂无疫苗接种记录</div>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- 溯源信息 Tab -->
+<div id="traceability" class="tab-content">
+    <div class="card">
+        <h3>🔍 溯源信息</h3>
+        
+        <div style="display: flex; gap: 30px;">
+            <!-- 左侧：溯源时间轴 -->
+            <div style="flex: 1;">
+                <h4 style="margin-bottom: 20px;">溯源时间轴</h4>
+                <div class="timeline">
+                    <!-- 出生记录 -->
+                    <div class="timeline-item">
+                        <div class="timeline-marker" style="background: #27ae60;">🐑</div>
+                        <div class="timeline-content">
+                            <div class="timeline-date">{{ sheep.created_at|date:'Y-m-d H:i' }}</div>
+                            <div class="timeline-title">羊只建档</div>
+                            <div class="timeline-desc">
+                                羊只 #{{ sheep.id }} 建档入库<br>
+                                性别：{{ sheep.get_gender_display }} | 品种：{{ sheep.breed }}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 疫苗接种记录 -->
+                    {% for record in vaccination_records %}
+                    <div class="timeline-item">
+                        <div class="timeline-marker" style="background: #3498db;">💉</div>
+                        <div class="timeline-content">
+                            <div class="timeline-date">{{ record.vaccination_date|date:'Y-m-d' }}</div>
+                            <div class="timeline-title">疫苗接种 - {{ record.vaccine.name }}</div>
+                            <div class="timeline-desc">
+                                剂量：{{ record.dosage }}ml | 接种人：{{ record.administered_by }}<br>
+                                有效期至：{{ record.expiry_date|date:'Y-m-d' }}
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                    
+                    <!-- 生长记录 -->
+                    {% for record in growth_records|slice:":3" %}
+                    <div class="timeline-item">
+                        <div class="timeline-marker" style="background: #9b59b6;">📏</div>
+                        <div class="timeline-content">
+                            <div class="timeline-date">{{ record.record_date|date:'Y-m-d' }}</div>
+                            <div class="timeline-title">生长监测</div>
+                            <div class="timeline-desc">
+                                体重：{{ record.weight }}kg | 身高：{{ record.height }}cm | 体长：{{ record.length }}cm
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                    
+                    <!-- 喂养记录 -->
+                    {% for record in feeding_records|slice:":3" %}
+                    <div class="timeline-item">
+                        <div class="timeline-marker" style="background: #f39c12;">🌾</div>
+                        <div class="timeline-content">
+                            <div class="timeline-date">{{ record.start_date|date:'Y-m-d' }}</div>
+                            <div class="timeline-title">饲料投喂 - {{ record.feed_type }}</div>
+                            <div class="timeline-desc">
+                                投喂量：{{ record.amount }}{{ record.unit }}
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            
+            <!-- 右侧：溯源二维码 -->
+            <div style="flex: 0 0 300px;">
+                <h4 style="margin-bottom: 20px;">防伪溯源二维码</h4>
+                <div style="background: #f8f9fa; border-radius: 10px; padding: 20px; text-align: center;">
+                    <div id="qrcode" style="margin-bottom: 15px;"></div>
+                    <div style="font-size: 12px; color: #666; margin-bottom: 10px;">
+                        羊只编号：{{ sheep.id }}
+                    </div>
+                    <div style="font-size: 11px; color: #999;">
+                        扫描二维码查看完整溯源信息
+                    </div>
+                </div>
+                
+                <div style="margin-top: 20px; padding: 15px; background: #e8f5e9; border-radius: 8px; border-left: 4px solid #27ae60;">
+                    <div style="font-weight: bold; color: #27ae60; margin-bottom: 5px;">✓ 溯源认证</div>
+                    <div style="font-size: 12px; color: #666;">
+                        该羊只信息已通过区块链存证，数据不可篡改，确保溯源信息真实可靠。
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.timeline {
+    position: relative;
+    padding-left: 30px;
+}
+.timeline::before {
+    content: '';
+    position: absolute;
+    left: 15px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: #e0e0e0;
+}
+.timeline-item {
+    position: relative;
+    margin-bottom: 25px;
+}
+.timeline-marker {
+    position: absolute;
+    left: -23px;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    color: white;
+    border: 3px solid white;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+.timeline-content {
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 8px;
+    margin-left: 10px;
+}
+.timeline-date {
+    font-size: 12px;
+    color: #999;
+    margin-bottom: 5px;
+}
+.timeline-title {
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 5px;
+}
+.timeline-desc {
+    font-size: 13px;
+    color: #666;
+    line-height: 1.5;
+}
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+// Tab切换功能
+function switchTab(tabId) {
+    // 隐藏所有tab内容
+    document.querySelectorAll('.tab-content').forEach(content => {
+        content.classList.remove('active');
+    });
+    // 移除所有tab按钮的active状态
+    document.querySelectorAll('.nav-tab').forEach(tab => {
+        tab.classList.remove('active');
+    });
+    // 显示选中的tab内容
+    document.getElementById(tabId).classList.add('active');
+    // 添加选中tab按钮的active状态
+    event.target.classList.add('active');
+}
+
+// 生成溯源二维码
+document.addEventListener('DOMContentLoaded', function() {
+    var qrcode = new QRCode(document.getElementById("qrcode"), {
+        text: "{{ request.scheme }}://{{ request.get_host }}{% url 'sheep_detail' sheep.pk %}",
+        width: 200,
+        height: 200,
+        colorDark : "#000000",
+        colorLight : "#ffffff",
+        correctLevel : QRCode.CorrectLevel.H
+    });
+    
+    // 生长记录图表
+    {% if growth_records %}
+    var ctx = document.getElementById('growthChart').getContext('2d');
+    var growthData = {
+        labels: [{% for record in growth_records reversed %}'{{ record.record_date|date:"m-d" }}'{% if not forloop.last %},{% endif %}{% endfor %}],
+        datasets: [{
+            label: '体重(kg)',
+            data: [{% for record in growth_records reversed %}{{ record.weight }}{% if not forloop.last %},{% endif %}{% endfor %}],
+            borderColor: '#3498db',
+            backgroundColor: 'rgba(52, 152, 219, 0.1)',
+            tension: 0.4,
+            fill: true
+        }, {
+            label: '身高(cm)',
+            data: [{% for record in growth_records reversed %}{{ record.height }}{% if not forloop.last %},{% endif %}{% endfor %}],
+            borderColor: '#27ae60',
+            backgroundColor: 'rgba(39, 174, 96, 0.1)',
+            tension: 0.4,
+            fill: true
+        }]
+    };
+    new Chart(ctx, {
+        type: 'line',
+        data: growthData,
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'top',
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+    {% endif %}
+});
+</script>
 {% endblock %}
-

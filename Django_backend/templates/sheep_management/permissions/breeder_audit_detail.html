@@ -1,0 +1,49 @@
+{% extends 'sheep_management/base.html' %}
+
+{% block page_title %}养殖户审核详情{% endblock %}
+
+{% block content %}
+<div class="card" style="max-width: 800px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h2>养殖户审核详情 #{{ breeder.id }}</h2>
+        <a href="{% url 'breeder_audit_list' %}" class="btn" style="background:#95a5a6;">← 返回审核列表</a>
+    </div>
+
+    {% if messages %}
+    {% for message in messages %}
+    <div class="message {% if message.tags == 'error' %}error{% else %}success{% endif %}" style="margin-bottom:16px;">
+        {{ message }}
+    </div>
+    {% endfor %}
+    {% endif %}
+
+    <table>
+        <tr><th style="width:160px;">用户ID</th><td>{{ breeder.id }}</td></tr>
+        <tr><th>用户名</th><td>{{ breeder.username }}</td></tr>
+        <tr><th>昵称</th><td>{{ breeder.nickname|default:"未设置" }}</td></tr>
+        <tr><th>手机号</th><td>{{ breeder.mobile|default:"未设置" }}</td></tr>
+        <tr><th>审核状态</th>
+            <td>
+                {% if breeder.is_verified %}
+                <span style="color:#27ae60;font-weight:600;">✅ 已认证</span>
+                {% else %}
+                <span style="color:#e67e22;font-weight:600;">⏳ 待审核</span>
+                {% endif %}
+            </td>
+        </tr>
+        <tr><th>旗下羊只</th><td>{{ sheep_count }} 只</td></tr>
+        <tr><th>相关订单</th><td>{{ order_count }} 笔</td></tr>
+        <tr><th>注册时间</th><td>{{ breeder.created_at|date:"Y-m-d H:i:s" }}</td></tr>
+    </table>
+
+    <div style="display:flex; gap:10px; margin-top:24px;">
+        {% if not breeder.is_verified %}
+        <a href="{% url 'breeder_approve' breeder.pk %}" class="btn btn-success">✅ 审核通过</a>
+        <a href="{% url 'breeder_reject' breeder.pk %}" class="btn btn-danger">❌ 拒绝申请</a>
+        {% else %}
+        <a href="{% url 'breeder_reject' breeder.pk %}" class="btn" style="background:#95a5a6;">撤销认证</a>
+        {% endif %}
+        <a href="{% url 'breeder_edit' breeder.pk %}" class="btn" style="background:#f39c12;">编辑信息</a>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,50 @@
+{% extends 'sheep_management/base.html' %}
+
+{% block content %}
+<div class="card">
+    <h2>编辑个人资料</h2>
+    
+    <form method="post" enctype="multipart/form-data" style="margin-top: 20px;">
+        {% csrf_token %}
+        
+        <div style="display: flex; align-items: center; margin-bottom: 30px;">
+            <div style="margin-right: 30px;">
+                <div style="width: 120px; height: 120px; border-radius: 50%; background: #f8f9fa; display: flex; align-items: center; justify-content: center; overflow: hidden; border: 2px solid #ddd;">
+                    {% if user.avatar_url %}
+                    <img src="{{ user.avatar_url }}" style="width: 100%; height: 100%; object-fit: cover;">
+                    {% else %}
+                    <span style="font-size: 48px; color: #ccc;">👤</span>
+                    {% endif %}
+                </div>
+                <input type="file" name="avatar" id="avatar" style="margin-top: 10px;">
+            </div>
+            <div style="flex: 1;">
+                <div class="form-group">
+                    <label for="username">用户名</label>
+                    <input type="text" name="username" id="username" value="{{ user.username }}" disabled style="background: #f8f9fa; cursor: not-allowed;">
+                </div>
+                
+                <div class="form-group">
+                    <label for="nickname">昵称</label>
+                    <input type="text" name="nickname" id="nickname" value="{{ user.nickname|default:'' }}" placeholder="请输入昵称">
+                </div>
+                
+                <div class="form-group">
+                    <label for="mobile">手机号</label>
+                    <input type="tel" name="mobile" id="mobile" value="{{ user.mobile|default:'' }}" placeholder="请输入手机号">
+                </div>
+                
+                <div class="form-group">
+                    <label>角色</label>
+                    <input type="text" value="养殖户" disabled style="background: #f8f9fa; cursor: not-allowed;">
+                </div>
+            </div>
+        </div>
+        
+        <div style="margin-top: 30px;">
+            <button type="submit" class="btn btn-success">保存修改</button>
+            <a href="{% url 'breeder_dashboard' %}" class="btn" style="margin-left: 10px;">取消</a>
+        </div>
+    </form>
+</div>
+{% endblock %}
