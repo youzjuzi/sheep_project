@@ -27,7 +27,7 @@
     <view class="sheep-list">
       <view wx:for="{{mySheepList}}" wx:key="id" class="sheep-card" bindtap="viewSheepDetail" data-sheep-id="{{item.sheep.id}}">
         <!-- 左侧头像 -->
-        <image class="sheep-avatar" src="/images/icons/function/f1.png" mode="aspectFill"></image>
+        <image class="sheep-avatar" src="{{item.sheep.image || '/images/icons/function/f1.png'}}" mode="aspectFill"></image>
         
         <!-- 右侧信息 -->
         <view class="sheep-info">

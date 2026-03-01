@@ -1,4 +1,6 @@
 // pages/adopt/result/result.js
+const API = require('../../../utils/api.js');
+
 Page({
     data: {
         sheepList: [],
@@ -10,6 +12,12 @@ Page({
         if (options.data) {
             try {
                 var sheepList = JSON.parse(decodeURIComponent(options.data));
+                const baseUrl = API.API_BASE_URL;
+                (sheepList || []).forEach(item => {
+                    if (item.image && !item.image.startsWith('http://') && !item.image.startsWith('https://')) {
+                        item.image = baseUrl + item.image;
+                    }
+                });
                 this.setData({
                     sheepList: sheepList || []
                 });

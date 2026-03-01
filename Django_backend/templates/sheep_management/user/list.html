@@ -18,6 +18,7 @@
         <thead>
             <tr>
                 <th>ID</th>
+                <th>头像</th>
                 <th>用户名</th>
                 <th>昵称</th>
                 <th>OpenID</th>
@@ -33,6 +34,13 @@
             {% for user in user_list %}
             <tr>
                 <td>{{ user.id }}</td>
+                <td>
+                    {% if user.avatar_url %}
+                        <img src="{{ user.avatar_url }}" style="width:40px;height:40px;border-radius:50%;object-fit:cover;border:1px solid #eee;" alt="">
+                    {% else %}
+                        <span style="font-size:24px;">&#x1F464;</span>
+                    {% endif %}
+                </td>
                 <td>{{ user.username|default:"未设置" }}</td>
                 <td>{{ user.nickname|default:"未设置" }}</td>
                 <td>{{ user.openid|truncatechars:20 }}</td>
@@ -51,7 +59,7 @@
             </tr>
             {% empty %}
             <tr>
-                <td colspan="10" style="text-align: center; padding: 40px;">暂无数据</td>
+                <td colspan="11" style="text-align: center; padding: 40px;">暂无数据</td>
             </tr>
             {% endfor %}
         </tbody>

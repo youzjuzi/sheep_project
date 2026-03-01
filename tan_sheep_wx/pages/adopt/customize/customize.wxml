@@ -152,13 +152,13 @@
 
 <!-- 底部固定操作栏 -->
 <view class="bottom-bar">
-    <view wx:if="{{adoptStatus === 'in_my_cart'}}" class="bottom-status status-cart">🛒 已在购物车中，去购物车结算吧</view>
+    <view wx:if="{{adoptStatus === 'in_my_cart'}}" class="bottom-status status-cart">🛒 已加入购物车，请先支付，支付成功后才算领养成功</view>
     <view wx:elif="{{adoptStatus === 'adopted_by_me'}}" class="bottom-status status-mine">✅ 你已领养了这只羊</view>
     <view wx:elif="{{adoptStatus === 'adopted_by_others'}}" class="bottom-status status-sold">⚠️ 该羊只已被其他用户领养</view>
     <button
-        class="adopt-btn {{adoptStatus !== 'available' ? 'btn-disabled' : ''}}"
+        class="adopt-btn {{(adoptStatus === 'adopted_by_me' || adoptStatus === 'adopted_by_others') ? 'btn-disabled' : ''}}"
         bindtap="adoptSheep"
-        disabled="{{adoptStatus !== 'available'}}">
-        {{adoptStatus === 'available' ? '👑 立即领养' : adoptStatusText}}
+        disabled="{{adoptStatus === 'adopted_by_me' || adoptStatus === 'adopted_by_others'}}">
+        {{adoptStatus === 'available' ? '👑 立即领养' : (adoptStatus === 'in_my_cart' ? '🛒 去购物车支付' : adoptStatusText)}}
     </button>
 </view>

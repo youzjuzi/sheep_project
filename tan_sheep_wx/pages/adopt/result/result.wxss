@@ -41,6 +41,13 @@
     margin-right: 24rpx;
 }
 
+.avatar-img {
+    width: 80rpx;
+    height: 80rpx;
+    border-radius: 12rpx;
+    display: block;
+}
+
 .avatar-icon {
     font-size: 40rpx;
 }

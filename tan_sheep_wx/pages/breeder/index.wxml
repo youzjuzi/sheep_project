@@ -1,11 +1,10 @@
 <view class="root">
     <block wx:for="{{breeders}}" wx:key="id" wx:for-index="index">
       <view class="item" bindtap="redirectToNextPage" data-index="{{index}}">
-        <image class="breeder-icon" src="{{item.iconUrl || item.icon_url || '/images/icons/function/f8.png'}}" mode="aspectFill" binderror="onImageError" data-index="{{index}}"></image>
+        <image class="breeder-icon" src="{{item.displayAvatar || '/images/icons/function/f8.png'}}" mode="aspectFill" binderror="onImageError" data-index="{{index}}"></image>
         <view class="breeder-info">
           <view class="breeder-name-row">
             <text class="breeder-name">{{item.name}}</text>
-            <text class="breeder-rating" wx:if="{{item.rating}}">⭐ {{item.rating}}</text>
           </view>
           <view class="breeder-details">
             <text class="breeder-detail">{{item.gender}}</text>

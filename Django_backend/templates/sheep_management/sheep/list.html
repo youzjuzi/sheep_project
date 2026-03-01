@@ -46,11 +46,13 @@
         <thead>
             <tr>
                 <th>编号</th>
+                <th>图片</th>
                 <th>耳标号</th>
                 <th>性别</th>
                 <th>健康状态</th>
                 <th>体重(kg)</th>
                 <th>价格（元）</th>
+                <th>领养人</th>
                 {% if is_admin %}<th>所属养殖户</th>{% endif %}
                 <th>操作</th>
             </tr>
@@ -59,6 +61,13 @@
             {% for sheep in sheep_list %}
             <tr>
                 <td>{{ sheep.id }}</td>
+                <td>
+                    {% if sheep.image %}
+                        <img src="{{ sheep.image.url }}" style="width:48px;height:48px;object-fit:cover;border-radius:6px;border:1px solid #eee;" alt="">
+                    {% else %}
+                        <span style="font-size:28px;">&#x1F411;</span>
+                    {% endif %}
+                </td>
                 <td>{{ sheep.ear_tag|default:'-' }}</td>
                 <td>{{ sheep.get_gender_display }}</td>
                 <td>
@@ -68,6 +77,13 @@
                 </td>
                 <td>{{ sheep.weight }}</td>
                 <td><strong style="color: #e74c3c;">¥ {{ sheep.price }}</strong></td>
+                <td>
+                    {% if sheep.adopter %}
+                        <span style="color: #27ae60; font-weight: bold;">{{ sheep.adopter.nickname|default:sheep.adopter.username }}</span>
+                    {% else %}
+                        <span style="color: #bbb;">未领养</span>
+                    {% endif %}
+                </td>
                 {% if is_admin %}<td>{{ sheep.owner.nickname|default:sheep.owner.username }}</td>{% endif %}
                 <td>
                     <a href="{% url 'sheep_detail' sheep.pk %}" class="btn" style="padding: 5px 10px; font-size: 12px;">查看</a>
@@ -76,7 +92,7 @@
             </tr>
             {% empty %}
             <tr>
-                <td colspan="{% if is_admin %}8{% else %}7{% endif %}" style="text-align: center; padding: 40px;">
+                <td colspan="{% if is_admin %}10{% else %}9{% endif %}" style="text-align: center; padding: 40px;">
                     <div style="color: #999;">
                         <div style="font-size: 48px; margin-bottom: 10px;">🐑</div>
                         <div>暂无羊只数据</div>

@@ -268,6 +268,7 @@ class CommerceService:
                     'height': float(sheep.height),
                     'length': float(sheep.length),
                     'price': float(sheep.price),
+                    'image': sheep.image.url if sheep.image else '',
                 },
             })
         return result
@@ -433,6 +434,7 @@ class CommerceService:
                 'height': float(sheep.height),
                 'length': float(sheep.length),
                 'price': float(sheep.price),
+                'image': sheep.image.url if sheep.image else '',
             },
             'quantity': item.quantity,
             'price': float(item.price),

@@ -3,7 +3,7 @@
 {% block content %}
 <div class="card">
     <h2>{{ title }}</h2>
-    <form method="post" style="margin-top: 20px;">
+    <form method="post" enctype="multipart/form-data" style="margin-top: 20px;">
         {% csrf_token %}
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
             {% if sheep %}
@@ -68,10 +68,46 @@
                 <input type="number" name="price" step="0.01" min="0" value="{% if sheep %}{{ sheep.price }}{% else %}0{% endif %}" placeholder="请输入销售价格">
             </div>
         </div>
-        <div style="display: flex; gap: 10px; margin-top: 20px;">
+
+        <!-- 图片上传区域 -->
+        <div class="form-group" style="margin-top: 20px;">
+            <label>羊只图片</label>
+            <div style="display:flex; align-items:center; gap:20px; flex-wrap:wrap;">
+                <!-- 当前图片预览 -->
+                <div id="img-preview-wrap" style="width:120px;height:120px;border-radius:10px;overflow:hidden;background:#f5f5f5;display:flex;align-items:center;justify-content:center;border:2px dashed #ddd;flex-shrink:0;">
+                    {% if sheep and sheep.image %}
+                        <img id="img-preview" src="{{ sheep.image.url }}" style="width:100%;height:100%;object-fit:cover;">
+                    {% else %}
+                        <span id="img-preview" style="font-size:48px;">&#x1F411;</span>
+                    {% endif %}
+                </div>
+                <div>
+                    <input type="file" name="image" id="sheep-image-input" accept="image/*" onchange="previewImage(this)" style="display:none;">
+                    <button type="button" class="btn" style="background:#3498db;" onclick="document.getElementById('sheep-image-input').click()">
+                        &#x1F4F7; {% if sheep and sheep.image %}更换图片{% else %}上传图片{% endif %}
+                    </button>
+                    <div style="margin-top:8px;font-size:12px;color:#999;">&#x2601;&#xfe0f; 图片会存储到 Cloudflare R2，支持 jpg/png/webp，建议不超过 5MB</div>
+                    <div id="img-filename" style="margin-top:4px;font-size:12px;color:#666;"></div>
+                </div>
+            </div>
+        </div>
             <button type="submit" class="btn">保存</button>
             <a href="{% url 'sheep_list' %}" class="btn" style="background: #95a5a6;">取消</a>
         </div>
     </form>
 </div>
+
+<script>
+function previewImage(input) {
+    if (!input.files || !input.files[0]) return;
+    var file = input.files[0];
+    document.getElementById('img-filename').textContent = '已选择: ' + file.name + ' (' + (file.size / 1024).toFixed(1) + ' KB)';
+    var reader = new FileReader();
+    reader.onload = function(e) {
+        var wrap = document.getElementById('img-preview-wrap');
+        wrap.innerHTML = '<img id="img-preview" src="' + e.target.result + '" style="width:100%;height:100%;object-fit:cover;">';
+    };
+    reader.readAsDataURL(file);
+}
+</script>
 {% endblock %}

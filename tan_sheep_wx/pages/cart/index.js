@@ -5,6 +5,8 @@ Page({
     data: {
         cartItems: [],
         totalPrice: 0,
+        selectedCount: 0,
+        allSelected: false,
         showPaymentSheet: false,
         userBalance: '0.00'
     },
@@ -42,26 +44,33 @@ Page({
                     const items = Array.isArray(cartData) ? cartData : [];
 
                     // 格式化数据
+                    const baseUrl = API.API_BASE_URL;
                     const cartItems = items.map(item => {
                         const sheep = item.sheep || {};
                         const unitPrice = item.price || sheep.price || 0;
                         const qty = item.quantity || 1;
+                        // 转换图片为绝对 URL
+                        let imageUrl = sheep.image || '';
+                        if (imageUrl && !imageUrl.startsWith('http://') && !imageUrl.startsWith('https://')) {
+                            imageUrl = baseUrl + imageUrl;
+                        }
                         return {
                             id: sheep.id || item.sheep_id || item.id,
                             cart_item_id: item.id, // 购物车记录ID，用于删除
-                            sheep: sheep,
+                            sheep: { ...sheep, image: imageUrl },
                             gender: sheep.gender || '',
                             weight: sheep.weight || 0,
                             height: sheep.height || 0,
                             length: sheep.length || 0,
                             quantity: qty,
                             price: unitPrice,
-                            total_price: unitPrice * qty
+                            total_price: unitPrice * qty,
+                            selected: true  // 默认全选
                         };
                     });
 
-                    const totalPrice = cartItems.reduce((sum, item) => sum + (item.total_price || 0), 0);
-                    that.setData({ cartItems, totalPrice });
+                    that.setData({ cartItems });
+                    that._updateSelection();
                 })
                 .catch((error) => {
                     wx.hideLoading();
@@ -126,6 +135,38 @@ Page({
         });
     },
 
+    // 单个商品切换选中状态
+    toggleSelect: function (e) {
+        const index = e.currentTarget.dataset.index;
+        const cartItems = this.data.cartItems;
+        cartItems[index].selected = !cartItems[index].selected;
+        this.setData({ cartItems });
+        this._updateSelection();
+    },
+
+    // 全选 / 取消全选
+    toggleSelectAll: function () {
+        const allSelected = !this.data.allSelected;
+        const cartItems = this.data.cartItems.map(item => ({
+            ...item,
+            selected: allSelected
+        }));
+        this.setData({ cartItems, allSelected });
+        this._updateSelection(false); // allSelected 已经手动设置，不需要重算
+    },
+
+    // 重新计算选中数量和总价
+    _updateSelection: function (recalcAllSelected) {
+        const cartItems = this.data.cartItems;
+        const selectedItems = cartItems.filter(item => item.selected);
+        const totalPrice = selectedItems.reduce((sum, item) => sum + (item.total_price || 0), 0);
+        const selectedCount = selectedItems.length;
+        const allSelected = recalcAllSelected === false
+            ? this.data.allSelected
+            : (cartItems.length > 0 && selectedCount === cartItems.length);
+        this.setData({ totalPrice, selectedCount, allSelected });
+    },
+
     viewOrderDetail: function (e) {
         const itemId = e.currentTarget.dataset.id;
         wx.navigateTo({
@@ -144,6 +185,11 @@ Page({
 
         if (this.data.cartItems.length === 0) {
             wx.showToast({ title: '购物车为空', icon: 'none' });
+            return;
+        }
+
+        if (this.data.selectedCount === 0) {
+            wx.showToast({ title: '请先选择要结算的羊只', icon: 'none' });
             return;
         }
 

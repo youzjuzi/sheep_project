@@ -4,7 +4,7 @@ from django.contrib import messages
 from django.db.models import Q
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
-from ..models import Sheep, GrowthRecord, FeedingRecord, VaccinationHistory, VaccineType, EnvironmentAlert, User
+from ..models import Sheep, GrowthRecord, FeedingRecord, VaccinationHistory, VaccineType, EnvironmentAlert, User, OrderItem
 from ..permissions import ROLE_ADMIN, ROLE_BREEDER
 
 
@@ -41,7 +41,19 @@ def sheep_list(request):
     # 按性别筛选
     if gender:
         sheep_list = sheep_list.filter(gender=int(gender))
-    
+
+    # 批量查询每只羊的领养人（已支付/完成的订单）
+    sheep_ids = [s.id for s in sheep_list]
+    adopter_map = {}
+    for oi in OrderItem.objects.filter(
+        sheep_id__in=sheep_ids,
+        order__status__in=['paid', 'completed']
+    ).select_related('order__user'):
+        adopter_map[oi.sheep_id] = oi.order.user
+
+    for s in sheep_list:
+        s.adopter = adopter_map.get(s.id)  # None 表示未领养
+
     # 获取筛选选项
     health_choices = Sheep.HEALTH_STATUS_CHOICES
     gender_choices = Sheep.GENDER_CHOICES
@@ -201,6 +213,9 @@ def sheep_create(request):
             price=float(request.POST.get('price', 0)),
             owner=owner,
         )
+        if request.FILES.get('image'):
+            sheep.image = request.FILES['image']
+            sheep.save()
         messages.success(request, f'羊只创建成功！耳标号：{sheep.ear_tag}')
         return redirect('sheep_detail', pk=sheep.pk)
     
@@ -242,6 +257,8 @@ def sheep_edit(request, pk):
         sheep.length = float(request.POST.get('length'))
         sheep.birth_date = request.POST.get('birth_date') or None
         sheep.price = float(request.POST.get('price', 0))
+        if request.FILES.get('image'):
+            sheep.image = request.FILES['image']
         sheep.save()
         messages.success(request, '羊只信息更新成功！')
         return redirect('sheep_detail', pk=sheep.pk)

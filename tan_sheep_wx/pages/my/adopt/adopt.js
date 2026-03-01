@@ -41,6 +41,17 @@ Page({
         const sheepData = res.data || res;
         const items = Array.isArray(sheepData) ? sheepData : [];
 
+        // 转换图片为绝对 URL
+        const baseUrl = API.API_BASE_URL;
+        items.forEach(item => {
+          if (item.sheep && item.sheep.image) {
+            const img = item.sheep.image;
+            item.sheep.image = (img.startsWith('http://') || img.startsWith('https://'))
+              ? img
+              : baseUrl + img;
+          }
+        });
+
         that.setData({
           mySheepList: items,
           loading: false

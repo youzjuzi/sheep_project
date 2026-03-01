@@ -343,11 +343,16 @@ def api_get_breeders(request, breeder_id=None):
                 health_rate = (healthy_count / actual_sheep_count * 100) if actual_sheep_count > 0 else 0
                 avg_weight = sum(s['weight'] for s in sheep_data) / actual_sheep_count if actual_sheep_count > 0 else 0
 
+                avatar_url = breeder.avatar_url or ''
+                if avatar_url and not (avatar_url.startswith('http://') or avatar_url.startswith('https://')):
+                    avatar_url = request.build_absolute_uri(avatar_url)
+
                 result = {
                     'id': breeder.id,
                     'name': breeder.nickname or breeder.username,
                     'gender': breeder.get_gender_display() if breeder.gender is not None else '',
                     'phone': breeder.mobile or '',
+                    'avatar_url': avatar_url,
                     'sheep_count': actual_sheep_count,
                     'actual_sheep_count': actual_sheep_count,
                     'sheep_id': str(breeder.id),
@@ -391,6 +396,10 @@ def api_get_breeders(request, breeder_id=None):
                     try:
                         actual_sheep_count = Sheep.objects.filter(owner=breeder).count()
 
+                        avatar_url = breeder.avatar_url or ''
+                        if avatar_url and not (avatar_url.startswith('http://') or avatar_url.startswith('https://')):
+                            avatar_url = request.build_absolute_uri(avatar_url)
+
                         # 统计健康羊只
                         try:
                             healthy_count = Sheep.objects.filter(
@@ -405,6 +414,7 @@ def api_get_breeders(request, breeder_id=None):
                             'name': breeder.nickname or breeder.username,
                             'gender': breeder.get_gender_display() if breeder.gender is not None else '',
                             'phone': breeder.mobile or '',
+                            'avatar_url': avatar_url,
                             'sheep_count': Sheep.objects.filter(owner=breeder).count(),
                             'actual_sheep_count': actual_sheep_count,
                             'sheep_id': str(breeder.id),

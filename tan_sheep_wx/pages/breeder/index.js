@@ -54,12 +54,20 @@ Page({
           console.log('[养殖户列表] 处理后的数据数量:', breedersData.length);
           
           // 处理数据并设置
+          const apiBaseUrl = (apiConfig.getApiBaseUrl() || '').replace(/\/$/, '');
+          const normalizeAvatarUrl = (url) => {
+            if (!url || typeof url !== 'string') return '';
+            if (url.startsWith('http://') || url.startsWith('https://')) return url;
+            if (url.startsWith('/')) return `${apiBaseUrl}${url}`;
+            return `${apiBaseUrl}/${url}`;
+          };
+
           const processedBreeders = breedersData.map(item => {
-            // 优先使用后端返回的图片，如果没有则使用farmer/people目录下的图片，最后使用默认图标
-            const defaultIconPath = `/images/farmer/people/p${item.id % 10 + 1}.png`;
+            // 优先使用用户自身头像，没有则使用默认头像
+            const defaultIconPath = '/images/icons/function/f8.png';
             return {
               ...item, 
-              iconUrl: item.iconUrl || item.icon_url || defaultIconPath
+              displayAvatar: normalizeAvatarUrl(item.avatar_url || item.avatarUrl) || defaultIconPath
             };
           });
           
@@ -115,15 +123,7 @@ Page({
         const index = e.currentTarget.dataset.index;
         const breeders = this.data.breeders;
         if (breeders[index]) {
-            const currentIcon = breeders[index].iconUrl;
-            // 如果当前是farmer/people的图片，说明该图片不存在，使用默认图标
-            if (currentIcon && currentIcon.includes('/farmer/people/')) {
-                breeders[index].iconUrl = '/images/icons/function/f8.png';
-            } else {
-                // 如果当前是后端返回的图片，先尝试使用farmer/people目录的图片
-                const farmerIconPath = `/images/farmer/people/p${breeders[index].id % 10 + 1}.png`;
-                breeders[index].iconUrl = farmerIconPath;
-            }
+        breeders[index].displayAvatar = '/images/icons/function/f8.png';
             this.setData({
                 breeders: breeders
             });

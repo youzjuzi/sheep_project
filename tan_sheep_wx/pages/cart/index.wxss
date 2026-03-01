@@ -71,6 +71,40 @@ page {
     color: #999;
 }
 
+/* ===== 复选框 ===== */
+.checkbox-wrap {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 60rpx;
+    height: 60rpx;
+    flex-shrink: 0;
+    margin-right: 16rpx;
+}
+
+.checkbox {
+    width: 44rpx;
+    height: 44rpx;
+    border: 3rpx solid #d0d0d0;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #fff;
+    transition: all 0.2s;
+}
+
+.checkbox-checked {
+    background-color: #FF5700;
+    border-color: #FF5700;
+}
+
+.checkbox-tick {
+    color: #fff;
+    font-size: 26rpx;
+    line-height: 1;
+}
+
 /* ===== 购物车商品列表 ===== */
 .cart-list {
     display: flex;
@@ -80,6 +114,7 @@ page {
 
 .cart-item {
     display: flex;
+    align-items: center;
     background-color: #fff;
     border-radius: 16rpx;
     padding: 24rpx;
@@ -188,6 +223,23 @@ page {
     padding: 0 32rpx;
     box-sizing: border-box;
     width: 100%;
+}
+
+.bar-left {
+    display: flex;
+    align-items: center;
+    gap: 24rpx;
+}
+
+.select-all-wrap {
+    display: flex;
+    align-items: center;
+    gap: 10rpx;
+}
+
+.select-all-text {
+    font-size: 26rpx;
+    color: #333;
 }
 
 .total-info {

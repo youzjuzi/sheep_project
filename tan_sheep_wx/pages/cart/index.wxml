@@ -32,8 +32,15 @@
         <view class="cart-list">
             <block wx:for="{{cartItems}}" wx:key="cart_item_id">
                 <view class="cart-item">
+                    <!-- 复选框 -->
+                    <view class="checkbox-wrap" bindtap="toggleSelect" data-index="{{index}}">
+                        <view class="checkbox {{item.selected ? 'checkbox-checked' : ''}}">
+                            <text wx:if="{{item.selected}}" class="checkbox-tick">✓</text>
+                        </view>
+                    </view>
+
                     <!-- 左侧图片 -->
-                    <image class="cart-image" src="/images/icons/function/f1.png" mode="aspectFill"></image>
+                    <image class="cart-image" src="{{item.sheep.image || '/images/icons/function/f1.png'}}" mode="aspectFill"></image>
                     
                     <!-- 右侧详情 -->
                     <view class="cart-details">
@@ -63,15 +70,24 @@
         </view>
     </block>
 
-    <!-- 底部结算栏区域 (悬浮底部) -->
     <view class="checkout-bar-wrapper" wx:if="{{cartItems.length > 0}}">
         <view class="checkout-bar">
-            <view class="total-info">
-                <text class="total-label">合计:</text>
-                <text class="total-symbol">¥</text>
-                <text class="total-price">{{totalPrice}}</text>
+            <!-- 左侧：全选 + 合计 -->
+            <view class="bar-left">
+                <view class="select-all-wrap" bindtap="toggleSelectAll">
+                    <view class="checkbox {{allSelected ? 'checkbox-checked' : ''}}">
+                        <text wx:if="{{allSelected}}" class="checkbox-tick">✓</text>
+                    </view>
+                    <text class="select-all-text">全选</text>
+                </view>
+                <view class="total-info">
+                    <text class="total-label">合计:</text>
+                    <text class="total-symbol">￥</text>
+                    <text class="total-price">{{totalPrice}}</text>
+                </view>
             </view>
-            <button class="checkout-button hover-class" bindtap="checkout" hover-class="checkout-hover">马上结算</button>
+            <!-- 右侧：结算按钒 -->
+            <button class="checkout-button hover-class" bindtap="checkout" hover-class="checkout-hover">马上结算({{selectedCount}})</button>
         </view>
     </view>
 
