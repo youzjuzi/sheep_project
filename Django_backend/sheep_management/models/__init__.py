@@ -2,6 +2,7 @@ from .sheep import Sheep, GrowthRecord, FeedingRecord, VaccineType, VaccinationH
 from .user import User
 from .commerce import CartItem, PromotionActivity, Coupon, UserCoupon, Order, OrderItem
 from .audit import AuditLog
+from .knowledge import KnowledgeDocument
 
 __all__ = [
     'Sheep',
@@ -18,4 +19,5 @@ __all__ = [
     'Order',
     'OrderItem',
     'AuditLog',
+    'KnowledgeDocument',
 ]

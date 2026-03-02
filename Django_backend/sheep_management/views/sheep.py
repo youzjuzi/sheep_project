@@ -8,6 +8,7 @@ from ..models import Sheep, GrowthRecord, FeedingRecord, VaccinationHistory, Vac
 from ..permissions import ROLE_ADMIN, ROLE_BREEDER
 
 
+@login_required
 def sheep_list(request):
     """羊只列表 - 带多条件筛选"""
     is_admin = request.user.role == ROLE_ADMIN
@@ -77,6 +78,7 @@ def sheep_list(request):
     return render(request, 'sheep_management/sheep/list.html', context)
 
 
+@login_required
 def sheep_detail(request, pk):
     """羊只详情"""
     sheep = get_object_or_404(Sheep, pk=pk)

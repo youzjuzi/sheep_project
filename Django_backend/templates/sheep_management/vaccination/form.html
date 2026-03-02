@@ -16,16 +16,12 @@
         </div>
         <div class="form-group">
             <label>疫苗类型 *</label>
-            <select name="vaccination_id" required>
+            <select name="vaccine_id" required>
                 <option value="">请选择疫苗类型</option>
-                <option value="1">口蹄疫苗</option>
-                <option value="2">传染性胸膜肺炎灭活疫苗</option>
-                <option value="3">四联苗</option>
+                {% for vt in vaccine_types %}
+                <option value="{{ vt.id }}">{{ vt.name }}{% if vt.manufacturer %} - {{ vt.manufacturer }}{% endif %}</option>
+                {% endfor %}
             </select>
-        </div>
-        <div class="form-group">
-            <label>疫苗类型名称</label>
-            <input type="text" name="vaccine_type" placeholder="可选，如：口蹄疫苗">
         </div>
         <div class="form-group">
             <label>接种日期 *</label>
