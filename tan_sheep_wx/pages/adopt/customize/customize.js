@@ -81,7 +81,7 @@ Page({
                     that.setData({ adoptStatus: 'in_my_cart', adoptStatusText: '去购物车支付' });
                     wx.showModal({
                         title: '已加入购物车',
-                        content: '该羊只已加入购物车。完成支付后，才算领养成功。是否立即前往购物车结算？',
+                        content: '该羊只已添加至购物车，完成支付流程后，领养手续正式生效。是否跳转至购物车页面完成结算?',
                         confirmText: '去购物车',
                         cancelText: '稍后再说',
                         success: function (modalRes) {

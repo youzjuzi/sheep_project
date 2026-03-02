@@ -12,21 +12,5 @@
   <van-grid-item wx:for="{{ rechargeSendRules }}" icon="balance-o" text="¥{{item.confine}}" badge="{{item.send ? '送 ¥' + item.send : ''}}" bind:click="rechargeAmount" data-confine="{{item.confine}}" data-send="{{item.send}}" />
 </van-grid>
 <view class="block-btn">
-  <van-button type="primary" block round bind:click="bindSave">立即充值</van-button>
+  <van-button type="primary" block round loading="{{ loading }}" bind:click="bindSave">立即充值</van-button>
 </view>
-
-<bind-mobile
-  title="绑定手机号码"
-  alarmText="为保障您的资金安全，请先绑定手机号码"
-  show="{{ bindMobileShow }}"
-  bind:cancel="bindMobileCancel"
-  bind:ok="bindMobileOk"
-/>
-
-<payment
-  money="{{ amount }}"
-  remark="在线充值{{ amount }}"
-  show="{{ paymentShow }}"
-  bind:cancel="paymentCancel"
-  bind:ok="paymentOk"
-/>

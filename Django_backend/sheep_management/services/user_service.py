@@ -241,6 +241,26 @@ class UserService:
     # ========================
 
     @staticmethod
+    def recharge(token, amount):
+        """用户余额充值"""
+        from decimal import Decimal, InvalidOperation
+        user = UserService.get_user_by_token(token)
+        try:
+            amt = Decimal(str(amount))
+        except (InvalidOperation, ValueError):
+            raise UserError('充值金额无效')
+        if amt <= 0:
+            raise UserError('充值金额必须大于 0')
+        if amt > Decimal('9999'):
+            raise UserError('单次充值金额不能超过 9999 元')
+        user.balance = user.balance + amt
+        user.save(update_fields=['balance'])
+        return {
+            'balance': float(user.balance),
+            'recharged': float(amt),
+        }
+
+    @staticmethod
     def _build_profile(user):
         """构建用户完整资料（统一返回所有字段）"""
         from ..models import Order

@@ -154,3 +154,26 @@ def api_apply_breeder(request):
         return _error_response(e)
     except Exception as e:
         return _error_response(e)
+
+
+@csrf_exempt
+@require_http_methods(["POST"])
+def api_recharge(request):
+    """
+    余额充值
+    POST /api/user/recharge
+    请求体: { "token": "xxx", "amount": 100 }
+    返回: { balance: 新余额, recharged: 本次充值金额 }
+    """
+    try:
+        data = json.loads(request.body)
+        token = data.get('token', '')
+        amount = data.get('amount')
+        if amount is None:
+            return JsonResponse({'code': 400, 'msg': '缺少 amount 参数', 'data': None}, status=400)
+        result = UserService.recharge(token=token, amount=amount)
+        return JsonResponse({'code': 0, 'msg': '充值成功', 'data': result})
+    except UserError as e:
+        return _error_response(e)
+    except Exception as e:
+        return _error_response(e)

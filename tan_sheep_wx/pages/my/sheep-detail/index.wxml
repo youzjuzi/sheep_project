@@ -77,8 +77,7 @@
 
     <!-- 底部操作区 -->
     <view class="action-bar">
-      <button class="action-btn outline-btn" bindtap="viewMonitor">查看监控</button>
-      <button class="action-btn primary-btn" bindtap="viewMonitor">溯源证书</button>
+      <button class="action-btn primary-btn" bindtap="viewMonitor">查看监控</button>
     </view>
   </block>
 </view>

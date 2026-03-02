@@ -75,16 +75,21 @@ Page({
           this.setData({
             sheepInfo: sheepInfo,
             noDataFound: false,
-            isLoading: false
+            isLoading: false,
+            ec: {
+              onInit: this.initChart
+            }
           }, () => {
-            // 延迟初始化图表，确保DOM已渲染
+            // wx:if 导致 ec-canvas 在数据到来时才创建，onInit 会自动触发
+            // 同时兼容已存在图表实例的情况（如重复查询）
             setTimeout(() => {
               if (this.chart) {
                 const option = this.getChartOption();
                 this.chart.setOption(option);
               }
-            }, 200);
+            }, 300);
           });
+
         } else {
           this.setData({
             sheepInfo: null,

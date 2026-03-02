@@ -1,63 +1,110 @@
-<view class="container">
-    <text class="title">羊的饲料都有什么?</text>
-    <view class="feed-item">
-        <text class="feed-type">粗饲料：</text>
-        <text class="feed-list">牧草、野草、青干草、树叶、大豆秸秆、花生秧、稻草、玉米秸秆等</text>
-    </view>
-    <view class="feed-item">
-        <text class="feed-type">精饲料：</text>
-        <text class="feed-list">玉米、大麦、麦麸、豆粕、花生粕等</text>
-    </view>
-    <view class="feed-item">
-        <text class="feed-type">糟粕饲料：</text>
-        <text class="feed-list">白酒糟、啤酒糟、醋糟、豆腐渣等</text>
-    </view>
-    <view class="feed-item">
-        <text class="feed-type">添加剂饲料：</text>
-        <text class="feed-list">预混料（添加剂预混合饲料）、瘤胃素、小苏打、健胃散等</text>
-    </view>
-</view>
-<view class="container">
-    <text class="title">羊的生长周期及饲料</text>
-    <view class="divider"></view>
-    <image src="http://localhost:5001/images/feed/xiaoyang.jpg"></image>
-    <view class="feed-item">
-        <text class="feed-type">幼羊期（出生至6个月）：</text>
-        <text class="feed-list">母羊的乳汁
-            青干草（适量）
-            牧草（适量）</text>
+<view class="feed-page">
+
+  <!-- 页头 -->
+  <view class="feed-header">
+    <text class="feed-header-icon">🌾</text>
+    <text class="feed-header-title">日常饲料指南</text>
+    <text class="feed-header-sub">宁夏盐池滩羊科学喂养</text>
+  </view>
+
+  <!-- 饲料分类 -->
+  <view class="section">
+    <view class="section-title">🗂️ 饲料分类</view>
+    <view class="feed-grid">
+
+      <view class="feed-card color-green">
+        <text class="feed-card-icon">🌿</text>
+        <text class="feed-card-name">粗饲料</text>
+        <text class="feed-card-desc">牧草、野草、青干草、树叶、大豆秸秆、花生秧、稻草、玉米秸秆</text>
+      </view>
+
+      <view class="feed-card color-yellow">
+        <text class="feed-card-icon">🌽</text>
+        <text class="feed-card-name">精饲料</text>
+        <text class="feed-card-desc">玉米、大麦、麦麸、豆粕、花生粕</text>
+      </view>
+
+      <view class="feed-card color-brown">
+        <text class="feed-card-icon">🍺</text>
+        <text class="feed-card-name">糟粕饲料</text>
+        <text class="feed-card-desc">白酒糟、啤酒糟、醋糟、豆腐渣</text>
+      </view>
+
+      <view class="feed-card color-blue">
+        <text class="feed-card-icon">💊</text>
+        <text class="feed-card-name">添加剂</text>
+        <text class="feed-card-desc">预混料、瘤胃素、小苏打、健胃散</text>
+      </view>
 
     </view>
+  </view>
 
-    <image src="http://localhost:5001/images/feed/milk.jpg" class="food-image"></image>
-    <image src="http://localhost:5001/images/feed/cao.jpg" class="food-image"></image>
-    <image src="http://localhost:5001/images/feed/mucao.jpg" class="food-image"></image>
-    <view class="divider"></view>
-    <image src="http://localhost:5001/images/feed/qingnian.jpg" class="food-image"></image>
-    <view class="feed-item">
-        <text class="feed-type">青年期（6个月至1岁）：</text>
+  <!-- 生长阶段饲料 -->
+  <view class="section">
+    <view class="section-title">📅 生长阶段与饲料</view>
 
-        <text class="feed-list">羊开始断奶，可以消化更多种类的食物，此时可以增加粗饲料和精饲料的比例，以支持它们快速成长的需求。
-            牧草、野草
-            青干草
-            树叶
-            大豆秸秆、花生秧
-            小量玉米、大麦
-            小量豆粕、花生粕</text>
+    <!-- 幼羊期 -->
+    <view class="stage-card">
+      <view class="stage-header stage-baby">
+        <text class="stage-icon">🐑</text>
+        <view class="stage-info">
+          <text class="stage-name">幼羊期</text>
+          <text class="stage-age">出生 ~ 6个月</text>
+        </view>
+      </view>
+      <view class="stage-body">
+        <view class="feed-tag-row">
+          <view class="feed-tag">🥛 母乳</view>
+          <view class="feed-tag">🌱 青干草（适量）</view>
+          <view class="feed-tag">🌿 牧草（适量）</view>
+        </view>
+        <text class="stage-tip">💡 以母乳为主，逐步引入少量植物性饲料</text>
+      </view>
     </view>
-    <image src="http://localhost:5001/images/feed/dou.jpg" class="food-image"></image>
-    <image src="http://localhost:5001/images/feed/yumi.jpg" class="food-image"></image>
-    <view class="divider"></view>
-    <view class="feed-item">
-        <images src="http://localhost:5001/images/feed/chengnian.jpg"></images>
-        <text class="feed-type">成年期（1岁以上）：</text>
-        <text class="feed-list">成年羊已经形成了自己的饮食习惯，可以摄入更多种类的饲料，以维持健康和生产性能（如肉羊或乳羊）。
-            牧草、干草、稻草、玉米秸秆
-            精饲料：玉米、大麦、麦麸
-            蛋白质补充：豆粕、花生粕
-            糟粕饲料：白酒糟、啤酒糟、醋糟、豆腐渣
-            添加剂饲料：预混料、瘤胃素、小苏打、健胃散等（根据需要和兽医建议）</text>
-        <image src="http://localhost:5001/images/feed/doubo.jpg" class="food-image"></image>
-        <image src="http://localhost:5001/images/feed/damai.jpg" class="food-image"></image>
+
+    <!-- 青年期 -->
+    <view class="stage-card">
+      <view class="stage-header stage-young">
+        <text class="stage-icon">🐏</text>
+        <view class="stage-info">
+          <text class="stage-name">青年期</text>
+          <text class="stage-age">6个月 ~ 1岁</text>
+        </view>
+      </view>
+      <view class="stage-body">
+        <view class="feed-tag-row">
+          <view class="feed-tag">🌿 牧草·野草</view>
+          <view class="feed-tag">🌱 青干草</view>
+          <view class="feed-tag">🍃 树叶·秸秆</view>
+          <view class="feed-tag">🌽 少量玉米</view>
+          <view class="feed-tag">🫘 少量豆粕</view>
+        </view>
+        <text class="stage-tip">💡 断奶后逐步增加粗饲料与精饲料比例，支持快速生长</text>
+      </view>
     </view>
+
+    <!-- 成年期 -->
+    <view class="stage-card">
+      <view class="stage-header stage-adult">
+        <text class="stage-icon">🐑</text>
+        <view class="stage-info">
+          <text class="stage-name">成年期</text>
+          <text class="stage-age">1岁以上</text>
+        </view>
+      </view>
+      <view class="stage-body">
+        <view class="feed-tag-row">
+          <view class="feed-tag">🌿 牧草·干草</view>
+          <view class="feed-tag">🌽 玉米·大麦</view>
+          <view class="feed-tag">🫘 豆粕·花生粕</view>
+          <view class="feed-tag">🍺 酒糟·醋糟</view>
+          <view class="feed-tag">💊 添加剂</view>
+        </view>
+        <text class="stage-tip">💡 饲料多样化，均衡营养以维持健康与生产性能</text>
+      </view>
+    </view>
+
+  </view>
+
+  <view style="height: 40rpx;"></view>
 </view>

@@ -1,3 +1,5 @@
 {
-  "usingComponents": {}
+  "usingComponents": {
+    "ec-canvas": "../../utils/echarts/ec-canvas/ec-canvas"
+  }
 }

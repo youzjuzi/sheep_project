@@ -43,6 +43,7 @@ urlpatterns = [
     path('api/user/profile', user_api.api_get_profile, name='api_get_profile'),
     path('api/user/profile_update', user_api.api_update_profile, name='api_update_profile'),
     path('api/user/apply_breeder', user_api.api_apply_breeder, name='api_apply_breeder'),
+    path('api/user/recharge', user_api.api_recharge, name='api_user_recharge'),
 
     # ==========================
     # 其他业务接口

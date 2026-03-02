@@ -117,6 +117,15 @@ function getUserInfo(token) {
 }
 
 /**
+ * 余额充值
+ * @param {string} token
+ * @param {number} amount 充值金额
+ */
+function recharge(token, amount) {
+  return request('/api/user/recharge', 'POST', { token, amount })
+}
+
+/**
  * 获取详细用户资料（含简介等）
  * @param {string} token 
  */
@@ -321,6 +330,7 @@ module.exports = {
   register,
   checkToken,
   getUserInfo,
+  recharge,
   updateUserInfo,
   getUserProfile,
   applyBreeder,
