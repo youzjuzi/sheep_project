@@ -170,17 +170,8 @@
 </div>
 
 <script>
-// 每只羊的图表数据
-const growthChartData = {
-    {% for sheep in sheep_list %}
-    '{{ sheep.id }}': {
-        labels: [{% for r in sheep.sorted_growth_records %}"{{ r.record_date }}"{% if not forloop.last %},{% endif %}{% endfor %}],
-        weights: [{% for r in sheep.sorted_growth_records %}{{ r.weight }}{% if not forloop.last %},{% endif %}{% endfor %}],
-        heights: [{% for r in sheep.sorted_growth_records %}{{ r.height }}{% if not forloop.last %},{% endif %}{% endfor %}],
-        lengths: [{% for r in sheep.sorted_growth_records %}{{ r.length }}{% if not forloop.last %},{% endif %}{% endfor %}]
-    }{% if not forloop.last %},{% endif %}
-    {% endfor %}
-};
+// 每只羊的图表数据（由视图序列化，避免模板拼接导致的语法错误）
+const growthChartData = {{ growth_chart_data_json|safe }};
 
 const chartInstances = {};
 

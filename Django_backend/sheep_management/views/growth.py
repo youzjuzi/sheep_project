@@ -1,4 +1,5 @@
 """生长记录管理视图"""
+import json
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.db.models import Prefetch
@@ -28,10 +29,21 @@ def growth_record_list(request):
     sheep_with_records = [s for s in sheep_qs if s.sorted_growth_records]
     total_count = sum(len(s.sorted_growth_records) for s in sheep_with_records)
 
+    # 预先序列化图表数据，避免模板中多次迭代及 None/日期格式问题
+    chart_data = {}
+    for s in sheep_with_records:
+        chart_data[str(s.id)] = {
+            'labels':  [str(r.record_date) for r in s.sorted_growth_records],
+            'weights': [r.weight  for r in s.sorted_growth_records],
+            'heights': [r.height  for r in s.sorted_growth_records],
+            'lengths': [r.length  for r in s.sorted_growth_records],
+        }
+
     context = {
         'sheep_list': sheep_with_records,
         'total_count': total_count,
         'is_admin': is_admin,
+        'growth_chart_data_json': json.dumps(chart_data, ensure_ascii=False),
     }
     return render(request, 'sheep_management/growth/list.html', context)
 
