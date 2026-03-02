@@ -85,6 +85,10 @@ def breeder_edit(request, pk):
         breeder.nickname    = request.POST.get('nickname', breeder.nickname or '').strip()
         breeder.mobile      = request.POST.get('mobile', breeder.mobile or '').strip()
         breeder.is_verified = request.POST.get('is_verified') == 'on'
+        lat = request.POST.get('latitude', '').strip()
+        lng = request.POST.get('longitude', '').strip()
+        breeder.latitude  = float(lat)  if lat  else None
+        breeder.longitude = float(lng) if lng else None
         if new_password:
             breeder.set_password(new_password)
         breeder.save()

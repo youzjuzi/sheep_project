@@ -3,8 +3,9 @@
       id="map"
       longitude="{{longitude}}"
       latitude="{{latitude}}"
-      scale="16"
+      scale="{{scale}}"
       markers="{{markers}}"
+      polygons="{{polygons}}"
       show-location
       bindmarkertap="onMarkerTap"
       bindregionchange="onRegionChange"

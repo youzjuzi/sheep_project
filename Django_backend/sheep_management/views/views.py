@@ -362,9 +362,8 @@ def api_get_breeders(request, breeder_id=None):
                     'actual_male_count': actual_male_count,
                     'icon_url': f'/images/farmer/people/p{breeder.id % 10 + 1}.png',
                     'isFollowed': False,
-                    # 数据库无位置信息，统一返回 None
-                    'latitude': None,
-                    'longitude': None,
+                    'latitude': float(breeder.latitude) if breeder.latitude is not None else None,
+                    'longitude': float(breeder.longitude) if breeder.longitude is not None else None,
                     'address': None,
                     'sheep_list': sheep_data,
                     'statistics': {
@@ -424,9 +423,8 @@ def api_get_breeders(request, breeder_id=None):
                             'healthy_count': healthy_count,
                             'rating': 4.5,
                             'followers_count': 0,
-                            # 数据库无位置信息，统一返回 None
-                            'latitude': None,
-                            'longitude': None,
+                            'latitude': float(breeder.latitude) if breeder.latitude is not None else None,
+                            'longitude': float(breeder.longitude) if breeder.longitude is not None else None,
                             'address': None
                         })
                     except Exception as e:

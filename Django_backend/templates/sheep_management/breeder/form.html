@@ -44,6 +44,18 @@
                    value="{% if breeder %}{{ breeder.mobile|default:'' }}{% endif %}" placeholder="请输入手机号">
         </div>
 
+        <div class="form-group">
+            <label for="latitude">纬度（可选，用于地图显示）</label>
+            <input id="latitude" type="number" name="latitude" step="0.000001"
+                   value="{% if breeder %}{{ breeder.latitude|default:'' }}{% endif %}" placeholder="例如：37.852274">
+        </div>
+
+        <div class="form-group">
+            <label for="longitude">经度（可选，用于地图显示）</label>
+            <input id="longitude" type="number" name="longitude" step="0.000001"
+                   value="{% if breeder %}{{ breeder.longitude|default:'' }}{% endif %}" placeholder="例如：107.392028">
+        </div>
+
         <div class="form-group" style="display: flex; align-items: center; gap: 8px;">
             <input id="is_verified" type="checkbox" name="is_verified" style="width: auto;"
                    {% if breeder and breeder.is_verified %}checked{% endif %}>

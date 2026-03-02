@@ -30,6 +30,8 @@ class User(AbstractUser):
     country = models.CharField(max_length=50, null=True, blank=True, verbose_name='国家')
     province = models.CharField(max_length=50, null=True, blank=True, verbose_name='省份')
     city = models.CharField(max_length=50, null=True, blank=True, verbose_name='城市')
+    latitude = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True, verbose_name='纬度')
+    longitude = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True, verbose_name='经度')
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='创建时间')
     updated_at = models.DateTimeField(auto_now=True, verbose_name='更新时间')
 

@@ -4,47 +4,26 @@ const API = require('../../utils/api.js');
 Page({
     data: {
       markers: [],
-      latitude: 37.784595,  // 默认中心点：盐池县
-      longitude: 107.40541,
+      polygons: [],
+      latitude: 37.852274,   // 两点中心
+      longitude: 107.392028,
+      scale: 11,             // 覆盖约 45km 范围
       farmers: [],
       selectedFarmer: null,
       loading: false
     },
   
     onLoad: function (options) {
-      // 如果从其他页面传入坐标，使用传入的坐标
+      // 若外部传入坐标则以传入坐标为中心，否则使用固定区域中心
       if (options.latitude && options.longitude) {
         this.setData({
           latitude: parseFloat(options.latitude),
-          longitude: parseFloat(options.longitude)
+          longitude: parseFloat(options.longitude),
+          scale: 14
         });
-      } else {
-        // 否则获取当前位置
-        this.getCurrentLocation();
       }
-      
       // 加载养殖户数据
       this.fetchFarmers();
-    },
-
-    /**
-     * 获取当前位置
-     */
-    getCurrentLocation: function() {
-      const that = this;
-      wx.getLocation({
-        type: 'gcj02',
-        success: function(res) {
-          that.setData({
-            latitude: res.latitude,
-            longitude: res.longitude
-          });
-        },
-        fail: function(err) {
-          console.log('获取位置失败，使用默认位置', err);
-          // 使用默认位置（盐池县）
-        }
-      });
     },
 
     /**
@@ -104,26 +83,8 @@ Page({
             loading: false
           });
           
-          // 添加地图标记
+          // 添加养殖户标记（会合并固定坐标点）
           that.addFarmerMarkers();
-          
-          // 如果有养殖户数据，调整地图中心点
-          if (farmersWithLocation.length > 0) {
-            const avgLat = farmersWithLocation.reduce((sum, f) => sum + parseFloat(f.latitude), 0) / farmersWithLocation.length;
-            const avgLng = farmersWithLocation.reduce((sum, f) => sum + parseFloat(f.longitude), 0) / farmersWithLocation.length;
-            console.log('[地图] 调整地图中心点:', avgLat, avgLng);
-            that.setData({
-              latitude: avgLat,
-              longitude: avgLng
-            });
-          } else {
-            console.warn('[地图] 没有有位置信息的养殖户，使用默认中心点');
-            wx.showToast({
-              title: '暂无位置数据，请先添加养殖户位置信息',
-              icon: 'none',
-              duration: 3000
-            });
-          }
         })
         .catch(function(error) {
           wx.hideLoading();
@@ -140,49 +101,19 @@ Page({
   
     addFarmerMarkers: function() {
       const { farmers } = this.data;
-      console.log('准备添加标记，养殖户数量:', farmers.length);
-      
-      const markers = farmers
-        .filter(farmer => {
-          const hasLocation = farmer.latitude && farmer.longitude;
-          if (!hasLocation) {
-            console.log('养殖户缺少位置信息:', farmer.id, farmer.name);
-          }
-          return hasLocation;
-        })
-        .map((farmer, index) => {
-          console.log(`添加标记 ${index + 1}:`, farmer.name, farmer.latitude, farmer.longitude);
-          return {
-            id: Number(farmer.id), 
-            latitude: parseFloat(farmer.latitude),
-            longitude: parseFloat(farmer.longitude),
-            width: 30,
-            height: 30,
-            // 不指定iconPath，使用默认标记样式
-            callout: {
-              content: farmer.name,
-              color: '#333',
-              fontSize: 12,
-              borderRadius: 4,
-              bgColor: '#fff',
-              padding: 5,
-              display: 'BYCLICK'  // 点击时显示
-            }
-          };
-        });
-      
-      console.log('最终标记数量:', markers.length);
-      console.log('标记数据:', markers);
-      
-      this.setData({ markers });
-      
-      if (markers.length === 0) {
-        wx.showToast({
-          title: '暂无位置信息',
-          icon: 'none',
-          duration: 2000
-        });
-      }
+
+      // 养殖户标记
+      const farmerMarkers = farmers
+        .filter(farmer => farmer.latitude && farmer.longitude)
+        .map(farmer => ({
+          id: Number(farmer.id),
+          latitude: parseFloat(farmer.latitude),
+          longitude: parseFloat(farmer.longitude),
+          width: 30, height: 30,
+          callout: { content: farmer.name, color: '#333', fontSize: 12, borderRadius: 4, bgColor: '#fff', padding: 5, display: 'BYCLICK' }
+        }));
+
+      this.setData({ markers: farmerMarkers });
     },
   
     onMarkerTap: function (e) {
