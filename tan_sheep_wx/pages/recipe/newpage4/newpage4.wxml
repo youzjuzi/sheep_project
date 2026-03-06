@@ -1,22 +1,56 @@
 <view class="container">
-    <image src="http://localhost:5001/images/recipe/04.jpg" class="recipe-image" mode="aspectFill" />
-    <view class="recipe-info">
-      <text class="recipe-title">红烧羊腱子</text>
-      <view class="recipe-ingredients">
-        <text class="section-title">配料：</text>
-        <text class="ingredients">
-          葱 、姜、 蒜、 花椒、 干海椒、 香叶 、八角 、桂皮 、茴香 、干山楂、 料酒 、生抽、 老抽 、 白糖、 盐 、香菜、 鸡精、油、胡萝卜等配菜
-        </text>
+  <image src="http://localhost:5001/images/recipe/04.jpg" class="recipe-image" mode="aspectFill" />
+  <view class="recipe-info">
+    <text class="recipe-title">红烧羊腱子</text>
+
+    <view class="section-block">
+      <view class="section-header">
+        <view class="section-bar"></view>
+        <text class="section-title">所需食材</text>
       </view>
-      <view class="recipe-method">
-        <text class="section-title">做法：</text>
-        <text class="method">
-          1.羊肉洗净切成合适大小，再焯水过一下，去浮沫。
-          2.把葱姜切片，以及八角等香料放入油锅煎香。
-          3.放入羊肉煎至均匀变色，加入生抽、老抽、料酒、白糖、少许水淹没肉。
-          4.炖约30分钟，加入胡萝卜等炖熟，收汁加入适量盐翻拌均匀。
-          5.出锅撒上香菜即可。
-        </text>
+      <view class="ing-list">
+        <view class="ing-item"><text class="ing-dot">·</text><text class="ing-name">葱、姜、蒜</text></view>
+        <view class="ing-item"><text class="ing-dot">·</text><text class="ing-name">花椒</text></view>
+        <view class="ing-item"><text class="ing-dot">·</text><text class="ing-name">干海椒</text></view>
+        <view class="ing-item"><text class="ing-dot">·</text><text class="ing-name">香叶、八角</text></view>
+        <view class="ing-item"><text class="ing-dot">·</text><text class="ing-name">桂皮、茴香</text></view>
+        <view class="ing-item"><text class="ing-dot">·</text><text class="ing-name">干山楂</text></view>
+        <view class="ing-item"><text class="ing-dot">·</text><text class="ing-name">料酒</text></view>
+        <view class="ing-item"><text class="ing-dot">·</text><text class="ing-name">生抽、老抽</text></view>
+        <view class="ing-item"><text class="ing-dot">·</text><text class="ing-name">白糖</text></view>
+        <view class="ing-item"><text class="ing-dot">·</text><text class="ing-name">盐、鸡精</text></view>
+        <view class="ing-item"><text class="ing-dot">·</text><text class="ing-name">香菜</text></view>
+        <view class="ing-item"><text class="ing-dot">·</text><text class="ing-name">胡萝卜等配菜</text></view>
       </view>
     </view>
+
+    <view class="section-block">
+      <view class="section-header">
+        <view class="section-bar"></view>
+        <text class="section-title">烹饪步骤</text>
+      </view>
+      <view class="step-list">
+        <view class="step-item">
+          <view class="step-num"><text>1</text></view>
+          <text class="step-text">羊肉洗净切成合适大小，冷水下锅焯水，撇去浮沫后捞出备用。</text>
+        </view>
+        <view class="step-item">
+          <view class="step-num"><text>2</text></view>
+          <text class="step-text">热锅放油，将葱姜切片与八角、香叶等香料下锅煎香。</text>
+        </view>
+        <view class="step-item">
+          <view class="step-num"><text>3</text></view>
+          <text class="step-text">放入羊肉翻炒至均匀变色，加入生抽、老抽、料酒、白糖，加少许水没过肉块。</text>
+        </view>
+        <view class="step-item">
+          <view class="step-num"><text>4</text></view>
+          <text class="step-text">中小火炖约 30 分钟，加入胡萝卜等配菜炖熟，大火收汁，酌情加盐翻拌均匀。</text>
+        </view>
+        <view class="step-item">
+          <view class="step-num"><text>5</text></view>
+          <text class="step-text">出锅撒上香菜即可。</text>
+        </view>
+      </view>
+    </view>
+  </view>
 </view>

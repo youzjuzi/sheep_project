@@ -1,17 +1,40 @@
 <view class="container">
-    <image src="http://localhost:5001/images/recipe/03.jpg" class="recipe-image" mode="aspectFill" />
-    <view class="recipe-info">
-      <text class="recipe-title">炒肉臊子</text>
-      <view class="recipe-ingredients">
-        <text class="section-title">配料：</text>
-        <text class="ingredients">花椒面、八角面、辣椒面、盐、鸡精、生抽、老抽、葱、姜、蒜沫。</text>
+  <image src="http://localhost:5001/images/recipe/03.jpg" class="recipe-image" mode="aspectFill" />
+  <view class="recipe-info">
+    <text class="recipe-title">炒肉臊子</text>
+
+    <view class="section-block">
+      <view class="section-header">
+        <view class="section-bar"></view>
+        <text class="section-title">所需食材</text>
       </view>
-      <view class="recipe-method">
-        <text class="section-title">做法：</text>
-        <text class="method">
-          1.取出羊肉块切丁，锅内放入油，加羊肉丁，下锅炒干水分，下入调配料即可。
-          2.炒好羊肉臊子也可做羊肉饺子。
-        </text>
+      <view class="ing-list">
+        <view class="ing-item"><text class="ing-dot">·</text><text class="ing-name">花椒面</text></view>
+        <view class="ing-item"><text class="ing-dot">·</text><text class="ing-name">八角面</text></view>
+        <view class="ing-item"><text class="ing-dot">·</text><text class="ing-name">辣椒面</text></view>
+        <view class="ing-item"><text class="ing-dot">·</text><text class="ing-name">盐</text></view>
+        <view class="ing-item"><text class="ing-dot">·</text><text class="ing-name">鸡精</text></view>
+        <view class="ing-item"><text class="ing-dot">·</text><text class="ing-name">生抽</text></view>
+        <view class="ing-item"><text class="ing-dot">·</text><text class="ing-name">老抽</text></view>
+        <view class="ing-item"><text class="ing-dot">·</text><text class="ing-name">葱、姜、蒜沫</text></view>
       </view>
     </view>
+
+    <view class="section-block">
+      <view class="section-header">
+        <view class="section-bar"></view>
+        <text class="section-title">烹饪步骤</text>
+      </view>
+      <view class="step-list">
+        <view class="step-item">
+          <view class="step-num"><text>1</text></view>
+          <text class="step-text">取出羊肉块切丁，锅内放入油，加羊肉丁下锅炒干水分，下入所有调配料翻炒均匀即可。</text>
+        </view>
+        <view class="step-item">
+          <view class="step-num"><text>2</text></view>
+          <text class="step-text">炒好的羊肉臊子也可用来做羊肉饺子馅，口感更佳。</text>
+        </view>
+      </view>
+    </view>
+  </view>
 </view>

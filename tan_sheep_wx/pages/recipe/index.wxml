@@ -1,57 +1,99 @@
-<view class="root">
-    <view class="item" bindtap="redirectToNextPage">
-        <image class='background-image' src='/images/icons/function/f1.png' mode="aspectFill" binderror="onImageError"></image>
-        <text class="content">清炖盐池滩羊肉</text>
-        <text class="symbol">》</text>
-    </view>
-    <view class="divider"></view>
+<view class="container">
 
-    <view class="item" bindtap="redirectToNextPage2">
-        <image class='background-image' src='/images/icons/function/f1.png' mode="aspectFill" binderror="onImageError"></image>
-        <text class="content">孜然羊肉</text>
-        <text class="symbol">》</text>
+  <view class="group-title">🥘 炖煮</view>
+  <view class="recipe-item" bindtap="redirectToNextPage">
+    <image class="thumb" src="/images/icons/function/f1.png" mode="aspectFill" binderror="onImageError" />
+    <view class="item-body">
+      <text class="item-name">清炖盐池滩羊肉</text>
+      <view class="tag-row">
+        <text class="tag tag-stew">炖煮</text>
+        <text class="tag tag-mild">清淡</text>
+      </view>
     </view>
-    <view class="divider"></view>
+    <text class="arrow">›</text>
+  </view>
+  <view class="recipe-item" bindtap="redirectToNextPage4">
+    <image class="thumb" src="/images/icons/function/f1.png" mode="aspectFill" binderror="onImageError" />
+    <view class="item-body">
+      <text class="item-name">红烧羊腱子</text>
+      <view class="tag-row">
+        <text class="tag tag-stew">炖煮</text>
+        <text class="tag tag-braise">红烧</text>
+      </view>
+    </view>
+    <text class="arrow">›</text>
+  </view>
+  <view class="recipe-item" bindtap="redirectToNextPage6">
+    <image class="thumb" src="/images/icons/function/f1.png" mode="aspectFill" binderror="onImageError" />
+    <view class="item-body">
+      <text class="item-name">手抓羊排</text>
+      <view class="tag-row">
+        <text class="tag tag-stew">炖煮</text>
+        <text class="tag tag-mild">清淡</text>
+      </view>
+    </view>
+    <text class="arrow">›</text>
+  </view>
 
-    <view class="item" bindtap="redirectToNextPage3">
-        <image class='background-image' src='/images/icons/function/f1.png' mode="aspectFill" binderror="onImageError"></image>
-        <text class="content">炒肉臊子</text>
-        <text class="symbol">》</text>
+  <view class="group-title">🔥 爆炒</view>
+  <view class="recipe-item" bindtap="redirectToNextPage2">
+    <image class="thumb" src="/images/icons/function/f1.png" mode="aspectFill" binderror="onImageError" />
+    <view class="item-body">
+      <text class="item-name">孜然羊肉</text>
+      <view class="tag-row">
+        <text class="tag tag-fry">爆炒</text>
+        <text class="tag tag-spicy">香辣</text>
+      </view>
     </view>
-    <view class="divider"></view>
+    <text class="arrow">›</text>
+  </view>
+  <view class="recipe-item" bindtap="redirectToNextPage3">
+    <image class="thumb" src="/images/icons/function/f1.png" mode="aspectFill" binderror="onImageError" />
+    <view class="item-body">
+      <text class="item-name">炒肉臊子</text>
+      <view class="tag-row">
+        <text class="tag tag-fry">爆炒</text>
+        <text class="tag tag-homestyle">家常</text>
+      </view>
+    </view>
+    <text class="arrow">›</text>
+  </view>
 
-    <view class="item" bindtap="redirectToNextPage4">
-        <image class='background-image' src='/images/icons/function/f1.png' mode="aspectFill" binderror="onImageError"></image>
-        <text class="content">红烧羊腱子</text>
-        <text class="symbol">》</text>
+  <view class="group-title">🍳 煎烤</view>
+  <view class="recipe-item" bindtap="redirectToNextPage7">
+    <image class="thumb" src="/images/icons/function/f1.png" mode="aspectFill" binderror="onImageError" />
+    <view class="item-body">
+      <text class="item-name">法式煎羊排</text>
+      <view class="tag-row">
+        <text class="tag tag-grill">煎烤</text>
+        <text class="tag tag-fresh">鲜嫩</text>
+      </view>
     </view>
-    <view class="divider"></view>
+    <text class="arrow">›</text>
+  </view>
+  <view class="recipe-item" bindtap="redirectToNextPage8">
+    <image class="thumb" src="/images/icons/function/f1.png" mode="aspectFill" binderror="onImageError" />
+    <view class="item-body">
+      <text class="item-name">煎烤羊颈片</text>
+      <view class="tag-row">
+        <text class="tag tag-grill">煎烤</text>
+        <text class="tag tag-fresh">鲜嫩</text>
+      </view>
+    </view>
+    <text class="arrow">›</text>
+  </view>
 
-    <view class="item" bindtap="redirectToNextPage5">
-        <image class='background-image' src='/images/icons/function/f1.png' mode="aspectFill" binderror="onImageError"></image>
-        <text class="content">切片涮肉</text>
-        <text class="symbol">》</text>
+  <view class="group-title">🍲 火锅</view>
+  <view class="recipe-item" bindtap="redirectToNextPage5">
+    <image class="thumb" src="/images/icons/function/f1.png" mode="aspectFill" binderror="onImageError" />
+    <view class="item-body">
+      <text class="item-name">切片涮肉</text>
+      <view class="tag-row">
+        <text class="tag tag-hotpot">火锅</text>
+        <text class="tag tag-mild">清淡</text>
+      </view>
     </view>
-    <view class="divider"></view>
+    <text class="arrow">›</text>
+  </view>
 
-    <view class="item" bindtap="redirectToNextPage6">
-        <image class='background-image' src='/images/icons/function/f1.png' mode="aspectFill" binderror="onImageError"></image>
-        <text class="content">手抓羊排</text>
-        <text class="symbol">》</text>
-    </view>
-    <view class="divider"></view>
-
-    <view class="item" bindtap="redirectToNextPage7">
-        <image class='background-image' src='/images/icons/function/f1.png' mode="aspectFill" binderror="onImageError"></image>
-        <text class="content">法式煎羊排</text>
-        <text class="symbol">》</text>
-    </view>
-    <view class="divider"></view>
-
-    <view class="item" bindtap="redirectToNextPage8">
-        <image class='background-image' src='/images/icons/function/f1.png' mode="aspectFill" binderror="onImageError"></image>
-        <text class="content">煎烤羊颈片</text>
-        <text class="symbol">》</text>
-    </view>
-    <view class="divider"></view>
 </view>

@@ -1,16 +1,25 @@
-// 使用 require 导入 echarts
-const echarts = require('../../utils/echarts/echarts');
-
 Page({
   data: {
     searchId: '',
     sheepInfo: null,
     noDataFound: false,
     isLoading: false,
-    now: '', // 当前日期，用于判断疫苗是否过期
-    ec: {
-      onInit: null // 初始化函数稍后设置
-    }
+    now: '',
+    // 概览卡片
+    overview: null,
+    // 生长表格分页
+    allTableData: [],
+    pagedTableData: [],
+    currentPage: 1,
+    totalPages: 1,
+    pageSize: 10,
+    // 喂养记录分页
+    feedStats: null,
+    allFeedData: [],
+    feedPagedData: [],
+    feedCurrentPage: 1,
+    feedTotalPages: 1,
+    feedPageSize: 20,
   },
 
   onInputChange(e) {
@@ -32,8 +41,16 @@ Page({
     // 清空之前的数据
     this.setData({
       sheepInfo: null,
+      overview: null,
+      allTableData: [],
+      pagedTableData: [],
+      currentPage: 1,
+      feedStats: null,
+      allFeedData: [],
+      feedPagedData: [],
+      feedCurrentPage: 1,
       noDataFound: false,
-      isLoading: true
+      isLoading: true,
     });
 
     wx.showLoading({
@@ -76,18 +93,9 @@ Page({
             sheepInfo: sheepInfo,
             noDataFound: false,
             isLoading: false,
-            ec: {
-              onInit: this.initChart
-            }
           }, () => {
-            // wx:if 导致 ec-canvas 在数据到来时才创建，onInit 会自动触发
-            // 同时兼容已存在图表实例的情况（如重复查询）
-            setTimeout(() => {
-              if (this.chart) {
-                const option = this.getChartOption();
-                this.chart.setOption(option);
-              }
-            }, 300);
+            this._computeDerivedData();
+            this._computeFeedingData();
           });
 
         } else {
@@ -119,15 +127,7 @@ Page({
       });
   },
 
-  onReady() {
-    // 绑定图表初始化函数
-    this.initChart = this.initChart.bind(this);
-    this.setData({
-      ec: {
-        onInit: this.initChart
-      }
-    });
-  },
+  onReady() {},
   
   onLoad() {
     // 页面加载时初始化
@@ -140,131 +140,142 @@ Page({
     });
   },
 
-  initChart(canvas, width, height, dpr) {
-    // 初始化图表
-    this.chart = echarts.init(canvas, null, {
-      width: width,
-      height: height,
-      devicePixelRatio: dpr // new
-    });
-    canvas.setChart(this.chart);
-
-    const option = this.getChartOption();
-    this.chart.setOption(option);
-    return this.chart;
-  },
-
-  getChartOption() {
+  // ── 生长派生数据：概览 + 表格 ───────────────────────────────────
+  _computeDerivedData() {
     const { sheepInfo } = this.data;
-    if (!sheepInfo || !sheepInfo.growth_records || sheepInfo.growth_records.length === 0) {
-      console.log('[生长周期] 没有生长记录数据，返回空配置');
-      return {
-        title: {
-          text: '暂无生长记录数据',
-          left: 'center',
-          top: 'center',
-          textStyle: {
-            fontSize: 14,
-            color: '#999'
-          }
-        }
-      };
-    }
+    if (!sheepInfo || !sheepInfo.growth_records || sheepInfo.growth_records.length === 0) return;
 
-    // 确保记录按日期排序（不修改原数组）
-    const sortedRecords = [...sheepInfo.growth_records].sort((a, b) => {
-      const dateA = new Date(a.record_date);
-      const dateB = new Date(b.record_date);
-      return dateA - dateB;
-    });
+    // 按日期升序排列
+    const sorted = [...sheepInfo.growth_records].sort(
+      (a, b) => new Date(a.record_date) - new Date(b.record_date)
+    );
+    const first = sorted[0];
+    const last  = sorted[sorted.length - 1];
 
-    const dates = sortedRecords.map(record => record.record_date);
-    const weights = sortedRecords.map(record => parseFloat(record.weight) || 0);
-    const heights = sortedRecords.map(record => parseFloat(record.height) || 0);
-    const lengths = sortedRecords.map(record => parseFloat(record.length) || 0);
-
-    console.log('[生长周期] 图表数据:', { dates, weights, heights, lengths });
-
-    return {
-      tooltip: {
-        trigger: 'axis',
-        axisPointer: {
-          type: 'cross'
-        }
-      },
-      legend: {
-        data: ['体重 (kg)', '身高 (cm)', '体长 (cm)'],
-        top: 10
-      },
-      grid: {
-        left: '3%',
-        right: '4%',
-        bottom: '3%',
-        containLabel: true
-      },
-      xAxis: {
-        type: 'category',
-        boundaryGap: false,
-        data: dates,
-        axisLabel: {
-          rotate: 45
-        }
-      },
-      yAxis: {
-        type: 'value'
-      },
-      series: [
-        {
-          name: '体重 (kg)',
-          type: 'line',
-          data: weights,
-          smooth: true,
-          itemStyle: {
-            color: '#ff6b6b'
-          },
-          lineStyle: {
-            color: '#ff6b6b'
-          }
-        },
-        {
-          name: '身高 (cm)',
-          type: 'line',
-          data: heights,
-          smooth: true,
-          itemStyle: {
-            color: '#51cf66'
-          },
-          lineStyle: {
-            color: '#51cf66'
-          }
-        },
-        {
-          name: '体长 (cm)',
-          type: 'line',
-          data: lengths,
-          smooth: true,
-          itemStyle: {
-            color: '#4dabf7'
-          },
-          lineStyle: {
-            color: '#4dabf7'
-          }
-        }
-      ]
+    // 概览数据
+    const rawGain  = (parseFloat(last.weight) - parseFloat(first.weight)).toFixed(1);
+    const totalGain = parseFloat(rawGain) >= 0 ? `+${rawGain}` : rawGain;
+    const overview = {
+      id:           sheepInfo.id,
+      gender:       sheepInfo.gender,
+      latestWeight: last.weight,
+      totalGain,
+      latestHeight: last.height,
+      latestLength: last.length,
     };
+
+    // 表格数据（最新在前），计算每行较上期增重
+    const allTableData = sorted.map((rec, i) => {
+      const prev = sorted[i - 1];
+      let weightDiff = '--';
+      let weightDiffPositive = false;
+      if (prev) {
+        const diff = (parseFloat(rec.weight) - parseFloat(prev.weight)).toFixed(1);
+        weightDiff = parseFloat(diff) >= 0 ? `+${diff}` : `${diff}`;
+        weightDiffPositive = parseFloat(diff) >= 0;
+      }
+      return { ...rec, weightDiff, weightDiffPositive };
+    }).reverse(); // 最新在前
+
+    const pageSize   = this.data.pageSize;
+    const totalPages = Math.max(1, Math.ceil(allTableData.length / pageSize));
+    this.setData({
+      overview,
+      allTableData,
+      currentPage: 1,
+      totalPages,
+      pagedTableData: allTableData.slice(0, pageSize),
+    });
   },
 
-  // 监听数据更新，重新渲染图表
-  onShow() {
-    if (this.chart && this.data.sheepInfo) {
-      const option = this.getChartOption();
-      this.chart.setOption(option);
-    }
+  prevPage() {
+    const { currentPage, pageSize, allTableData } = this.data;
+    if (currentPage <= 1) return;
+    const newPage = currentPage - 1;
+    const start   = (newPage - 1) * pageSize;
+    this.setData({
+      currentPage: newPage,
+      pagedTableData: allTableData.slice(start, start + pageSize),
+    });
   },
 
-  onUnload() {
-    if (this.chart) {
-      this.chart.dispose();
-    }
-  }
+  nextPage() {
+    const { currentPage, totalPages, pageSize, allTableData } = this.data;
+    if (currentPage >= totalPages) return;
+    const newPage = currentPage + 1;
+    const start   = (newPage - 1) * pageSize;
+    this.setData({
+      currentPage: newPage,
+      pagedTableData: allTableData.slice(start, start + pageSize),
+    });
+  },
+
+  // ── 喂养派生数据 ─────────────────────────────────────────────────
+  _computeFeedingData() {
+    const { sheepInfo } = this.data;
+    const raw = (sheepInfo && sheepInfo.feeding_records) || [];
+    if (raw.length === 0) return;
+
+    // 饲料类型 → CSS class 映射
+    const FEED_COLOR = {
+      '青草':    'feed-grass',
+      '玉米秸秆': 'feed-corn',
+      '精饲料':  'feed-pellet',
+      '燕麦干草': 'feed-hay',
+      '豆粕':    'feed-soybean',
+      '麦麸':    'feed-bran',
+      '胡萝卜':  'feed-carrot',
+      '盐砖':    'feed-salt',
+    };
+
+    // 统计各饲料使用次数，找出最常用
+    const freqMap = {};
+    raw.forEach(r => { freqMap[r.feed_type] = (freqMap[r.feed_type] || 0) + 1; });
+    const topFeed = Object.keys(freqMap).sort((a, b) => freqMap[b] - freqMap[a])[0] || '--';
+
+    const feedStats = {
+      totalDays:     raw.length,
+      topFeed,
+      feedTypeCount: Object.keys(freqMap).length,
+    };
+
+    const allFeedData = raw.map(r => ({
+      ...r,
+      colorClass: FEED_COLOR[r.feed_type] || 'feed-default',
+    }));
+
+    const feedPageSize   = this.data.feedPageSize;
+    const feedTotalPages = Math.max(1, Math.ceil(allFeedData.length / feedPageSize));
+    this.setData({
+      feedStats,
+      allFeedData,
+      feedCurrentPage: 1,
+      feedTotalPages,
+      feedPagedData: allFeedData.slice(0, feedPageSize),
+    });
+  },
+
+  prevFeedPage() {
+    const { feedCurrentPage, feedPageSize, allFeedData } = this.data;
+    if (feedCurrentPage <= 1) return;
+    const newPage = feedCurrentPage - 1;
+    const start   = (newPage - 1) * feedPageSize;
+    this.setData({
+      feedCurrentPage: newPage,
+      feedPagedData: allFeedData.slice(start, start + feedPageSize),
+    });
+  },
+
+  nextFeedPage() {
+    const { feedCurrentPage, feedTotalPages, feedPageSize, allFeedData } = this.data;
+    if (feedCurrentPage >= feedTotalPages) return;
+    const newPage = feedCurrentPage + 1;
+    const start   = (newPage - 1) * feedPageSize;
+    this.setData({
+      feedCurrentPage: newPage,
+      feedPagedData: allFeedData.slice(start, start + feedPageSize),
+    });
+  },
+
+  onUnload() {},
 });

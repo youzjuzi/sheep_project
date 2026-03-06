@@ -1,33 +1,81 @@
-
-.root {
-    display: flex;
-    flex-direction: column;
+page {
+  background: #f9f6f1;
 }
 
-.item {
-    display: flex;
-    align-items: center;
-    justify-content: space-between; 
-    padding: 10px;
+.container {
+  padding: 24rpx 20rpx 40rpx;
+  background: #f9f6f1;
+  min-height: 100vh;
 }
 
-.symbol {
-    margin-left: auto;
+/* 分组标题 */
+.group-title {
+  font-size: 24rpx;
+  font-weight: 700;
+  color: #8B4513;
+  letter-spacing: 2rpx;
+  padding: 32rpx 8rpx 16rpx;
 }
 
-
-.background-image {
-    width: 50px;
-    height: 50px;
-    margin-right: 10px;
+/* 食谱列表项 */
+.recipe-item {
+  display: flex;
+  align-items: center;
+  background: #fff;
+  border-radius: 16rpx;
+  padding: 20rpx;
+  margin-bottom: 16rpx;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.06);
 }
 
-.content {
-    font-size: 16px;
-}
-.divider {
-    height: 1px;
-    background: linear-gradient(to right, red, orange, yellow, green, blue, indigo, violet);
-    margin: 5px 0;
+.thumb {
+  width: 96rpx;
+  height: 96rpx;
+  border-radius: 12rpx;
+  flex-shrink: 0;
+  margin-right: 20rpx;
+  background: #f0e8d8;
 }
 
+.item-body {
+  flex: 1;
+}
+
+.item-name {
+  display: block;
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #2c2018;
+  margin-bottom: 12rpx;
+}
+
+.tag-row {
+  display: flex;
+  gap: 10rpx;
+}
+
+.tag {
+  font-size: 20rpx;
+  padding: 4rpx 14rpx;
+  border-radius: 20rpx;
+  font-weight: 500;
+}
+
+/* 做法标签 */
+.tag-stew    { background: #fef3c7; color: #92400e; }
+.tag-fry     { background: #fee2e2; color: #991b1b; }
+.tag-grill   { background: #d1fae5; color: #065f46; }
+.tag-hotpot  { background: #dbeafe; color: #1e40af; }
+
+/* 口味标签 */
+.tag-mild      { background: #f0fdf4; color: #166534; }
+.tag-spicy     { background: #fef2f2; color: #dc2626; }
+.tag-braise    { background: #fdf2f8; color: #9d174d; }
+.tag-homestyle { background: #f3f4f6; color: #4b5563; }
+.tag-fresh     { background: #ecfdf5; color: #047857; }
+
+.arrow {
+  font-size: 40rpx;
+  color: #ccc;
+  margin-left: 12rpx;
+}

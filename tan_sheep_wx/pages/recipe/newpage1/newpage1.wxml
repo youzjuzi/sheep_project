@@ -1,21 +1,47 @@
-<!-- pages/feature2/newpage1.wxml -->
 <view class="container">
-    <image src="http://localhost:5001/images/recipe/01.jpg" class="recipe-image" mode="aspectFill" />
-    <view class="recipe-info">
-      <text class="recipe-title">清炖盐池滩羊肉</text>
-      <view class="recipe-ingredients">
-        <text class="section-title">配料：</text>
-        <text class="method">花椒10-20颗，大葱段，厚姜片5-10片，山药，青萝卜，粗盐适量，香菜少许。</text>
+  <image src="http://localhost:5001/images/recipe/01.jpg" class="recipe-image" mode="aspectFill" />
+  <view class="recipe-info">
+    <text class="recipe-title">清炖盐池滩羊肉</text>
+
+    <view class="section-block">
+      <view class="section-header">
+        <view class="section-bar"></view>
+        <text class="section-title">所需食材</text>
       </view>
-      <view class="recipe-method">
-        <text class="section-title">做法</text>
-        <text class="method">
-          1. 750g清炖羊肉，洗净入锅（最好是砂锅，土锅等适合煲汤的锅）一次性要加足够的水，尽可能避免中途加水，有失汤味。
-          2. 羊肉汤开锅后撇去浮沫，加入除盐以外调味料入锅。
-          3. 开中小火煲40分钟左右，加入准备好山药或者萝卜等配菜煮熟。
-          4. 酌情入盐，出锅撒上香菜即可。
-        </text>
+      <view class="ing-list">
+        <view class="ing-item"><text class="ing-dot">·</text><text class="ing-name">花椒 10-20颗</text></view>
+        <view class="ing-item"><text class="ing-dot">·</text><text class="ing-name">大葱段</text></view>
+        <view class="ing-item"><text class="ing-dot">·</text><text class="ing-name">厚姜片 5-10片</text></view>
+        <view class="ing-item"><text class="ing-dot">·</text><text class="ing-name">山药</text></view>
+        <view class="ing-item"><text class="ing-dot">·</text><text class="ing-name">青萝卜</text></view>
+        <view class="ing-item"><text class="ing-dot">·</text><text class="ing-name">粗盐适量</text></view>
+        <view class="ing-item"><text class="ing-dot">·</text><text class="ing-name">香菜少许</text></view>
+      </view>
+    </view>
+
+    <view class="section-block">
+      <view class="section-header">
+        <view class="section-bar"></view>
+        <text class="section-title">烹饪步骤</text>
+      </view>
+      <view class="step-list">
+        <view class="step-item">
+          <view class="step-num"><text>1</text></view>
+          <text class="step-text">750g 清炖羊肉洗净入锅（最好是砂锅、土锅等适合煲汤的锅），一次性加足水，尽量避免中途加水，以免影响汤味。</text>
+        </view>
+        <view class="step-item">
+          <view class="step-num"><text>2</text></view>
+          <text class="step-text">羊肉汤开锅后撇去浮沫，加入除盐以外的所有调味料。</text>
+        </view>
+        <view class="step-item">
+          <view class="step-num"><text>3</text></view>
+          <text class="step-text">转中小火煲 40 分钟左右，加入山药或青萝卜等配菜煮熟。</text>
+        </view>
+        <view class="step-item">
+          <view class="step-num"><text>4</text></view>
+          <text class="step-text">酌情加盐，出锅撒上香菜即可。</text>
+        </view>
       </view>
     </view>
   </view>
-  
+</view>

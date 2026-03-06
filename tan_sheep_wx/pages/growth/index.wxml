@@ -8,108 +8,132 @@
         </view>
     </view>
 
-    <!-- 基本信息卡片 -->
-    <view class="card sheep-info-card" wx:if="{{sheepInfo}}">
+    <!-- ① 数据概览卡片 -->
+    <view class="card overview-card" wx:if="{{overview}}">
         <view class="card-header">
             <view class="card-title">
                 <text class="title-icon">🐑</text>
-                <text class="title-text">基本信息</text>
+                <text class="title-text">数据概览</text>
+                <text class="sheep-tag">ID {{overview.id}} · {{overview.gender}}</text>
             </view>
         </view>
-        <view class="card-body">
-            <view class="info-grid">
-                <view class="info-item">
-                    <text class="info-label">羊只ID</text>
-                    <text class="info-value">{{sheepInfo.id}}</text>
+        <view class="card-body overview-body">
+            <!-- 主指标：最新体重 -->
+            <view class="metric-main">
+                <text class="metric-main-label">最新体重</text>
+                <view class="metric-main-val">
+                    <text class="metric-main-num">{{overview.latestWeight}}</text>
+                    <text class="metric-main-unit">kg</text>
                 </view>
-                <view class="info-item">
-                    <text class="info-label">性别</text>
-                    <text class="info-value gender-{{sheepInfo.gender}}">{{sheepInfo.gender}}</text>
+            </view>
+            <!-- 次要指标行 -->
+            <view class="metric-row">
+                <view class="metric-cell">
+                    <text class="metric-cell-label">累计增重</text>
+                    <view class="metric-cell-val">
+                        <text class="metric-cell-num gain-color">{{overview.totalGain}}</text>
+                        <text class="metric-cell-unit">kg</text>
+                    </view>
                 </view>
-                <view class="info-item highlight">
-                    <text class="info-label">体重</text>
-                    <text class="info-value">{{sheepInfo.weight}}<text class="unit">kg</text></text>
+                <view class="metric-sep"></view>
+                <view class="metric-cell">
+                    <text class="metric-cell-label">当前体高</text>
+                    <view class="metric-cell-val">
+                        <text class="metric-cell-num height-color">{{overview.latestHeight}}</text>
+                        <text class="metric-cell-unit">cm</text>
+                    </view>
                 </view>
-                <view class="info-item">
-                    <text class="info-label">身高</text>
-                    <text class="info-value">{{sheepInfo.height}}<text class="unit">cm</text></text>
-                </view>
-                <view class="info-item">
-                    <text class="info-label">体长</text>
-                    <text class="info-value">{{sheepInfo.length}}<text class="unit">cm</text></text>
+                <view class="metric-sep"></view>
+                <view class="metric-cell">
+                    <text class="metric-cell-label">当前体长</text>
+                    <view class="metric-cell-val">
+                        <text class="metric-cell-num length-color">{{overview.latestLength}}</text>
+                        <text class="metric-cell-unit">cm</text>
+                    </view>
                 </view>
             </view>
         </view>
     </view>
 
-    <!-- 生长趋势图表 -->
-    <view class="card chart-card" wx:if="{{sheepInfo.growth_records && sheepInfo.growth_records.length > 0}}">
-        <view class="card-header">
-            <view class="card-title">
-                <text class="title-icon">📈</text>
-                <text class="title-text">生长趋势</text>
-            </view>
-        </view>
-        <view class="card-body">
-            <ec-canvas id="growthChart" canvas-id="growthChart" ec="{{ ec }}"></ec-canvas>
-        </view>
-    </view>
+    <!-- ② 生长趋势图表（已移除）-->
 
-    <!-- 生长记录列表 -->
-    <view class="card records-card" wx:if="{{sheepInfo.growth_records && sheepInfo.growth_records.length > 0}}">
+    <!-- ③ 紧凑型数据表格 -->
+    <view class="card table-card" wx:if="{{allTableData.length > 0}}">
         <view class="card-header">
             <view class="card-title">
                 <text class="title-icon">📋</text>
-                <text class="title-text">生长记录</text>
-                <text class="record-count">({{sheepInfo.growth_records.length}}条)</text>
+                <text class="title-text">生长明细</text>
+                <text class="record-count">({{allTableData.length}}条)</text>
             </view>
         </view>
-        <view class="card-body">
-            <view wx:for="{{sheepInfo.growth_records}}" wx:key="id" class="record-item">
-                <view class="record-date">
-                    <text class="date-icon">📅</text>
-                    <text class="date-text">{{item.record_date}}</text>
-                </view>
-                <view class="record-data">
-                    <view class="data-item">
-                        <text class="data-label">体重</text>
-                        <text class="data-value weight">{{item.weight}}kg</text>
-                    </view>
-                    <view class="data-item">
-                        <text class="data-label">身高</text>
-                        <text class="data-value height">{{item.height}}cm</text>
-                    </view>
-                    <view class="data-item">
-                        <text class="data-label">体长</text>
-                        <text class="data-value length">{{item.length}}cm</text>
-                    </view>
-                </view>
+        <view class="card-body table-body">
+            <!-- 表头 -->
+            <view class="tbl-head">
+                <text class="th col-date">日期</text>
+                <text class="th col-num">体重(kg)</text>
+                <text class="th col-num">体高(cm)</text>
+                <text class="th col-num">体长(cm)</text>
+                <text class="th col-diff">增重</text>
+            </view>
+            <!-- 数据行 -->
+            <view class="tbl-row {{index % 2 === 1 ? 'row-stripe' : ''}}" wx:for="{{pagedTableData}}" wx:key="id">
+                <text class="td col-date">{{item.record_date}}</text>
+                <text class="td col-num td-weight">{{item.weight}}</text>
+                <text class="td col-num td-height">{{item.height}}</text>
+                <text class="td col-num td-length">{{item.length}}</text>
+                <text class="td col-diff {{item.weightDiffPositive ? 'diff-up' : 'diff-neutral'}}">{{item.weightDiff}}</text>
+            </view>
+            <!-- 分页控制 -->
+            <view class="pagination" wx:if="{{totalPages > 1}}">
+                <button class="page-btn" bindtap="prevPage" disabled="{{currentPage <= 1}}">‹ 上页</button>
+                <text class="page-info">{{currentPage}} / {{totalPages}} 页</text>
+                <button class="page-btn" bindtap="nextPage" disabled="{{currentPage >= totalPages}}">下页 ›</button>
             </view>
         </view>
     </view>
 
     <!-- 喂养记录 -->
-    <view class="card feeding-card" wx:if="{{sheepInfo.feeding_records && sheepInfo.feeding_records.length > 0}}">
+    <view class="card feeding-card" wx:if="{{feedStats}}">
         <view class="card-header">
             <view class="card-title">
                 <text class="title-icon">🌾</text>
                 <text class="title-text">喂养记录</text>
-                <text class="record-count">({{sheepInfo.feeding_records.length}}条)</text>
+                <text class="record-count">({{feedStats.totalDays}}条)</text>
             </view>
         </view>
-        <view class="card-body">
-            <view wx:for="{{sheepInfo.feeding_records}}" wx:key="id" class="feeding-item">
-                <view class="feeding-header">
-                    <text class="feeding-type">{{item.feed_type}}</text>
-                    <text class="feeding-amount">{{item.amount}}{{item.unit}}</text>
-                </view>
-                <view class="feeding-date">
-                    <text class="date-range">{{item.start_date}}</text>
-                    <text class="date-separator" wx:if="{{item.end_date}}">至</text>
-                    <text class="date-range" wx:if="{{item.end_date}}">{{item.end_date}}</text>
-                    <text class="date-range ongoing" wx:if="{{!item.end_date}}">进行中</text>
+        <!-- 摘要统计条 -->
+        <view class="feed-stats-bar">
+            <view class="feed-stat-item">
+                <text class="feed-stat-num">{{feedStats.totalDays}}</text>
+                <text class="feed-stat-label">投喂天数</text>
+            </view>
+            <view class="feed-stat-sep"></view>
+            <view class="feed-stat-item">
+                <text class="feed-stat-num feed-stat-top">{{feedStats.topFeed}}</text>
+                <text class="feed-stat-label">最常用饲料</text>
+            </view>
+            <view class="feed-stat-sep"></view>
+            <view class="feed-stat-item">
+                <text class="feed-stat-num">{{feedStats.feedTypeCount}}</text>
+                <text class="feed-stat-label">饲料种数</text>
+            </view>
+        </view>
+        <!-- 记录列表 -->
+        <view class="feed-list">
+            <view class="feed-row" wx:for="{{feedPagedData}}" wx:key="id">
+                <text class="feed-date">{{item.feed_date}}</text>
+                <text class="feed-tag {{item.colorClass}}">{{item.feed_type}}</text>
+                <view class="feed-amount-wrap">
+                    <text class="feed-amount">{{item.amount}}</text>
+                    <text class="feed-unit">{{item.unit}}</text>
                 </view>
             </view>
+        </view>
+        <!-- 分页 -->
+        <view class="pagination" wx:if="{{feedTotalPages > 1}}">
+            <button class="page-btn" bindtap="prevFeedPage" disabled="{{feedCurrentPage <= 1}}">‹ 上页</button>
+            <text class="page-info">{{feedCurrentPage}} / {{feedTotalPages}} 页</text>
+            <button class="page-btn" bindtap="nextFeedPage" disabled="{{feedCurrentPage >= feedTotalPages}}">下页 ›</button>
         </view>
     </view>
 

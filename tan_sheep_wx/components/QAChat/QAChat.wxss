@@ -56,7 +56,7 @@
 .qa-window {
   position: fixed;
   right: 30rpx;
-  bottom: 30rpx;
+  bottom: 120rpx;
   width: 680rpx;
   height: 80vh;
   max-height: 900rpx;
@@ -105,6 +105,8 @@
   background-color: #238E23;
   color: #fff;
   flex-shrink: 0;
+  border-radius: 24rpx 24rpx 0 0;
+  overflow: hidden;
 }
 
 .header-title {
@@ -150,6 +152,7 @@
   padding: 20rpx;
   overflow-y: auto;
   min-height: 0;
+  box-sizing: border-box;
 }
 
 .messages-list {
@@ -161,7 +164,10 @@
 /* 消息项 */
 .message-item {
   display: flex;
+  align-items: flex-start;
   gap: 20rpx;
+  box-sizing: border-box;
+  width: 100%;
   animation: fadeIn 0.3s ease-in;
 }
 
@@ -179,6 +185,7 @@
 /* 用户消息右对齐 */
 .message-item.user {
   flex-direction: row-reverse;
+  padding-right: 12rpx;
 }
 
 /* 头像 */
@@ -190,14 +197,12 @@
 }
 
 .avatar-img {
-  width: 100%;
-  height: 100%;
+  width: 60rpx;
+  height: 60rpx;
   border-radius: 50%;
   background-color: #e0e0e0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden; /* 图片溢出时裁剪 */
+  display: block;
+  overflow: hidden;
   box-sizing: border-box;
 }
 
@@ -205,16 +210,13 @@
   background-color: #e0e0e0;
 }
 
-.avatar-img.bot-avatar {
-  width: 100%;
-  height: 100%;
-  border-radius: 50%;
-}
-
 .user-avatar {
   background-color: #238E23;
   color: #fff;
-  overflow: visible; /* 确保文字图标完全显示 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
 }
 
 .avatar-text {
@@ -225,8 +227,8 @@
 
 /* 消息内容 */
 .message-content {
-  flex: 1;
-  max-width: 75%;
+  max-width: calc(100% - 80rpx);
+  min-width: 0;
 }
 
 .message-bubble {
@@ -323,6 +325,8 @@
   border-top: 1rpx solid #e0e0e0;
   flex-shrink: 0;
   padding-bottom: calc(20rpx + env(safe-area-inset-bottom));
+  border-radius: 0 0 24rpx 24rpx;
+  overflow: hidden;
 }
 
 .input-wrapper {

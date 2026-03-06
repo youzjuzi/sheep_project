@@ -1,18 +1,42 @@
 <view class="container">
-    <image src="http://localhost:5001/images/recipe/06.jpg" class="recipe-image" mode="aspectFill" />
-    <view class="recipe-info">
-      <text class="recipe-title">手抓羊排</text>
-      <view class="recipe-ingredients">
-        <text class="section-title">配料：</text>
-        <text class="ingredients">葱、姜、蒜、花椒、盐、醋</text>
+  <image src="http://localhost:5001/images/recipe/06.jpg" class="recipe-image" mode="aspectFill" />
+  <view class="recipe-info">
+    <text class="recipe-title">手抓羊排</text>
+
+    <view class="section-block">
+      <view class="section-header">
+        <view class="section-bar"></view>
+        <text class="section-title">所需食材</text>
       </view>
-      <view class="recipe-method">
-        <text class="section-title">做法：</text>
-        <text class="method">
-          1.取出羊排，用清水浸泡15分钟，沥干。
-          2.锅内放入凉水和羊排一起下锅，烧开锅撇去浮沫，放入葱、姜、盐、花椒，煮一个半小时即可。
-          3.小碗加入蒜泥醋做蘸料。
-        </text>
+      <view class="ing-list">
+        <view class="ing-item"><text class="ing-dot"></text><text class="ing-name">葱</text></view>
+        <view class="ing-item"><text class="ing-dot"></text><text class="ing-name">姜</text></view>
+        <view class="ing-item"><text class="ing-dot"></text><text class="ing-name">蒜</text></view>
+        <view class="ing-item"><text class="ing-dot"></text><text class="ing-name">花椒</text></view>
+        <view class="ing-item"><text class="ing-dot"></text><text class="ing-name">盐</text></view>
+        <view class="ing-item"><text class="ing-dot"></text><text class="ing-name">醋</text></view>
       </view>
     </view>
+
+    <view class="section-block">
+      <view class="section-header">
+        <view class="section-bar"></view>
+        <text class="section-title">烹饪步骤</text>
+      </view>
+      <view class="step-list">
+        <view class="step-item">
+          <view class="step-num"><text>1</text></view>
+          <text class="step-text">取出羊排，用清水浸泡 15 分钟，沥干。</text>
+        </view>
+        <view class="step-item">
+          <view class="step-num"><text>2</text></view>
+          <text class="step-text">锅内放入凉水和羊排一起下锅，烧开后撇去浮沫，放入葱、姜、盐、花椒，中小火煮一个半小时即可。</text>
+        </view>
+        <view class="step-item">
+          <view class="step-num"><text>3</text></view>
+          <text class="step-text">取小碗加入蒜泥与醋调成蘸料，搭配食用。</text>
+        </view>
+      </view>
+    </view>
+  </view>
 </view>
