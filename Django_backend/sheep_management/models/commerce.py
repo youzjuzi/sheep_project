@@ -175,6 +175,11 @@ class Order(models.Model):
     total_amount = models.DecimalField(max_digits=10, decimal_places=2, verbose_name='订单总金额')
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending', verbose_name='订单状态')
 
+    # 收货信息
+    receiver_name    = models.CharField(max_length=50,  null=True, blank=True, verbose_name='收货人姓名')
+    receiver_phone   = models.CharField(max_length=20,  null=True, blank=True, verbose_name='收货人手机')
+    shipping_address = models.TextField(null=True, blank=True, verbose_name='收货地址')
+
     # 物流信息
     logistics_company = models.CharField(max_length=100, null=True, blank=True, verbose_name='物流公司')
     logistics_tracking_number = models.CharField(max_length=100, null=True, blank=True, verbose_name='物流单号')

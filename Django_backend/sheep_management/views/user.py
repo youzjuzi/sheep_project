@@ -122,3 +122,22 @@ def user_delete(request, pk):
         return redirect('user_list')
     return render(request, 'sheep_management/user/confirm_delete.html', {'target_user': user})
 
+
+@admin_required
+def user_batch_delete(request):
+    """批量删除用户"""
+    if request.method != 'POST':
+        return redirect('user_list')
+
+    ids = request.POST.getlist('user_ids')
+    if not ids:
+        messages.warning(request, '未选择任何用户')
+        return redirect('user_list')
+
+    # 排除当前登录账号
+    to_delete = User.objects.filter(pk__in=ids).exclude(pk=request.user.pk)
+    count = to_delete.count()
+    to_delete.delete()
+    messages.success(request, f'已成功删除 {count} 个用户')
+    return redirect('user_list')
+

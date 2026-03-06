@@ -1,22 +1,83 @@
 {% extends 'sheep_management/base.html' %}
 
 {% block content %}
+<style>
+#batch-bar {
+    display: none;
+    align-items: center;
+    gap: 12px;
+    background: #fff3cd;
+    border: 1px solid #ffc107;
+    border-radius: 8px;
+    padding: 10px 16px;
+    margin-bottom: 14px;
+    font-size: 14px;
+    color: #856404;
+}
+#batch-bar.visible { display: flex; }
+#batch-bar .selected-count { font-weight: 600; }
+.btn-batch-delete {
+    background: #e74c3c;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 6px 16px;
+    font-size: 13px;
+    cursor: pointer;
+    transition: background .15s;
+}
+.btn-batch-delete:hover { background: #c0392b; }
+.btn-batch-cancel {
+    background: transparent;
+    color: #856404;
+    border: 1px solid #ffc107;
+    border-radius: 6px;
+    padding: 6px 12px;
+    font-size: 13px;
+    cursor: pointer;
+    transition: background .15s;
+}
+.btn-batch-cancel:hover { background: #fff0b3; }
+/* 全选框列 */
+th.col-check, td.col-check {
+    width: 40px;
+    text-align: center;
+    padding: 8px 4px;
+}
+input[type="checkbox"] { cursor: pointer; width: 16px; height: 16px; accent-color: #e74c3c; }
+tr.row-selected td { background: #fff5f5 !important; }
+</style>
+
 <div class="card">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
         <h2>用户列表</h2>
         <a href="{% url 'user_create' %}" class="btn btn-success">+ 新增用户</a>
     </div>
-    
+
     <div class="search-box">
         <form method="get">
             <input type="text" name="search" placeholder="搜索用户名、昵称、openid或手机号..." value="{{ search }}">
             <button type="submit" class="btn">搜索</button>
         </form>
     </div>
-    
+
+    <!-- 批量操作栏（选中后才显示） -->
+    <div id="batch-bar">
+        <span>已选择 <span class="selected-count" id="selected-count">0</span> 个用户</span>
+        <form id="batch-delete-form" method="post" action="{% url 'user_batch_delete' %}" style="display:inline;">
+            {% csrf_token %}
+            <div id="hidden-ids"></div>
+            <button type="button" class="btn-batch-delete" onclick="confirmBatchDelete()">🗑 批量删除</button>
+        </form>
+        <button type="button" class="btn-batch-cancel" onclick="clearSelection()">取消选择</button>
+    </div>
+
     <table>
         <thead>
             <tr>
+                <th class="col-check">
+                    <input type="checkbox" id="check-all" title="全选" onchange="toggleAll(this)">
+                </th>
                 <th>ID</th>
                 <th>头像</th>
                 <th>用户名</th>
@@ -32,7 +93,12 @@
         </thead>
         <tbody>
             {% for user in user_list %}
-            <tr>
+            <tr id="row-{{ user.id }}">
+                <td class="col-check">
+                    {% if request.user.pk != user.pk %}
+                    <input type="checkbox" class="row-check" value="{{ user.id }}" onchange="updateSelection()">
+                    {% endif %}
+                </td>
                 <td>{{ user.id }}</td>
                 <td>
                     {% if user.avatar_url %}
@@ -59,11 +125,75 @@
             </tr>
             {% empty %}
             <tr>
-                <td colspan="11" style="text-align: center; padding: 40px;">暂无数据</td>
+                <td colspan="12" style="text-align: center; padding: 40px;">暂无数据</td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
 </div>
+
+<script>
+function getChecked() {
+    return Array.from(document.querySelectorAll('.row-check:checked'));
+}
+
+function updateSelection() {
+    const checked = getChecked();
+    const count = checked.length;
+    const batchBar = document.getElementById('batch-bar');
+    document.getElementById('selected-count').textContent = count;
+
+    if (count > 0) {
+        batchBar.classList.add('visible');
+    } else {
+        batchBar.classList.remove('visible');
+    }
+
+    // 同步全选框状态
+    const all = document.querySelectorAll('.row-check');
+    document.getElementById('check-all').indeterminate = count > 0 && count < all.length;
+    document.getElementById('check-all').checked = count > 0 && count === all.length;
+
+    // 高亮选中行
+    document.querySelectorAll('.row-check').forEach(cb => {
+        const row = cb.closest('tr');
+        if (cb.checked) row.classList.add('row-selected');
+        else row.classList.remove('row-selected');
+    });
+}
+
+function toggleAll(masterCb) {
+    document.querySelectorAll('.row-check').forEach(cb => {
+        cb.checked = masterCb.checked;
+    });
+    updateSelection();
+}
+
+function clearSelection() {
+    document.querySelectorAll('.row-check').forEach(cb => cb.checked = false);
+    document.getElementById('check-all').checked = false;
+    document.getElementById('check-all').indeterminate = false;
+    updateSelection();
+}
+
+function confirmBatchDelete() {
+    const checked = getChecked();
+    if (checked.length === 0) return;
+
+    if (!confirm(`确定要删除选中的 ${checked.length} 个用户吗？此操作不可撤销！`)) return;
+
+    // 将选中 ID 填入隐藏 div
+    const container = document.getElementById('hidden-ids');
+    container.innerHTML = '';
+    checked.forEach(cb => {
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = 'user_ids';
+        input.value = cb.value;
+        container.appendChild(input);
+    });
+    document.getElementById('batch-delete-form').submit();
+}
+</script>
 {% endblock %}
 

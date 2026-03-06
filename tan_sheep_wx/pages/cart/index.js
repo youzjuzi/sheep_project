@@ -7,8 +7,6 @@ Page({
         totalPrice: 0,
         selectedCount: 0,
         allSelected: false,
-        showPaymentSheet: false,
-        userBalance: '0.00'
     },
 
     onShow: function () {
@@ -175,93 +173,15 @@ Page({
     },
 
     checkout: function () {
-        const that = this;
         const token = wx.getStorageSync('token');
+        if (!token) { wx.showToast({ title: '请先登录', icon: 'none' }); return; }
+        if (this.data.cartItems.length === 0) { wx.showToast({ title: '购物车为空', icon: 'none' }); return; }
+        if (this.data.selectedCount === 0) { wx.showToast({ title: '请先选择要结算的羊只', icon: 'none' }); return; }
 
-        if (!token) {
-            wx.showToast({ title: '请先登录', icon: 'none' });
-            return;
-        }
-
-        if (this.data.cartItems.length === 0) {
-            wx.showToast({ title: '购物车为空', icon: 'none' });
-            return;
-        }
-
-        if (this.data.selectedCount === 0) {
-            wx.showToast({ title: '请先选择要结算的羊只', icon: 'none' });
-            return;
-        }
-
-        // 结算前获取一下最新余额
-        wx.showLoading({ title: '获取数据中...' });
-        API.getUserInfo(token)
-            .then(res => {
-                wx.hideLoading();
-                const balance = res.data && res.data.balance !== undefined ? res.data.balance : 0;
-                that.setData({
-                    userBalance: Number(balance).toFixed(2),
-                    showPaymentSheet: true
-                });
-            })
-            .catch(err => {
-                wx.hideLoading();
-                wx.showToast({ title: '获取余额失败', icon: 'none' });
-            });
-    },
-
-    onClosePaymentSheet: function () {
-        this.setData({ showPaymentSheet: false });
-    },
-
-    onSelectPayment: function (e) {
-        const method = e.currentTarget.dataset.method; // 'balance' or 'wechat'
-        const that = this;
-        const token = wx.getStorageSync('token');
-
-        // 微信支付暂时不下单
-        if (method === 'wechat') {
-            wx.showModal({
-                title: '微信支付',
-                content: '暂未开通微信真实支付。',
-                showCancel: false
-            });
-            return;
-        }
-
-        // 二次确认
-        wx.showModal({
-            title: '确认付款',
-            content: `总价 ¥${that.data.totalPrice}，扣除余额，确认支付吗？`,
-            success: function (res) {
-                if (res.confirm) {
-                    that.setData({ showPaymentSheet: false });
-                    wx.showLoading({ title: '处理中...', mask: true });
-
-                    API.checkout(token, method)
-                        .then((res) => {
-                            wx.hideLoading();
-                            console.log('[结算] API返回:', res);
-
-                            if (res.code === 0) {
-                                that.setData({ cartItems: [], totalPrice: 0 });
-                                wx.showToast({
-                                    title: '支付成功！',
-                                    icon: 'success',
-                                    duration: 2000
-                                });
-                            } else {
-                                wx.showToast({ title: res.msg || '余额不足或结算失败', icon: 'none', duration: 3000 });
-                            }
-                        })
-                        .catch((error) => {
-                            wx.hideLoading();
-                            console.error('[结算] 失败:', error);
-                            wx.showToast({ title: '网络错误', icon: 'none' });
-                        });
-                }
-            }
-        });
+        // 将选中商品存入缓存，跳转到订单确认页
+        const selectedItems = this.data.cartItems.filter(item => item.selected);
+        wx.setStorageSync('checkoutItems', selectedItems);
+        wx.navigateTo({ url: '/pages/cart/checkout' });
     },
 
     goToHistory: function () {

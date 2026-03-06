@@ -1,5 +1,6 @@
 const app = getApp()
 const WXAPI = require('apifm-wxapi')
+const API = require('../../utils/api.js')
 const AUTH = require('../../utils/auth')
 
 var sliderWidth = 96; // 需要设置slider的宽度，用于计算中间位置
@@ -59,25 +60,16 @@ Page({
   initData() {
     const _this = this
     const token = wx.getStorageSync('token')
-    
-    WXAPI.userAmount(token).then(function (res) {
-      if (res.code == 700) {
-        wx.showToast({
-          title: '当前账户存在异常',
-          icon: 'none'
-        })
-        return
+
+    // 从我们自己的后端获取最新余额
+    API.getUserInfo(token).then(function (res) {
+      if (res.code === 0) {
+        const newBalance = parseFloat(res.data.balance).toFixed(2);
+        _this.setData({ balance: newBalance });
+        wx.setStorageSync('balance', newBalance);
       }
-      if (res.code == 0) {
-        // 获取余额并且同时更新 balance 和 freeze 为同一个值
-        const newBalance = res.data.balance.toFixed(2);  // 获取的余额
-        _this.setData({
-          balance: newBalance,   // 可用余额
-          freeze: newBalance,    // 冻结金额
-          totleConsumed: res.data.totleConsumed.toFixed(2),
-          score: res.data.score
-        });
-      }
+    }).catch(function () {
+      // 静默失败，保留缓存余额
     })
     this.fetchTabData(this.data.activeIndex)
   },

@@ -32,6 +32,12 @@ class User(AbstractUser):
     city = models.CharField(max_length=50, null=True, blank=True, verbose_name='城市')
     latitude = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True, verbose_name='纬度')
     longitude = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True, verbose_name='经度')
+
+    # 养殖户申请资质文件
+    business_license      = models.ImageField(upload_to='qualifications/', null=True, blank=True, verbose_name='营业执照')
+    env_protection_doc    = models.ImageField(upload_to='qualifications/', null=True, blank=True, verbose_name='环保手续')
+    animal_prevention_cert = models.ImageField(upload_to='qualifications/', null=True, blank=True, verbose_name='动物防疫条件合格证')
+
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='创建时间')
     updated_at = models.DateTimeField(auto_now=True, verbose_name='更新时间')
 

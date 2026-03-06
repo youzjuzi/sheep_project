@@ -95,6 +95,12 @@ def register_view(request):
         user.set_password(password)
         user.save()
 
+        # 保存资质文件（可选）
+        for field_name in ('business_license', 'env_protection_doc', 'animal_prevention_cert'):
+            if field_name in request.FILES:
+                setattr(user, field_name, request.FILES[field_name])
+        user.save(update_fields=['business_license', 'env_protection_doc', 'animal_prevention_cert'])
+
         return render(request, 'sheep_management/register_success.html', {'nickname': nickname or username})
 
     return render(request, 'sheep_management/register.html')

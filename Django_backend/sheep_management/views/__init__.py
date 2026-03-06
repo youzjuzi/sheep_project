@@ -15,7 +15,7 @@ from .breeder import breeder_list, breeder_detail, breeder_create, breeder_edit,
 from .growth import growth_record_list, growth_record_create
 from .feeding import feeding_record_list, feeding_record_create
 from .vaccination import vaccination_list, vaccination_create
-from .user import user_list, user_detail, user_create, user_update, user_delete
+from .user import user_list, user_detail, user_create, user_update, user_delete, user_batch_delete
 from .order import order_list, order_detail, order_update_status
 from .coupon import coupon_list, coupon_create, coupon_edit, coupon_delete, coupon_detail
 from .permissions import (
@@ -41,7 +41,7 @@ __all__ = [
     'growth_record_list', 'growth_record_create',
     'feeding_record_list', 'feeding_record_create',
     'vaccination_list', 'vaccination_create',
-    'user_list', 'user_detail', 'user_create', 'user_update', 'user_delete',
+    'user_list', 'user_detail', 'user_create', 'user_update', 'user_delete', 'user_batch_delete',
     'order_list', 'order_detail', 'order_update_status',
     'breeder_audit_list', 'breeder_audit_detail', 'breeder_approve', 'breeder_reject',
     'role_user_list', 'role_user_edit', 'permission_overview',

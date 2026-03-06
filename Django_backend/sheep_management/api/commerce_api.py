@@ -159,7 +159,16 @@ def api_checkout(request):
         data = json.loads(request.body)
         token = data.get('token', '') or _get_token(request)
         payment_method = data.get('payment_method', 'balance')
-        result = CommerceService.checkout(token, payment_method=payment_method)
+        receiver_name    = (data.get('receiver_name', '') or '').strip() or None
+        receiver_phone   = (data.get('receiver_phone', '') or '').strip() or None
+        shipping_address = (data.get('shipping_address', '') or '').strip() or None
+        result = CommerceService.checkout(
+            token,
+            payment_method=payment_method,
+            receiver_name=receiver_name,
+            receiver_phone=receiver_phone,
+            shipping_address=shipping_address,
+        )
         return JsonResponse({'code': 0, 'msg': '结算成功', 'data': result})
     except CommerceError as e:
         return _error_response(e)

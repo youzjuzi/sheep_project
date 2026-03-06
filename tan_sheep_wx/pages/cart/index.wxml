@@ -91,38 +91,5 @@
         </view>
     </view>
 
-    <!-- 支付方式弹出面板 -->
-    <van-action-sheet
-      show="{{ showPaymentSheet }}"
-      title="选择支付方式"
-      bind:close="onClosePaymentSheet"
-    >
-      <view class="payment-options">
-        <van-cell-group>
-          <!-- 余额支付 -->
-          <van-cell 
-            title="余额支付" 
-            label="可用余额: ¥{{userBalance}}" 
-            icon="gold-coin-o" 
-            clickable 
-            is-link
-            data-method="balance"
-            bind:click="onSelectPayment"
-          />
-
-          <!-- 微信支付 -->
-          <van-cell 
-            title="微信支付" 
-            label="暂未开通真实支付" 
-            icon="wechat" 
-            clickable
-            is-link 
-            data-method="wechat"
-            bind:click="onSelectPayment"
-          />
-        </van-cell-group>
-      </view>
-    </van-action-sheet>
-
     <van-dialog id="van-dialog" />
 </view>

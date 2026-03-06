@@ -174,11 +174,15 @@ class CommerceService:
     # ========================
 
     @staticmethod
-    def checkout(token, payment_method='balance'):
+    def checkout(token, payment_method='balance',
+                 receiver_name=None, receiver_phone=None, shipping_address=None):
         """
         购物车结算：将购物车所有商品打包为一笔订单，清空购物车
         :param token: 用户 JWT token
         :param payment_method: 支付方式 'balance' 或 'wechat'
+        :param receiver_name: 收货人姓名
+        :param receiver_phone: 收货人手机号
+        :param shipping_address: 收货地址
         :return: dict 订单信息
         """
         user = CommerceService._resolve_user(token)
@@ -221,6 +225,9 @@ class CommerceService:
             total_amount=total_amount,
             status=order_status,
             pay_time=pay_time,
+            receiver_name=receiver_name,
+            receiver_phone=receiver_phone,
+            shipping_address=shipping_address,
         )
 
         # 创建订单明细
@@ -457,6 +464,10 @@ class CommerceService:
             'delivery_date': order.delivery_date.strftime('%Y-%m-%d %H:%M:%S') if order.delivery_date else '',
             'logistics_company': order.logistics_company or '',
             'logistics_tracking_number': order.logistics_tracking_number or '',
+            'receiver_name': order.receiver_name or '',
+            'receiver_phone': order.receiver_phone or '',
+            'shipping_address': order.shipping_address or '',
+            'user_balance': float(order.user.balance),  # 支付后最新余额，前端用于更新缓存
             'created_at': order.created_at.strftime('%Y-%m-%d %H:%M:%S') if order.created_at else '',
             'items': [{
                 'sheep_id': oi.sheep.id,
