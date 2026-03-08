@@ -1,72 +1,25 @@
-// pages/promotion/index.js
 const API = require('../../utils/api.js');
+const app = getApp();
 
 Page({
     data: {
-        activities: [],
         coupons: [],
-        activeTab: 'activities',
-        loading: false,
-        userInfo: null,
+        loading: false
     },
 
-    onLoad(options) {
-        this.loadActivities();
+    onLoad: function (options) {
         this.loadCoupons();
     },
 
-    onShow() {
-        // 每次显示页面时刷新数据
-        this.loadActivities();
-        this.loadCoupons();
-    },
-
-    onPullDownRefresh() {
-        Promise.all([this.loadActivities(), this.loadCoupons()]).finally(() => {
+    onPullDownRefresh: function () {
+        this.loadCoupons().then(() => {
             wx.stopPullDownRefresh();
         });
     },
 
-    // 加载优惠活动列表
-    loadActivities() {
-        this.setData({ loading: true });
-        return API.getPromotionActivities()
-            .then(res => {
-                console.log('优惠活动数据:', res);
-                if (res.code === 0 && res.data) {
-                    // 预处理活动数据
-                    const activities = res.data.map(activity => {
-                        return {
-                            ...activity,
-                            remainingTime: this.getRemainingTime(activity.end_time),
-                            activityTypeText: activity.activity_type === 'flash_sale' ? '限时抢购' : 
-                                            activity.activity_type === 'package' ? '套餐活动' : '折扣活动'
-                        };
-                    });
-                    this.setData({
-                        activities: activities,
-                        loading: false
-                    });
-                } else {
-                    wx.showToast({
-                        title: res.msg || '加载失败',
-                        icon: 'none'
-                    });
-                    this.setData({ loading: false });
-                }
-            })
-            .catch(error => {
-                console.error('加载优惠活动失败:', error);
-                wx.showToast({
-                    title: '加载失败: ' + (error.message || '未知错误'),
-                    icon: 'none'
-                });
-                this.setData({ loading: false });
-            });
-    },
-
     // 加载优惠券列表
     loadCoupons() {
+        this.setData({ loading: true });
         return API.getAvailableCoupons()
             .then(res => {
                 console.log('优惠券数据:', res);
@@ -79,54 +32,35 @@ Page({
                         };
                     });
                     this.setData({
-                        coupons: coupons
+                        coupons: coupons,
+                        loading: false
                     });
                 } else {
                     console.error('加载优惠券失败:', res.msg);
+                    this.setData({ loading: false });
+                    wx.showToast({
+                        title: res.msg || '加载失败',
+                        icon: 'none'
+                    });
                 }
             })
             .catch(error => {
                 console.error('加载优惠券失败:', error);
+                this.setData({ loading: false });
+                wx.showToast({
+                    title: '网络错误',
+                    icon: 'none'
+                });
             });
-    },
-
-    // 切换标签
-    changeTab(e) {
-        const tab = e.currentTarget.dataset.tab;
-        this.setData({
-            activeTab: tab
-        });
-    },
-
-    // 参与活动
-    joinActivity(e) {
-        const activityId = e.currentTarget.dataset.id;
-        const activity = this.data.activities.find(a => a.id === activityId);
-        
-        if (!activity) {
-            return;
-        }
-
-        wx.showModal({
-            title: '参与活动',
-            content: `确定要参与"${activity.title}"吗？`,
-            success: (res) => {
-                if (res.confirm) {
-                    // 这里可以跳转到商品页面或订单页面
-                    wx.showToast({
-                        title: '活动参与成功',
-                        icon: 'success'
-                    });
-                }
-            }
-        });
     },
 
     // 领取优惠券
     claimCoupon(e) {
         const couponId = e.currentTarget.dataset.id;
         const coupon = this.data.coupons.find(c => c.id === couponId);
+        
         if (!coupon) return;
+        if (coupon.remaining_count === 0) return; // 已领完
 
         // 检查用户是否登录
         const token = wx.getStorageSync('token');
@@ -169,33 +103,10 @@ Page({
                 wx.hideLoading();
                 console.error('领取优惠券失败:', error);
                 wx.showToast({
-                    title: '领取失败: ' + (error.message || '未知错误'),
-                    icon: 'none',
-                    duration: 2000
+                    title: '领取失败',
+                    icon: 'none'
                 });
             });
-    },
-
-    // 计算剩余时间
-    getRemainingTime(endTime) {
-        if (!endTime) return '';
-        const now = new Date().getTime();
-        const end = new Date(endTime).getTime();
-        const diff = end - now;
-        
-        if (diff <= 0) return '已结束';
-        
-        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-        const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-        
-        if (days > 0) {
-            return `剩余${days}天${hours}小时`;
-        } else if (hours > 0) {
-            return `剩余${hours}小时${minutes}分钟`;
-        } else {
-            return `剩余${minutes}分钟`;
-        }
     },
 
     // 获取优惠券显示文本

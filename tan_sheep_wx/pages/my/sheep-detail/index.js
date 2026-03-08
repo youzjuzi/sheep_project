@@ -38,6 +38,7 @@ Page({
                         status: res.status_display || '健康养殖中',
                         farm_name: res.farm_name || '宁夏盐池核心牧场',
                         breeder_name: res.breeder_name || '官方推荐养殖户',
+                        owner_id: res.owner_id, // 确保获取 owner_id
                         qr_code: (res.qr_code && !res.qr_code.startsWith('http')) ? (API.API_BASE_URL + res.qr_code) : (res.qr_code || ''),
                         image: (res.image && !res.image.startsWith('http')) ? (API.API_BASE_URL + res.image) : (res.image || '')
                     };
@@ -87,5 +88,17 @@ Page({
     // 查看生长记录或监控视频的占位方法
     viewMonitor: function () {
         wx.showToast({ title: '牧场监控接入中...', icon: 'none' });
+    },
+
+    // 跳转到养殖户详情
+    viewBreederDetail: function (e) {
+        const breederId = e.currentTarget.dataset.id;
+        if (breederId) {
+            wx.navigateTo({
+                url: `/pages/breeder/my1/my1?id=${breederId}`
+            });
+        } else {
+            wx.showToast({ title: '暂无养殖户信息', icon: 'none' });
+        }
     }
 });

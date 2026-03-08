@@ -162,12 +162,15 @@ def api_checkout(request):
         receiver_name    = (data.get('receiver_name', '') or '').strip() or None
         receiver_phone   = (data.get('receiver_phone', '') or '').strip() or None
         shipping_address = (data.get('shipping_address', '') or '').strip() or None
+        user_coupon_id   = data.get('user_coupon_id')  # 新增
+        
         result = CommerceService.checkout(
             token,
             payment_method=payment_method,
             receiver_name=receiver_name,
             receiver_phone=receiver_phone,
             shipping_address=shipping_address,
+            user_coupon_id=user_coupon_id,  # 新增
         )
         return JsonResponse({'code': 0, 'msg': '结算成功', 'data': result})
     except CommerceError as e:

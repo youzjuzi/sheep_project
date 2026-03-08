@@ -20,23 +20,44 @@ Page({
             .then(function(res) {
                 wx.hideLoading();
                 console.log('返回的数据:', res);
-                const breeder = res;
-                const baseUrl = API.API_BASE_URL;
+                
+                // 处理数据：如果是 {code: 0, data: {...}} 格式，则取 data
+                let breeder = (res && res.code === 0 && res.data) ? res.data : res;
+                
+                if (!breeder || !breeder.id) {
+                     wx.showToast({ title: '数据异常', icon: 'none' });
+                     return;
+                }
+
+                const baseUrl = API.API_BASE_URL || 'http://127.0.0.1:8000';
+
+                // 处理头像
                 let avatarUrl = breeder.avatar_url || breeder.iconUrl || breeder.icon_url || '';
-                if (avatarUrl && !avatarUrl.startsWith('http://') && !avatarUrl.startsWith('https://')) {
+                if (avatarUrl && !avatarUrl.startsWith('http')) {
                     avatarUrl = baseUrl + avatarUrl;
                 }
-                if (!avatarUrl) avatarUrl = '/images/icons/function/f8.png';
+                breeder.avatarUrl = avatarUrl || '/images/icons/function/f8.png';
+                
+                // 处理羊只列表图片
+                if (breeder.sheep_list && Array.isArray(breeder.sheep_list)) {
+                    breeder.sheep_list = breeder.sheep_list.map(sheep => {
+                        let img = sheep.image_url || sheep.image || '';
+                        if (img && !img.startsWith('http')) {
+                            img = baseUrl + img;
+                        }
+                        return {
+                            ...sheep,
+                            image_url: img
+                        };
+                    });
+                }
 
                 // 从本地存储读取关注状态
                 const followList = wx.getStorageSync('followedBreeders') || [];
                 const isFollowed = followList.some(item => item.id === breeder.id);
 
                 that.setData({
-                    currentBreeder: {
-                        ...breeder,
-                        avatarUrl: avatarUrl
-                    },
+                    currentBreeder: breeder,
                     isFollowed: isFollowed
                 });
             })

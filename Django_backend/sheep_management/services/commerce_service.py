@@ -7,7 +7,7 @@ import uuid
 from decimal import Decimal
 from django.utils import timezone
 
-from ..models import CartItem, Sheep, Order, OrderItem
+from ..models import CartItem, Sheep, Order, OrderItem, UserCoupon
 from .user_service import UserService, UserError
 
 
@@ -175,7 +175,8 @@ class CommerceService:
 
     @staticmethod
     def checkout(token, payment_method='balance',
-                 receiver_name=None, receiver_phone=None, shipping_address=None):
+                 receiver_name=None, receiver_phone=None, shipping_address=None,
+                 user_coupon_id=None):
         """
         购物车结算：将购物车所有商品打包为一笔订单，清空购物车
         :param token: 用户 JWT token
@@ -183,6 +184,7 @@ class CommerceService:
         :param receiver_name: 收货人姓名
         :param receiver_phone: 收货人手机号
         :param shipping_address: 收货地址
+        :param user_coupon_id: 用户优惠券ID（可选）
         :return: dict 订单信息
         """
         user = CommerceService._resolve_user(token)
@@ -197,13 +199,78 @@ class CommerceService:
         for item in cart_items:
             total_amount += item.price * item.quantity
 
+        # 处理优惠券
+        discount_amount = Decimal('0')
+        used_coupon = None
+
+        if user_coupon_id:
+            try:
+                uc = UserCoupon.objects.select_related('coupon').get(pk=user_coupon_id, user=user)
+                if uc.status != 'unused':
+                    raise CommerceError('优惠券已使用或已过期')
+                
+                # 检查有效期
+                if uc.coupon.valid_until < timezone.now():
+                    uc.status = 'expired'
+                    uc.save()
+                    raise CommerceError('优惠券已过期')
+                
+                coupon = uc.coupon
+                
+                # 统计适用金额
+                applicable_amount = Decimal('0')
+                if coupon.owner:
+                    # 养殖户优惠券：仅限该养殖户的商品
+                    for item in cart_items:
+                        if item.sheep.owner_id == coupon.owner_id:
+                            applicable_amount += item.price * item.quantity
+                    
+                    if applicable_amount == Decimal('0'):
+                        owner_name = coupon.owner.nickname or coupon.owner.username
+                        raise CommerceError(f'该优惠券仅限 {owner_name} 的商品使用')
+                else:
+                    # 平台通用券
+                    applicable_amount = total_amount
+
+                # 校验门槛
+                if applicable_amount < coupon.min_purchase_amount:
+                    raise CommerceError(f'未满足使用门槛 (满 {coupon.min_purchase_amount} 元可用)')
+                
+                # 计算优惠金额
+                current_discount = Decimal('0')
+                if coupon.coupon_type == 'discount': # 满减
+                    current_discount = coupon.discount_amount if coupon.discount_amount else Decimal('0')
+                elif coupon.coupon_type == 'percentage': # 折扣
+                    if coupon.discount_rate:
+                        rate = Decimal(str(coupon.discount_rate))
+                        current_discount = applicable_amount * (Decimal('1') - rate)
+                    
+                    if coupon.max_discount_amount and current_discount > coupon.max_discount_amount:
+                        current_discount = coupon.max_discount_amount
+                elif coupon.coupon_type == 'cash': # 现金券
+                    current_discount = coupon.discount_amount if coupon.discount_amount else Decimal('0')
+                
+                # 优惠金额不能超过适用金额
+                if current_discount > applicable_amount:
+                    current_discount = applicable_amount
+                
+                discount_amount = current_discount
+                used_coupon = uc
+                
+            except UserCoupon.DoesNotExist:
+                raise CommerceError('优惠券不存在或不属于您')
+
+        final_amount = total_amount - discount_amount
+        if final_amount < Decimal('0'):
+            final_amount = Decimal('0')
+
         # 处理支付逻辑
         if payment_method == 'balance':
-            if user.balance < total_amount:
+            if user.balance < final_amount:
                 raise CommerceError('余额不足，请充值或选择其他支付方式')
             
             # 扣除余额
-            user.balance -= total_amount
+            user.balance -= final_amount
             user.save(update_fields=['balance'])
             
             order_status = 'paid'
@@ -222,13 +289,20 @@ class CommerceService:
         order = Order.objects.create(
             user=user,
             order_no=order_no,
-            total_amount=total_amount,
+            total_amount=final_amount,
             status=order_status,
             pay_time=pay_time,
             receiver_name=receiver_name,
             receiver_phone=receiver_phone,
             shipping_address=shipping_address,
         )
+
+        # 更新优惠券状态
+        if used_coupon:
+            used_coupon.status = 'used'
+            used_coupon.used_at = timezone.now()
+            used_coupon.order_id = order.id
+            used_coupon.save()
 
         # 创建订单明细
         for item in cart_items:
@@ -443,6 +517,7 @@ class CommerceService:
                 'length': float(sheep.length),
                 'price': float(sheep.price),
                 'image': sheep.image.url if sheep.image else '',
+                'owner_id': sheep.owner_id,  # 新增
             },
             'quantity': item.quantity,
             'price': float(item.price),

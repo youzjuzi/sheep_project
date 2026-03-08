@@ -165,6 +165,12 @@ def api_coupons(request):
                     uc.status = 'expired'
                     uc.save()
                 
+                owner_info = {
+                    'id': coupon.owner.id,
+                    'name': coupon.owner.nickname or coupon.owner.username,
+                    'farm_name': getattr(coupon.owner, 'farm_name', '')
+                } if coupon.owner else None
+
                 result.append({
                     'id': uc.id,
                     'coupon_id': coupon.id,
@@ -172,6 +178,7 @@ def api_coupons(request):
                     'code': coupon.code,
                     'coupon_type': coupon.coupon_type,
                     'status': uc.status,
+                    'owner': owner_info,  # 新增
                     'discount_amount': float(coupon.discount_amount) if coupon.discount_amount else None,
                     'discount_rate': float(coupon.discount_rate) if coupon.discount_rate else None,
                     'min_purchase_amount': float(coupon.min_purchase_amount),
@@ -203,12 +210,19 @@ def api_coupons(request):
                 if coupon.total_count and coupon.used_count >= coupon.total_count:
                     continue
                 
+                owner_info = {
+                    'id': coupon.owner.id,
+                    'name': coupon.owner.nickname or coupon.owner.username,
+                    'farm_name': getattr(coupon.owner, 'farm_name', '')
+                } if coupon.owner else None
+
                 result.append({
                     'id': coupon.id,
                     'name': coupon.name,
                     'code': coupon.code,
                     'coupon_type': coupon.coupon_type,
                     'status': coupon.status,
+                    'owner': owner_info,
                     'discount_amount': float(coupon.discount_amount) if coupon.discount_amount else None,
                     'discount_rate': float(coupon.discount_rate) if coupon.discount_rate else None,
                     'min_purchase_amount': float(coupon.min_purchase_amount),

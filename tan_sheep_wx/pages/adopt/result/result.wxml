@@ -9,7 +9,7 @@
         <view class="sheep-item" wx:for="{{sheepList}}" wx:key="id" bindtap="viewSheepDetail" data-id="{{item.id}}">
             <view class="sheep-avatar">
                 <image wx:if="{{item.image}}" src="{{item.image}}" class="avatar-img" mode="aspectFill"></image>
-                <text wx:else class="avatar-icon">&#x1F411;</text>
+                <text wx:else class="avatar-icon">🐑</text>
             </view>
             <view class="sheep-info">
                 <view class="sheep-id">羊只 #{{item.id}}</view>

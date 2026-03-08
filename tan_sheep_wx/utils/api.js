@@ -267,13 +267,18 @@ function confirmAvatarUpload(token, objectKey) {
  * @param {string} token 
  * @param {string} paymentMethod 支付方式（'balance' 或 'wechat'）
  * @param {object} addressInfo { receiver_name, receiver_phone, shipping_address }
+ * @param {number} userCouponId 用户优惠券ID（可选）
  */
-function checkout(token, paymentMethod = 'balance', addressInfo = {}) {
-  return request('/api/cart/checkout', 'POST', {
+function checkout(token, paymentMethod = 'balance', addressInfo = {}, userCouponId = null) {
+  const data = {
     token: token,
     payment_method: paymentMethod,
     ...addressInfo
-  })
+  };
+  if (userCouponId) {
+    data.user_coupon_id = userCouponId;
+  }
+  return request('/api/cart/checkout', 'POST', data)
 }
 
 /**

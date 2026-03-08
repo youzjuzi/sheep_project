@@ -42,7 +42,14 @@
         <van-cell title="性别" value="{{sheepDetail.gender}}" />
         <van-cell title="出生日期" value="{{sheepDetail.birth_date}}" />
         <van-cell title="养殖牧场" value="{{sheepDetail.farm_name}}" icon="shop-o" />
-        <van-cell title="负责农户" value="{{sheepDetail.breeder_name}}" icon="contact" is-link />
+        <van-cell 
+          title="负责农户" 
+          value="{{sheepDetail.breeder_name}}" 
+          icon="contact" 
+          is-link 
+          bind:click="viewBreederDetail"
+          data-id="{{sheepDetail.owner_id}}"
+        />
       </van-cell-group>
     </view>
 

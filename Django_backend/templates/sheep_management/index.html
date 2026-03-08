@@ -126,34 +126,27 @@
         </a>
     </div>
 
-    <!-- ── 本月营收 + 快速导航 ── -->
-    <div class="two-col" style="margin-bottom:24px;">
-        <div style="background:linear-gradient(135deg,#e8f5e9,#f1f8e9);border-radius:12px;padding:28px;box-shadow:0 1px 8px rgba(0,0,0,.06);text-align:center;">
-            <div style="font-size:13px;color:#777;margin-bottom:10px;">📈 本月已完成营收</div>
-            <div style="font-size:40px;font-weight:700;color:#2e7d32;">¥{{ monthly_revenue|floatformat:2 }}</div>
-            <div style="font-size:12px;color:#aaa;margin-top:8px;">{% now "Y年m月" %} 累计</div>
-        </div>
-        <div class="section-card" style="margin-bottom:0;">
-            <div class="sec-head"><h3>⚡ 快速导航</h3></div>
-            <div class="nav-grid">
-                <a href="{% url 'breeder_audit_list' %}" class="nav-btn" {% if pending_breeders > 0 %}style="background:#fff8e1;border-color:#ffe082;position:relative;"{% else %}style="position:relative;"{% endif %}>
-                    <div class="icon">{% if pending_breeders > 0 %}🔍{% else %}✅{% endif %}</div>
-                    <div class="txt" {% if pending_breeders > 0 %}style="color:#e65100;"{% else %}style="color:#666;"{% endif %}>养殖户审核</div>
-                    {% if pending_breeders > 0 %}<span class="badge-dot">{{ pending_breeders }}</span>{% endif %}
-                </a>
-                <a href="{% url 'user_list' %}" class="nav-btn" style="background:#e3f2fd;border-color:#90caf9;">
-                    <div class="icon">👥</div>
-                    <div class="txt" style="color:#1565c0;">用户管理</div>
-                </a>
-                <a href="{% url 'order_list' %}" class="nav-btn" style="background:#fce4ec;border-color:#f48fb1;">
-                    <div class="icon">📦</div>
-                    <div class="txt" style="color:#880e4f;">订单管理</div>
-                </a>
-                <a href="{% url 'permission_overview' %}" class="nav-btn" style="background:#ede7f6;border-color:#ce93d8;">
-                    <div class="icon">🔑</div>
-                    <div class="txt" style="color:#4a148c;">权限管理</div>
-                </a>
-            </div>
+    <!-- ── 快速导航 ── -->
+    <div class="section-card" style="margin-bottom:24px;">
+        <div class="sec-head"><h3>⚡ 快速导航</h3></div>
+        <div class="nav-grid">
+            <a href="{% url 'breeder_audit_list' %}" class="nav-btn" {% if pending_breeders > 0 %}style="background:#fff8e1;border-color:#ffe082;position:relative;"{% else %}style="position:relative;"{% endif %}>
+                <div class="icon">{% if pending_breeders > 0 %}🔍{% else %}✅{% endif %}</div>
+                <div class="txt" {% if pending_breeders > 0 %}style="color:#e65100;"{% else %}style="color:#666;"{% endif %}>养殖户审核</div>
+                {% if pending_breeders > 0 %}<span class="badge-dot">{{ pending_breeders }}</span>{% endif %}
+            </a>
+            <a href="{% url 'user_list' %}" class="nav-btn" style="background:#e3f2fd;border-color:#90caf9;">
+                <div class="icon">👥</div>
+                <div class="txt" style="color:#1565c0;">用户管理</div>
+            </a>
+            <a href="{% url 'order_list' %}" class="nav-btn" style="background:#fce4ec;border-color:#f48fb1;">
+                <div class="icon">📦</div>
+                <div class="txt" style="color:#880e4f;">订单管理</div>
+            </a>
+            <a href="{% url 'permission_overview' %}" class="nav-btn" style="background:#ede7f6;border-color:#ce93d8;">
+                <div class="icon">🔑</div>
+                <div class="txt" style="color:#4a148c;">权限管理</div>
+            </a>
         </div>
     </div>
 
@@ -334,7 +327,11 @@
     </div>
 
     <!-- ── 养殖统计 ── -->
-    <div class="kpi-grid" style="grid-template-columns:repeat(2,1fr);">
+    <div class="kpi-grid" style="grid-template-columns:repeat(3,1fr);">
+        <div class="kpi" style="border-left-color:#2e7d32;text-align:center;">
+            <div class="num" style="color:#2e7d32;font-size:36px;">¥{{ monthly_revenue|floatformat:2 }}</div>
+            <div style="color:#666;font-size:14px;margin-top:4px;">📈 本月营收</div>
+        </div>
         <a href="{% url 'sheep_list' %}" class="kpi" style="border-left-color:#43a047;text-align:center;">
             <div class="num" style="color:#43a047;font-size:36px;">{{ sheep_count }}</div>
             <div style="color:#666;font-size:14px;margin-top:4px;">🐑 我的羊只</div>

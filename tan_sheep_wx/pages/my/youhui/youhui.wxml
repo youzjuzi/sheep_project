@@ -15,6 +15,8 @@
                 </view>
                 <view class="coupon-info">
                     <text class="coupon-name">{{coupon.name}}</text>
+                    <!-- 显示养殖户信息 -->
+                    <text class="coupon-owner" wx:if="{{coupon.owner}}">仅限购买 {{coupon.owner.farm_name || coupon.owner.name}} 的羊只使用</text>
                     <text class="coupon-desc">{{coupon.displayText}}</text>
                     <text class="coupon-code">优惠码：{{coupon.code}}</text>
                     <text class="coupon-time">有效期至：{{coupon.valid_until}}</text>

@@ -31,12 +31,6 @@ def _admin_dashboard(request, user):
     total_orders   = Order.objects.count()
     pending_orders = Order.objects.filter(status='paid').count()   # 已付款待发货
 
-    # 本月营收（已完成订单）
-    monthly_revenue = (
-        Order.objects.filter(status='completed', created_at__date__gte=month_start)
-        .aggregate(total=Sum('total_amount'))['total'] or 0
-    )
-
     # 全平台未处理环境预警
     alert_count = EnvironmentAlert.objects.filter(is_resolved=False).count()
     environment_alerts = EnvironmentAlert.objects.filter(
@@ -63,7 +57,6 @@ def _admin_dashboard(request, user):
         'total_sheep': total_sheep,
         'total_orders': total_orders,
         'pending_orders': pending_orders,
-        'monthly_revenue': monthly_revenue,
         'alert_count': alert_count,
         # 列表
         'environment_alerts': environment_alerts,
@@ -78,6 +71,7 @@ def _admin_dashboard(request, user):
 def _breeder_dashboard(request, user):
     """养殖户：自己的羊只 / 订单 / 待办"""
     today = timezone.now().date()
+    month_start = today.replace(day=1)
 
     sheep_list = Sheep.objects.filter(owner=user)
     sheep_ids  = sheep_list.values_list('id', flat=True)
@@ -87,20 +81,33 @@ def _breeder_dashboard(request, user):
         items__sheep_id__in=sheep_ids
     ).distinct().order_by('-created_at')
 
+    # 本月营收（该养殖户名下的羊只被购买且订单已完成）
+    # 注意：这里按 OrderItem 统计，因为一笔订单可能包含多个养殖户的羊（虽然业务上不太可能，但这样更严谨）
+    monthly_revenue = (
+        OrderItem.objects.filter(
+            sheep__owner=user,
+            order__status='completed',
+            order__created_at__date__gte=month_start
+        )
+        .aggregate(total=Sum('price'))['total'] or 0
+    )
+
     # 1. 待发货订单
     pending_shipping_count = order_qs.filter(status='paid').count()
 
-    # 2. 即将到期疫苗（30天内）
+    # 2. 即将到期疫苗（30天内，且未过期）
     upcoming_vaccinations = []
     for sheep in sheep_list:
         for vac in VaccinationHistory.objects.filter(sheep=sheep).order_by('-vaccination_date')[:5]:
-            if vac.expiry_date and (vac.expiry_date - today).days <= 30:
-                upcoming_vaccinations.append({
-                    'sheep': sheep,
-                    'vaccine': vac.vaccine,
-                    'expiry_date': vac.expiry_date,
-                    'days_left': (vac.expiry_date - today).days,
-                })
+            if vac.expiry_date:
+                days_left = (vac.expiry_date - today).days
+                if 0 <= days_left <= 30:
+                    upcoming_vaccinations.append({
+                        'sheep': sheep,
+                        'vaccine': vac.vaccine,
+                        'expiry_date': vac.expiry_date,
+                        'days_left': days_left,
+                    })
 
     # 3. 本人的环境预警
     environment_alerts = EnvironmentAlert.objects.filter(
@@ -109,6 +116,7 @@ def _breeder_dashboard(request, user):
 
     context = {
         'is_admin': False,
+        'monthly_revenue': monthly_revenue,
         'sheep_count': sheep_list.count(),
         'order_count': order_qs.count(),
         'sheep_list': sheep_list.order_by('-id')[:5],

@@ -118,6 +118,7 @@ class SheepService:
             'qr_code': sheep.qr_code.url if sheep.qr_code else '',
             'farm_name': sheep.farm_name or '宁夏盐池滩羊核心产区',  # 如果真实农场没填给个默认
             'breeder_name': sheep.owner.nickname or sheep.owner.username if sheep.owner else '官方牧场',
+            'owner_id': sheep.owner.id if sheep.owner else None,  # 确保返回 owner_id
             'image': sheep.image.url if sheep.image else '',
         }
 

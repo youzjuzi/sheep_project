@@ -1,52 +1,6 @@
 <view class="container">
-    <view class="tab-bar">
-        <view class="tab-item {{activeTab === 'activities' ? 'active' : ''}}" bindtap="changeTab" data-tab="activities">优惠活动</view>
-        <view class="tab-item {{activeTab === 'coupons' ? 'active' : ''}}" bindtap="changeTab" data-tab="coupons">优惠券</view>
-    </view>
-
-    <!-- 优惠活动列表 -->
-    <view class="content" wx:if="{{activeTab === 'activities'}}">
-        <view class="activity-list" wx:if="{{activities.length > 0}}">
-            <view class="activity-item" wx:for="{{activities}}" wx:key="id">
-                <image class="activity-image" src="{{item.image_url || '/images/icons/function/f4.png'}}" mode="aspectFill" wx:if="{{item.image_url}}"></image>
-                <view class="activity-info">
-                    <view class="activity-header">
-                        <text class="activity-title">{{item.title}}</text>
-                        <text class="activity-type">{{item.activityTypeText}}</text>
-                    </view>
-                    <text class="activity-description" wx:if="{{item.description}}">{{item.description}}</text>
-                    <view class="activity-details">
-                        <view class="detail-row" wx:if="{{item.discount_rate}}">
-                            <text class="detail-label">折扣：</text>
-                            <text class="detail-value">{{Math.round(item.discount_rate * 100)}}折</text>
-                        </view>
-                        <view class="detail-row" wx:if="{{item.discount_amount}}">
-                            <text class="detail-label">优惠：</text>
-                            <text class="detail-value">¥{{item.discount_amount}}</text>
-                        </view>
-                        <view class="detail-row" wx:if="{{item.min_purchase_amount > 0}}">
-                            <text class="detail-label">最低消费：</text>
-                            <text class="detail-value">¥{{item.min_purchase_amount}}</text>
-                        </view>
-                    </view>
-                    <view class="activity-time">
-                        <text class="time-text">活动时间：{{item.start_time}} 至 {{item.end_time}}</text>
-                        <text class="remaining-time">{{item.remainingTime}}</text>
-                    </view>
-                    <view class="activity-footer">
-                        <text class="sold-count" wx:if="{{item.total_limit}}">已售：{{item.sold_count}}/{{item.total_limit}}</text>
-                        <button class="join-btn" bindtap="joinActivity" data-id="{{item.id}}">立即参与</button>
-                    </view>
-                </view>
-            </view>
-        </view>
-        <view class="empty-state" wx:else>
-            <text>暂无优惠活动</text>
-        </view>
-    </view>
-
     <!-- 优惠券列表 -->
-    <view class="content" wx:if="{{activeTab === 'coupons'}}">
+    <view class="content">
         <view class="coupon-list" wx:if="{{coupons.length > 0}}">
             <view class="coupon-item" wx:for="{{coupons}}" wx:key="id">
                 <view class="coupon-left">
@@ -56,14 +10,16 @@
                     </view>
                     <view class="coupon-info">
                         <text class="coupon-name">{{item.name}}</text>
+                        <!-- 显示养殖户信息 -->
+                        <text class="coupon-owner" wx:if="{{item.owner}}">仅限购买 {{item.owner.farm_name || item.owner.name}} 的羊只使用</text>
                         <text class="coupon-desc">{{item.displayText}}</text>
                         <text class="coupon-time">有效期至：{{item.valid_until}}</text>
                     </view>
                 </view>
                 <view class="coupon-right">
-                    <button class="claim-btn" bindtap="claimCoupon" data-id="{{item.id}}" disabled="{{item.remaining_count === 0}}">
+                    <view class="claim-btn {{item.remaining_count === 0 ? 'disabled' : ''}}" bindtap="claimCoupon" data-id="{{item.id}}">
                         {{item.remaining_count === 0 ? '已领完' : '领取'}}
-                    </button>
+                    </view>
                     <text class="coupon-limit" wx:if="{{item.remaining_count !== null}}">剩余{{item.remaining_count}}张</text>
                 </view>
             </view>

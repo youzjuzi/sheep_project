@@ -4,6 +4,7 @@ Page({
   data: {
     checkoutItems: [],  // 要结算的羊只列表
     totalPrice: 0,
+    userCouponId: null, // 优惠券ID
 
     // 收货信息
     receiverName: '',
@@ -16,7 +17,20 @@ Page({
     loading: false,
   },
 
-  onLoad() {
+  onLoad(options) {
+    // 获取传递的优惠券ID
+    if (options.user_coupon_id) {
+        this.setData({ userCouponId: options.user_coupon_id });
+        // 注意：前端目前无法直接计算优惠后的价格，因为逻辑在后端。
+        // 这里可以调用后端预结算接口，但后端暂时没有。
+        // 所以我们先按原价显示，或者提示用户“将在下单时自动抵扣”。
+        wx.showToast({
+            title: '已选择优惠券，下单自动抵扣',
+            icon: 'none',
+            duration: 2500
+        });
+    }
+
     // 读取购物车传过来的选中商品
     const items = wx.getStorageSync('checkoutItems') || [];
     const totalPrice = items.reduce((sum, item) => sum + (item.total_price || item.price || 0), 0);
@@ -62,7 +76,7 @@ Page({
 
   // 提交订单
   async submitOrder() {
-    const { receiverName, receiverPhone, shippingAddress, totalPrice, payMethod } = this.data;
+    const { receiverName, receiverPhone, shippingAddress, totalPrice, payMethod, userCouponId } = this.data;
 
     if (!receiverName.trim()) {
       wx.showToast({ title: '请填写收货人姓名', icon: 'none' }); return;
@@ -79,7 +93,7 @@ Page({
 
     wx.showModal({
       title: '确认下单',
-      content: `共 ¥${totalPrice}，使用余额支付，确认吗？`,
+      content: userCouponId ? `订单将自动抵扣优惠券，确认支付吗？` : `共 ¥${totalPrice}，使用余额支付，确认吗？`,
       success: async (modalRes) => {
         if (!modalRes.confirm) return;
 
@@ -89,7 +103,7 @@ Page({
             receiver_name: receiverName.trim(),
             receiver_phone: receiverPhone.trim(),
             shipping_address: shippingAddress.trim(),
-          });
+          }, userCouponId); // 传递优惠券ID
 
           if (res.code === 0) {
             // 保存收货信息方便下次使用

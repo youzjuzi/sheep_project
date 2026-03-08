@@ -43,7 +43,7 @@
     </navigator>
     <navigator url="/pages/promotion/index" class="function-item">
         <image src="{{functionIcons.f4}}" class="function-icon" />
-        <text>优惠活动</text>
+        <text>优惠券</text>
     </navigator>
   
     <navigator url="/pages/recipe/index" class="function-item">
