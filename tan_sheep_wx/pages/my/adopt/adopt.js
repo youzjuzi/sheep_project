@@ -1,4 +1,4 @@
-// adopt.js - 我的羊页面
+﻿// adopt.js - 我的羊页面
 const API = require('../../../utils/api.js');
 
 Page({
@@ -61,10 +61,11 @@ Page({
 
   viewSheepDetail: function (e) {
     const sheepId = e.currentTarget.dataset.sheepId;
-    wx.navigateTo({ url: `/pages/my/sheep-detail/index?id=${sheepId}` });
+    wx.navigateTo({ url: `/packageUser/my/sheep-detail/index?id=${sheepId}` });
   },
 
   goHome: function () {
     wx.switchTab({ url: '/pages/index/index' });
   }
 });
+

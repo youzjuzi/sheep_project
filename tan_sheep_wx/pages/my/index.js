@@ -1,4 +1,4 @@
-// pages/my/index.js - 重新设计版
+﻿// pages/my/index.js - 重新设计版
 const AUTH = require('../../utils/auth');
 const API = require('../../utils/api.js');
 
@@ -19,7 +19,7 @@ Page({
         icon: 'orders-o',
         bgColor: '#FCE4EC',
         iconColor: '#E91E63',
-        url: '/pages/cart/history/index',
+        url: '/packageOrder/cart/history/index',
         type: 'order',
         badge: ''
       },
@@ -28,7 +28,7 @@ Page({
         icon: 'coupon-o',
         bgColor: '#FFEBEE',
         iconColor: '#F44336',
-        url: '/pages/my/youhui/youhui',
+        url: '/packageUser/my/youhui/youhui',
         type: 'coupon',
         badge: ''
       },
@@ -37,7 +37,7 @@ Page({
         icon: 'user-o',
         bgColor: '#E6F5ED',
         iconColor: '#238E23',
-        url: '/pages/my/info',
+        url: '/packageUser/my/info',
         type: 'profile',
         badge: ''
       },
@@ -46,7 +46,7 @@ Page({
         icon: 'like-o',
         bgColor: '#FFF3E0',
         iconColor: '#FF9800',
-        url: '/pages/my/follows/index',
+        url: '/packageUser/my/follows/index',
         type: 'follows',
         badge: ''
       },
@@ -242,7 +242,7 @@ Page({
 
   goAsset() {
     wx.navigateTo({
-      url: "/pages/asset/index"
+      url: "/packageWallet/asset/index"
     });
   },
 
@@ -468,3 +468,4 @@ Page({
     });
   }
 });
+

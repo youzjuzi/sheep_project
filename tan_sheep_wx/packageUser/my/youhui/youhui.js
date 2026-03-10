@@ -1,4 +1,4 @@
-// pages/my/youhui/youhui.js
+﻿// pages/my/youhui/youhui.js
 const API = require('../../../utils/api.js');
 
 Page({
@@ -233,7 +233,7 @@ Page({
             
             // 跳转到结算页，并传递优惠券ID
             wx.navigateTo({
-                url: `/pages/cart/checkout?user_coupon_id=${couponId}`
+                url: `/packageOrder/cart/checkout?user_coupon_id=${couponId}`
             });
 
         }).catch(err => {
@@ -242,3 +242,4 @@ Page({
         });
     }
 });
+

@@ -1,4 +1,4 @@
-const app = getApp()
+﻿const app = getApp()
 const WXAPI = require('apifm-wxapi')
 const API = require('../../utils/api.js')
 const AUTH = require('../../utils/auth')
@@ -136,21 +136,22 @@ Page({
   // 充值
   recharge: function (e) {
     wx.navigateTo({
-      url: "/pages/recharge/index"
+      url: "/packageWallet/recharge/index"
     })
   },
 
   // 提现
   withdraw: function (e) {
-    wx.navigateTo({
-      url: "/pages/withdraw/index"
+    wx.showToast({
+      title: "提现功能暂未开放",
+      icon: "none"
     })
   },
 
   // 预存
   payDeposit: function (e) {
     wx.navigateTo({
-      url: "/pages/deposit/pay"
+      url: "/packageWallet/deposit/pay"
     })
   },
 
@@ -168,3 +169,4 @@ Page({
     })
   },
 })
+

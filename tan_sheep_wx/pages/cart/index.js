@@ -1,4 +1,4 @@
-// 引入API工具
+﻿// 引入API工具
 const API = require('../../utils/api.js');
 
 Page({
@@ -181,12 +181,12 @@ Page({
         // 将选中商品存入缓存，跳转到订单确认页
         const selectedItems = this.data.cartItems.filter(item => item.selected);
         wx.setStorageSync('checkoutItems', selectedItems);
-        wx.navigateTo({ url: '/pages/cart/checkout' });
+        wx.navigateTo({ url: '/packageOrder/cart/checkout' });
     },
 
     goToHistory: function () {
         wx.navigateTo({
-            url: '/pages/cart/history/index'
+            url: '/packageOrder/cart/history/index'
         });
     },
 
@@ -196,3 +196,4 @@ Page({
         });
     }
 });
+

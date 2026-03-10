@@ -3,26 +3,12 @@
         "pages/index/index",
         "pages/login/index",
         "pages/cart/index",
-        "pages/cart/history/index",
-        "pages/cart/checkout",
         "pages/my/index",
-        "pages/my/youhui/youhui",
-        "pages/my/info",
-        "pages/my/info-menu/info-menu",
         "pages/my/info/info",
         "pages/my/adopt/adopt",
-        "pages/my/follows/index",
-        "pages/my/sheep-detail/index",
         "pages/search/index",
         "pages/category/index",
-        "pages/goodsdetail/goodsdetail",
-        "pages/search/search-content",
-        "pages/asset/index",
-        "pages/score/index",
-        "pages/score/growth",
-        "pages/deposit/pay",
-        "pages/recharge/index",
-        "pages/trace/detail"
+        "pages/goodsdetail/goodsdetail"
     ],
     "subPackages": [
         {
@@ -103,6 +89,44 @@
             "name": "qa",
             "pages": [
                 "index"
+            ]
+        },
+        {
+            "root": "packageOrder",
+            "name": "packageOrder",
+            "pages": [
+                "cart/history/index",
+                "cart/checkout"
+            ]
+        },
+        {
+            "root": "packageUser",
+            "name": "packageUser",
+            "pages": [
+                "my/youhui/youhui",
+                "my/info",
+                "my/info-menu/info-menu",
+                "my/follows/index",
+                "my/sheep-detail/index"
+            ]
+        },
+        {
+            "root": "packageSearch",
+            "name": "packageSearch",
+            "pages": [
+                "search/search-content",
+                "trace/detail"
+            ]
+        },
+        {
+            "root": "packageWallet",
+            "name": "packageWallet",
+            "pages": [
+                "asset/index",
+                "score/index",
+                "score/growth",
+                "deposit/pay",
+                "recharge/index"
             ]
         }
     ],

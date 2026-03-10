@@ -1,4 +1,4 @@
-// pages/search/index.js
+﻿// pages/search/index.js
 const API = require('../../utils/api.js');
 
 Page({
@@ -327,7 +327,7 @@ Page({
   jumpToTraceDetail(earTag) {
     // 跳转到溯源详情页，传递耳标编号参数
     wx.navigateTo({
-      url: `/pages/trace/detail?ear_tag=${encodeURIComponent(earTag)}`,
+      url: `/packageSearch/trace/detail?ear_tag=${encodeURIComponent(earTag)}`,
       success: () => {
         console.log('[扫码溯源] 成功跳转到溯源详情页');
       },
@@ -464,4 +464,5 @@ Page({
     });
   }
 });
+
 

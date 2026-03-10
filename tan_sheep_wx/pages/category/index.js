@@ -1,4 +1,4 @@
-Page({
+﻿Page({
     data: {
         imageList: [
             { src: '/images/icons/function/f1.png' }
@@ -62,7 +62,7 @@ Page({
     confirmBuyNow: function () {
         const sheepDetail = this.data.sheepDetail;
         wx.navigateTo({
-            url: `/pages/cart/checkout?id=${sheepDetail.id}`
+            url: `/packageOrder/cart/checkout?id=${sheepDetail.id}`
         });
         this.closeBuyNowModal();  // 确认购买后关闭弹窗
     },
@@ -111,7 +111,8 @@ Page({
     buyNow: function (e) {
         const sheepDetail = this.data.sheepDetail;
         wx.navigateTo({
-            url: `/pages/cart/checkout?id=${sheepDetail.id}`
+            url: `/packageOrder/cart/checkout?id=${sheepDetail.id}`
         });
     }
 });
+

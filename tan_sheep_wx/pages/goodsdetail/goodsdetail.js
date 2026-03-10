@@ -1,4 +1,4 @@
-// 在文件顶部引入API工具
+﻿// 在文件顶部引入API工具
 const API = require('../../utils/api.js');
 
 Page({
@@ -83,7 +83,7 @@ Page({
     confirmBuyNow: function () {
         var sheepDetail = this.data.sheepDetail;
         wx.navigateTo({
-            url: '/pages/cart/checkout?sheepId=' + (sheepDetail.sheepId || '')
+            url: '/packageOrder/cart/checkout?sheepId=' + (sheepDetail.sheepId || '')
         });
         this.closeBuyNowModal();
     },
@@ -130,3 +130,4 @@ Page({
         });
     }
 });
+
