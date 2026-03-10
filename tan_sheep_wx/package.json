@@ -1,7 +1,6 @@
 {
   "dependencies": {
     "@vant/weapp": "^1.11.7",
-    "apifm-wxapi": "^24.9.22",
-    "echarts": "^5.5.1"
+    "apifm-wxapi": "^24.9.22"
   }
 }
