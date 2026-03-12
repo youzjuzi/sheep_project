@@ -4,6 +4,7 @@ import os
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth import update_session_auth_hash
 from django.core.files.storage import default_storage
 from django.http import JsonResponse
 from django.shortcuts import redirect, render
@@ -72,6 +73,45 @@ def breeder_profile(request):
 def breeder_account(request):
     """Breeder account management page."""
     return render(request, "sheep_management/breeder/account.html", {"user": request.user})
+
+
+@login_required
+def breeder_change_password(request):
+    """Breeder password change page."""
+    user = request.user
+
+    if request.method == "POST":
+        old_password = request.POST.get("old_password", "").strip()
+        new_password = request.POST.get("new_password", "").strip()
+        confirm_password = request.POST.get("confirm_password", "").strip()
+
+        if not old_password or not new_password or not confirm_password:
+            messages.error(request, "请完整填写所有密码字段")
+            return render(request, "sheep_management/breeder/change_password.html")
+
+        if not user.check_password(old_password):
+            messages.error(request, "原密码不正确")
+            return render(request, "sheep_management/breeder/change_password.html")
+
+        if len(new_password) < 6:
+            messages.error(request, "新密码不能少于6位")
+            return render(request, "sheep_management/breeder/change_password.html")
+
+        if new_password != confirm_password:
+            messages.error(request, "两次输入的新密码不一致")
+            return render(request, "sheep_management/breeder/change_password.html")
+
+        if new_password == old_password:
+            messages.error(request, "新密码不能与原密码相同")
+            return render(request, "sheep_management/breeder/change_password.html")
+
+        user.set_password(new_password)
+        user.save(update_fields=["password"])
+        update_session_auth_hash(request, user)
+        messages.success(request, "密码修改成功")
+        return redirect("breeder_account")
+
+    return render(request, "sheep_management/breeder/change_password.html")
 
 
 @login_required

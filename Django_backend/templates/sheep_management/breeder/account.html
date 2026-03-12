@@ -13,7 +13,7 @@
             <div style="font-size:12px; opacity:.9;">修改昵称、手机号、头像等信息</div>
         </a>
 
-        <a href="/admin/password_change/" class="btn" style="display:block; text-align:left; background:#27ae60; padding:14px 16px; border-radius:10px; text-decoration:none;">
+        <a href="{% url 'breeder_change_password' %}" class="btn" style="display:block; text-align:left; background:#27ae60; padding:14px 16px; border-radius:10px; text-decoration:none;">
             <div style="font-size:16px; font-weight:600; margin-bottom:4px;">修改密码</div>
             <div style="font-size:12px; opacity:.9;">更新当前账号密码以提高安全性</div>
         </a>
@@ -25,3 +25,4 @@
     </div>
 </div>
 {% endblock %}
+

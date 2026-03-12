@@ -39,7 +39,7 @@ from .views import api_get_breeders, api_search_goods, api_health
 from .cart_api import api_cart, api_cart_item
 from .promotion_api import api_promotion_activities, api_promotion_activity_detail, api_coupons, api_claim_coupon
 from .qa_api import api_qa_ask
-from .breeder_dashboard import breeder_dashboard, breeder_profile, breeder_account, breeder_update_location
+from .breeder_dashboard import breeder_dashboard, breeder_profile, breeder_account, breeder_change_password, breeder_update_location
 from .smart_farm import (
     smart_farm,
     api_monitor_breeders,
@@ -72,7 +72,7 @@ __all__ = [
     'news_set_top_slot', 'news_detail', 'api_news_home',
     'api_news_detail',
     'api_news_list',
-    'breeder_dashboard', 'breeder_profile', 'breeder_account', 'breeder_update_location',
+    'breeder_dashboard', 'breeder_profile', 'breeder_account', 'breeder_change_password', 'breeder_update_location',
     'smart_farm',
     'api_monitor_breeders',
     'api_monitor_devices',
@@ -95,4 +95,5 @@ __all__ = [
     'api_breeder_unfollow',
     'api_breeder_follows',
 ]
+
 

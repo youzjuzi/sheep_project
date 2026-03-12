@@ -146,6 +146,7 @@ urlpatterns = [
     path('breeder/dashboard/', views.breeder_dashboard, name='breeder_dashboard'),
     path('breeder/profile/', views.breeder_profile, name='breeder_profile'),
     path('breeder/account/', views.breeder_account, name='breeder_account'),
+    path('breeder/password/', views.breeder_change_password, name='breeder_change_password'),
     path('breeder/location/update/', views.breeder_update_location, name='breeder_update_location'),
     
     # 环境预警路由
@@ -207,4 +208,5 @@ urlpatterns = [
     path('api/orders', commerce_api.api_order_history, name='api_order_history'),
     path('api/breeder/orders', commerce_api.api_breeder_orders, name='api_breeder_orders'),
     path('api/breeder/orders/<int:order_id>/status', commerce_api.api_update_order_status, name='api_update_order_status')]
+
 
