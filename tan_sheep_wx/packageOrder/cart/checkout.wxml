@@ -1,4 +1,4 @@
-﻿<view class="checkout-page">
+<view class="checkout-page">
 
   <!-- 收货人信息 -->
   <view class="section">
@@ -33,7 +33,7 @@
         <text class="goods-name">滩羊 #{{item.id}}</text>
         <text class="goods-attr">{{item.gender}}  {{item.weight}} kg</text>
       </view>
-      <view class="goods-price">{{item.price}}</view>
+      <view class="goods-price">¥{{item.price}}</view>
     </view>
   </view>
 
@@ -52,11 +52,32 @@
     </view>
   </view>
 
+  <!-- 金额明细 -->
+  <view class="section">
+    <view class="section-title">
+      <text class="section-icon"></text>
+      <text>金额明细</text>
+    </view>
+    <view class="amount-row">
+      <text class="amount-label">商品金额</text>
+      <text class="amount-value">¥{{originalTotalPrice}}</text>
+    </view>
+    <view class="amount-row" wx:if="{{userCouponId}}">
+      <text class="amount-label">优惠券抵扣</text>
+      <text class="amount-discount">-¥{{discountAmount}}</text>
+    </view>
+    <view class="amount-row amount-row-final">
+      <text class="amount-label-final">应付金额</text>
+      <text class="amount-payable">¥{{payableAmount}}</text>
+    </view>
+    <text class="coupon-tip" wx:if="{{couponTip}}">{{couponTip}}</text>
+  </view>
+
   <!-- 底部展示总价 + 下单按钮 -->
   <view class="footer-bar">
     <view class="footer-total">
-      <text class="total-label">合计：</text>
-      <text class="total-price">{{totalPrice}}</text>
+      <text class="total-label">应付：</text>
+      <text class="total-price">¥{{payableAmount}}</text>
     </view>
     <van-button type="danger" round loading="{{loading}}" bind:click="submitOrder" class="submit-btn">确认下单</van-button>
   </view>

@@ -81,6 +81,47 @@
 .pay-label { font-size: 28rpx; color: #333; }
 .pay-balance { font-size: 24rpx; color: #999; }
 
+.amount-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18rpx 0;
+  border-bottom: 1rpx solid #f8f8f8;
+}
+.amount-row-final {
+  border-bottom: none;
+  padding-top: 22rpx;
+}
+.amount-label {
+  font-size: 26rpx;
+  color: #666;
+}
+.amount-value {
+  font-size: 26rpx;
+  color: #333;
+}
+.amount-discount {
+  font-size: 28rpx;
+  color: #e64340;
+  font-weight: 600;
+}
+.amount-label-final {
+  font-size: 28rpx;
+  color: #333;
+  font-weight: 600;
+}
+.amount-payable {
+  font-size: 34rpx;
+  color: #e64340;
+  font-weight: bold;
+}
+.coupon-tip {
+  display: block;
+  margin-top: 4rpx;
+  font-size: 22rpx;
+  color: #999;
+}
+
 .footer-bar {
   position: fixed;
   bottom: 0;
