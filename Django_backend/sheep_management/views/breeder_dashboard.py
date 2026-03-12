@@ -69,6 +69,12 @@ def breeder_profile(request):
 
 
 @login_required
+def breeder_account(request):
+    """Breeder account management page."""
+    return render(request, "sheep_management/breeder/account.html", {"user": request.user})
+
+
+@login_required
 @csrf_exempt
 def breeder_update_location(request):
     """AJAX save breeder location."""

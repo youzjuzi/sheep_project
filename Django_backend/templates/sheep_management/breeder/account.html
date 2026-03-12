@@ -1,0 +1,27 @@
+{% extends 'sheep_management/base.html' %}
+
+{% block page_title %}账号管理{% endblock %}
+
+{% block content %}
+<div class="card" style="max-width: 900px; margin: 0 auto;">
+    <h2 style="margin-top: 0; margin-bottom: 8px;">账号管理</h2>
+    <p style="color:#777; margin-bottom: 22px;">管理个人资料、密码与登录安全设置。</p>
+
+    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px;">
+        <a href="{% url 'breeder_profile' %}" class="btn" style="display:block; text-align:left; background:#5b6ee8; padding:14px 16px; border-radius:10px; text-decoration:none;">
+            <div style="font-size:16px; font-weight:600; margin-bottom:4px;">个人资料</div>
+            <div style="font-size:12px; opacity:.9;">修改昵称、手机号、头像等信息</div>
+        </a>
+
+        <a href="/admin/password_change/" class="btn" style="display:block; text-align:left; background:#27ae60; padding:14px 16px; border-radius:10px; text-decoration:none;">
+            <div style="font-size:16px; font-weight:600; margin-bottom:4px;">修改密码</div>
+            <div style="font-size:12px; opacity:.9;">更新当前账号密码以提高安全性</div>
+        </a>
+
+        <a href="/logout/" class="btn" onclick="return confirm('确定退出登录吗？');" style="display:block; text-align:left; background:#e74c3c; padding:14px 16px; border-radius:10px; text-decoration:none;">
+            <div style="font-size:16px; font-weight:600; margin-bottom:4px;">退出登录</div>
+            <div style="font-size:12px; opacity:.9;">退出当前账号并返回登录页</div>
+        </a>
+    </div>
+</div>
+{% endblock %}

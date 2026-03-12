@@ -145,6 +145,7 @@ urlpatterns = [
     # 养殖户个人中心路由
     path('breeder/dashboard/', views.breeder_dashboard, name='breeder_dashboard'),
     path('breeder/profile/', views.breeder_profile, name='breeder_profile'),
+    path('breeder/account/', views.breeder_account, name='breeder_account'),
     path('breeder/location/update/', views.breeder_update_location, name='breeder_update_location'),
     
     # 环境预警路由
