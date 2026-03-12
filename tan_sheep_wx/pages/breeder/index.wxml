@@ -27,8 +27,26 @@
       </view>
       <view class="divider"></view>
     </block>
-    <view class="empty-tip" wx:if="{{breeders.length === 0}}">
+
+    <view class="pagination" wx:if="{{allBreeders.length > 0}}">
+      <view class="page-btn {{currentPage <= 1 ? 'disabled' : ''}}" bindtap="goPrevPage">上一页</view>
+      <view class="page-number-wrap">
+        <view
+          wx:for="{{visiblePageNumbers}}"
+          wx:key="*this"
+          class="page-number {{currentPage === item ? 'active' : ''}}"
+          bindtap="goToPage"
+          data-page="{{item}}"
+        >
+          {{item}}
+        </view>
+      </view>
+      <view class="page-btn {{currentPage >= totalPages ? 'disabled' : ''}}" bindtap="goNextPage">下一页</view>
+    </view>
+
+    <view class="page-indicator" wx:if="{{allBreeders.length > 0}}">第 {{currentPage}} / {{totalPages}} 页</view>
+
+    <view class="empty-tip" wx:if="{{allBreeders.length === 0}}">
       <text>暂无养殖户信息</text>
     </view>
   </view>
-  

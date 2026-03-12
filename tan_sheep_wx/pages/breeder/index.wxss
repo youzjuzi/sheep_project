@@ -14,8 +14,8 @@
 }
 
 .breeder-icon {
-    width: 60px;   
-    height: 60px; 
+    width: 60px;
+    height: 60px;
     margin-right: 12px;
     border-radius: 50%;
     border: 2px solid #238E23;
@@ -91,7 +91,7 @@
 }
 
 .symbol {
-    font-size: 18px;   
+    font-size: 18px;
     color: #999;
     margin-left: 10px;
 }
@@ -102,10 +102,63 @@
     margin: 0;
 }
 
+.pagination {
+    margin: 18rpx 24rpx 8rpx;
+    padding: 14rpx;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #fff;
+    border-radius: 12rpx;
+}
+
+.page-btn {
+    min-width: 120rpx;
+    text-align: center;
+    font-size: 24rpx;
+    color: #238E23;
+    padding: 10rpx 14rpx;
+    border: 1rpx solid #238E23;
+    border-radius: 10rpx;
+}
+
+.page-btn.disabled {
+    color: #b5b5b5;
+    border-color: #e0e0e0;
+}
+
+.page-number-wrap {
+    display: flex;
+    align-items: center;
+    gap: 8rpx;
+}
+
+.page-number {
+    min-width: 56rpx;
+    height: 56rpx;
+    line-height: 56rpx;
+    text-align: center;
+    font-size: 24rpx;
+    color: #666;
+    border-radius: 8rpx;
+    background: #f2f4f6;
+}
+
+.page-number.active {
+    color: #fff;
+    background: #238E23;
+}
+
+.page-indicator {
+    text-align: center;
+    font-size: 22rpx;
+    color: #888;
+    margin-bottom: 18rpx;
+}
+
 .empty-tip {
     text-align: center;
     padding: 40px 20px;
     color: #999;
     font-size: 14px;
 }
-  
