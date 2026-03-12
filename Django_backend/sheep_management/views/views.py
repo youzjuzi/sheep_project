@@ -2,12 +2,12 @@
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
-from django.db.models import Q
+from django.db.models import Q, Count
 import json
 import re
 from datetime import datetime, date
 from django.utils import timezone
-from ..models import User, Sheep, VaccinationHistory, GrowthRecord, FeedingRecord, CartItem, PromotionActivity, Coupon
+from ..models import User, Sheep, VaccinationHistory, GrowthRecord, FeedingRecord, CartItem, PromotionActivity, Coupon, BreederFollow
 from ..utils import generate_token, verify_token
 import requests
 
@@ -300,6 +300,21 @@ def api_get_breeders(request, breeder_id=None):
     获取养殖户列表或详情
     """
     try:
+        token = (request.GET.get('token', '') or '').strip()
+        if not token:
+            auth_header = (request.META.get('HTTP_AUTHORIZATION', '') or '').strip()
+            if auth_header.lower().startswith('bearer '):
+                token = auth_header[7:].strip()
+
+        current_user = None
+        if token:
+            payload = verify_token(token)
+            if payload and payload.get('user_id'):
+                try:
+                    current_user = User.objects.get(pk=payload.get('user_id'))
+                except User.DoesNotExist:
+                    current_user = None
+
         if breeder_id:
             # ----------------- 获取单个养殖户详情 -----------------
             try:
@@ -347,6 +362,11 @@ def api_get_breeders(request, breeder_id=None):
                 if avatar_url and not (avatar_url.startswith('http://') or avatar_url.startswith('https://')):
                     avatar_url = request.build_absolute_uri(avatar_url)
 
+                followers_count = BreederFollow.objects.filter(breeder=breeder).count()
+                is_followed = False
+                if current_user:
+                    is_followed = BreederFollow.objects.filter(user=current_user, breeder=breeder).exists()
+
                 result = {
                     'id': breeder.id,
                     'name': breeder.nickname or breeder.username,
@@ -361,7 +381,7 @@ def api_get_breeders(request, breeder_id=None):
                     'actual_female_count': actual_female_count,
                     'actual_male_count': actual_male_count,
                     'icon_url': f'/images/farmer/people/p{breeder.id % 10 + 1}.png',
-                    'isFollowed': False,
+                    'isFollowed': is_followed,
                     'latitude': float(breeder.latitude) if breeder.latitude is not None else None,
                     'longitude': float(breeder.longitude) if breeder.longitude is not None else None,
                     'address': None,
@@ -374,7 +394,7 @@ def api_get_breeders(request, breeder_id=None):
                         'vaccine_coverage': round((healthy_count / actual_sheep_count * 100) if actual_sheep_count > 0 else 0, 1)
                     },
                     'rating': 4.5,
-                    'followers_count': 0,
+                    'followers_count': followers_count,
                     'description': f'专业养殖户，拥有{actual_sheep_count}只优质滩羊，养殖经验丰富。'
                 }
                 return JsonResponse(result, status=200)
@@ -390,6 +410,25 @@ def api_get_breeders(request, breeder_id=None):
 
                 result = []
                 today = date.today()
+
+                breeder_ids = list(breeders.values_list('id', flat=True))
+                follower_count_map = {}
+                followed_id_set = set()
+
+                if breeder_ids:
+                    follower_count_map = dict(
+                        BreederFollow.objects.filter(breeder_id__in=breeder_ids)
+                        .values('breeder_id')
+                        .annotate(cnt=Count('id'))
+                        .values_list('breeder_id', 'cnt')
+                    )
+
+                    if current_user:
+                        followed_id_set = set(
+                            BreederFollow.objects.filter(user=current_user, breeder_id__in=breeder_ids)
+                            .values_list('breeder_id', flat=True)
+                        )
+
 
                 for breeder in breeders:
                     try:
@@ -422,7 +461,8 @@ def api_get_breeders(request, breeder_id=None):
                             'icon_url': f'/images/farmer/people/p{breeder.id % 10 + 1}.png',
                             'healthy_count': healthy_count,
                             'rating': 4.5,
-                            'followers_count': 0,
+                            'followers_count': follower_count_map.get(breeder.id, 0),
+                            'isFollowed': breeder.id in followed_id_set,
                             'latitude': float(breeder.latitude) if breeder.latitude is not None else None,
                             'longitude': float(breeder.longitude) if breeder.longitude is not None else None,
                             'address': None
@@ -957,3 +997,7 @@ def api_get_sheep_by_ear_tag(request):
     
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
+
+
+
+

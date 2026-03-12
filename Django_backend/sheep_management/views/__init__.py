@@ -50,6 +50,7 @@ from .smart_farm import (
 )
 from .auth import login_view, logout_view, register_view
 from .trace import sheep_trace_h5
+from .follow_api import api_breeder_follow, api_breeder_unfollow, api_breeder_follows
 
 __all__ = [
     'index',
@@ -90,4 +91,8 @@ __all__ = [
     'api_claim_coupon',
     'api_qa_ask',
     'sheep_trace_h5',
+    'api_breeder_follow',
+    'api_breeder_unfollow',
+    'api_breeder_follows',
 ]
+

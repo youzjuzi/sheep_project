@@ -160,6 +160,32 @@ class UserCoupon(models.Model):
         return f"{self.user} - {self.coupon} - {self.get_status_display()}"
 
 
+
+class BreederFollow(models.Model):
+    """用户关注养殖户关系表"""
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='followed_breeders', verbose_name='用户')
+    breeder = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='breeder_followers',
+        limit_choices_to={'role': 1},
+        verbose_name='养殖户'
+    )
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name='关注时间')
+    updated_at = models.DateTimeField(auto_now=True, verbose_name='更新时间')
+
+    class Meta:
+        db_table = 'breeder_follows'
+        verbose_name = '养殖户关注关系'
+        verbose_name_plural = '养殖户关注关系'
+        unique_together = ('user', 'breeder')
+        indexes = [
+            models.Index(fields=['user']),
+            models.Index(fields=['breeder']),
+        ]
+
+    def __str__(self):
+        return f"{self.user} -> {self.breeder}"
 class Order(models.Model):
     """订单主表"""
     STATUS_CHOICES = [
@@ -213,3 +239,4 @@ class OrderItem(models.Model):
 
     def __str__(self):
         return f"{self.order.order_no} - {self.sheep}"
+

@@ -402,6 +402,8 @@ module.exports = {
   getAvailableCoupons,
   getUserCoupons,
   claimCoupon,
+  followBreeder,
+  getFollowedBreeders,
   getMonitorBreeders,
   getMonitorDevices,
   getHomeNews,
@@ -409,3 +411,26 @@ module.exports = {
   getNewsList,
   API_BASE_URL
 }
+
+/**
+ * 关注/取消关注养殖户
+ * @param {string} token
+ * @param {number} breederId
+ * @param {boolean} follow
+ */
+function followBreeder(token, breederId, follow = true) {
+  return request('/api/breeders/follow', 'POST', {
+    token: token,
+    breeder_id: breederId,
+    follow: !!follow
+  })
+}
+
+/**
+ * 获取我的关注养殖户列表
+ * @param {string} token
+ */
+function getFollowedBreeders(token) {
+  return request('/api/breeders/follows?token=' + encodeURIComponent(token), 'GET')
+}
+

@@ -1,7 +1,7 @@
 from .sheep import Sheep, GrowthRecord, FeedingRecord, VaccineType, VaccinationHistory, EnvironmentAlert
 from .user import User
 from .monitor import MonitorDevice
-from .commerce import CartItem, PromotionActivity, Coupon, UserCoupon, Order, OrderItem
+from .commerce import CartItem, PromotionActivity, Coupon, UserCoupon, BreederFollow, Order, OrderItem
 from .audit import AuditLog
 from .knowledge import KnowledgeDocument
 from .qa import QALog
@@ -20,6 +20,7 @@ __all__ = [
     'PromotionActivity',
     'Coupon',
     'UserCoupon',
+    'BreederFollow',
     'Order',
     'OrderItem',
     'AuditLog',
@@ -27,3 +28,4 @@ __all__ = [
     'QALog',
     'News',
 ]
+

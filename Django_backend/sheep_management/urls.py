@@ -69,6 +69,9 @@ urlpatterns = [
     path('api/breeders/<int:breeder_id>', views.api_get_breeders, name='api_get_breeder_detail'),
     path('breeders', views.api_get_breeders, name='breeders_compat'),
     path('breeders/<int:breeder_id>', views.api_get_breeders, name='breeders_detail_compat'),
+    path('api/breeders/follow', views.api_breeder_follow, name='api_breeder_follow'),
+    path('api/breeders/unfollow', views.api_breeder_unfollow, name='api_breeder_unfollow'),
+    path('api/breeders/follows', views.api_breeder_follows, name='api_breeder_follows'),
 
     # 商品搜索
     path('search_goods', views.api_search_goods, name='api_search_goods'),
@@ -203,3 +206,4 @@ urlpatterns = [
     path('api/orders', commerce_api.api_order_history, name='api_order_history'),
     path('api/breeder/orders', commerce_api.api_breeder_orders, name='api_breeder_orders'),
     path('api/breeder/orders/<int:order_id>/status', commerce_api.api_update_order_status, name='api_update_order_status')]
+

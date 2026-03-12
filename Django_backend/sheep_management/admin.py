@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Sheep, GrowthRecord, FeedingRecord, VaccineType, VaccinationHistory, User, MonitorDevice, CartItem, Order, OrderItem, PromotionActivity, Coupon, UserCoupon
+from .models import Sheep, GrowthRecord, FeedingRecord, VaccineType, VaccinationHistory, User, MonitorDevice, CartItem, Order, OrderItem, PromotionActivity, Coupon, UserCoupon, BreederFollow
 from django.utils.html import format_html
 
 
@@ -194,3 +194,12 @@ class UserCouponAdmin(admin.ModelAdmin):
     list_per_page = 20
     readonly_fields = ['obtained_at']
 
+
+@admin.register(BreederFollow)
+class BreederFollowAdmin(admin.ModelAdmin):
+    list_display = ['id', 'user', 'breeder', 'created_at']
+    list_filter = ['created_at']
+    search_fields = ['user__username', 'user__nickname', 'breeder__username', 'breeder__nickname']
+    date_hierarchy = 'created_at'
+    list_per_page = 20
+    readonly_fields = ['created_at', 'updated_at']
