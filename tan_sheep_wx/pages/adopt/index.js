@@ -20,11 +20,23 @@ Page({
         selectedWeights: [false, false, false, false],
         
         // 体高选项 - 多选
-        heightOptions: ['55-65cm', '65-75cm', '75-85cm', '85cm+'],
+        heightOptions: [
+            { value: '55-65cm', label: '55-65cm', desc: '矮壮型' },
+            { value: '65-75cm', label: '65-75cm', desc: '标准型' },
+            { value: '75-85cm', label: '75-85cm', desc: '高挑型' },
+            { value: '85cm+', label: '85cm+', desc: '特高型' }
+        ],
         selectedHeights: [false, false, false, false],
         
         // 体长选项 - 多选
-        lengthOptions: ['60-70cm', '70-80cm', '80-90cm', '90-100cm', '100-110cm', '110cm+'],
+        lengthOptions: [
+            { value: '60-70cm', label: '60-70cm', desc: '紧凑型' },
+            { value: '70-80cm', label: '70-80cm', desc: '匀称型' },
+            { value: '80-90cm', label: '80-90cm', desc: '修长型' },
+            { value: '90-100cm', label: '90-100cm', desc: '大体型' },
+            { value: '100-110cm', label: '100-110cm', desc: '超大体型' },
+            { value: '110cm+', label: '110cm+', desc: '特大型' }
+        ],
         selectedLengths: [false, false, false, false, false, false],
         
         // 动态显示的羊只数量

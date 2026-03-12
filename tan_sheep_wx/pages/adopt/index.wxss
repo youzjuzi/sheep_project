@@ -4,13 +4,13 @@
 /* 页面容器 */
 .container {
     min-height: 100vh;
-    background: linear-gradient(180deg, #E8F5E9 0%, #F7F8FA 30%);
+    background: linear-gradient(180deg, #E6F4EA 0%, #F6F8FC 34%, #F4F6F8 100%);
 }
 
 /* 顶部品牌横幅 */
 .brand-banner {
     width: 100%;
-    height: 200rpx;
+    height: 220rpx;
     background: linear-gradient(135deg, #238E23 0%, #2BA02B 50%, #34C759 100%);
     position: relative;
     overflow: hidden;
@@ -30,7 +30,7 @@
 .brand-content {
     position: relative;
     z-index: 1;
-    padding: 50rpx 40rpx;
+    padding: 52rpx 40rpx;
 }
 
 .brand-title {
@@ -53,27 +53,68 @@
 .filter-card {
     background-color: #FFFFFF;
     border-radius: 32rpx 32rpx 0 0;
-    margin-top: -40rpx;
+    margin-top: -36rpx;
     padding: 40rpx 32rpx 180rpx;
     position: relative;
     z-index: 10;
-    box-shadow: 0 -8rpx 32rpx rgba(0, 0, 0, 0.06);
+    box-shadow: 0 -8rpx 32rpx rgba(16, 24, 40, 0.06);
 }
 
 /* 卡片标题 - 去掉竖线装饰 */
 .card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
     margin-bottom: 40rpx;
 }
 
 .card-title {
     font-size: 34rpx;
-    font-weight: 600;
+    font-weight: 700;
     color: #333333;
+    display: block;
+}
+
+.card-subtitle {
+    margin-top: 8rpx;
+    font-size: 24rpx;
+    color: #8A8F99;
+}
+
+.count-badge {
+    min-width: 150rpx;
+    height: 88rpx;
+    padding: 0 18rpx;
+    border-radius: 18rpx;
+    background: linear-gradient(135deg, #F0FDF4 0%, #DCFCE7 100%);
+    border: 1rpx solid #B7E8CA;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+}
+
+.count-value {
+    font-size: 34rpx;
+    line-height: 1.05;
+    color: #238E23;
+    font-weight: 700;
+}
+
+.count-label {
+    margin-top: 4rpx;
+    font-size: 20rpx;
+    color: #5C9466;
 }
 
 /* 筛选区块 */
 .filter-section {
-    margin-bottom: 36rpx;
+    margin-bottom: 24rpx;
+    padding: 22rpx;
+    border-radius: 20rpx;
+    border: 1rpx solid #ECF0F3;
+    background: linear-gradient(180deg, #FFFFFF 0%, #FAFBFC 100%);
 }
 
 .filter-section:last-child {
@@ -84,7 +125,7 @@
 .section-title {
     display: flex;
     align-items: center;
-    margin-bottom: 20rpx;
+    margin-bottom: 18rpx;
 }
 
 .section-title text {
@@ -217,9 +258,11 @@
     align-items: center;
     justify-content: center;
     height: 80rpx;
-    background-color: #F5F6F8;
+    background-color: #F7F8FA;
+    border: 2rpx solid #EBEFF3;
     border-radius: 16rpx;
     transition: all 0.25s ease;
+    box-sizing: border-box;
 }
 
 .tag-text {
@@ -229,82 +272,52 @@
 
 /* 标签选中状态 */
 .tag-active {
-    background-color: #E6F5ED;
+    background: linear-gradient(180deg, #ECFDF3 0%, #E6F5ED 100%);
     border: 2rpx solid #07C160;
+    box-shadow: 0 6rpx 16rpx rgba(7, 193, 96, 0.14);
 }
 
 .tag-active .tag-text,
-.tag-active .weight-value {
+.tag-active .option-value {
     color: #07C160;
-    font-weight: 500;
+    font-weight: 600;
 }
 
-.tag-active .weight-desc {
+.tag-active .option-desc {
     color: rgba(7, 193, 96, 0.7);
 }
 
-/* 体重网格布局 - 一行两列 */
-.weight-grid {
+/* 选项网格布局 - 一行两列 */
+.option-grid {
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
     gap: 16rpx;
 }
 
-.weight-card {
+.option-card {
     width: 48%;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 20rpx 0;
-    background-color: #F5F6F8;
+    padding: 20rpx 0 18rpx;
+    background-color: #F7F8FA;
+    border: 2rpx solid #EBEFF3;
     border-radius: 16rpx;
     transition: all 0.25s ease;
+    box-sizing: border-box;
 }
 
-.weight-value {
+.option-value {
     font-size: 28rpx;
     color: #666666;
     margin-bottom: 4rpx;
 }
 
-.weight-desc {
+.option-desc {
     font-size: 22rpx;
     color: #999999;
-}
-
-/* 胶囊流式布局 - 体高/体长 */
-.capsule-flow {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 16rpx;
-}
-
-.capsule {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 12rpx 28rpx;
-    background-color: #F5F6F8;
-    border-radius: 100rpx;
-    transition: all 0.25s ease;
-}
-
-.capsule text {
-    font-size: 26rpx;
-    color: #666666;
-}
-
-/* 胶囊选中状态 */
-.capsule-active {
-    background-color: #E6F5ED;
-    border: 2rpx solid #07C160;
-}
-
-.capsule-active text {
-    color: #07C160;
-    font-weight: 500;
 }
 
 /* 底部安全区域占位 */

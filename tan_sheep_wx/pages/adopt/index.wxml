@@ -12,7 +12,14 @@
     <view class="filter-card">
         <!-- 卡片标题 -->
         <view class="card-header">
-            <text class="card-title">筛选您的专属滩羊</text>
+            <view>
+                <text class="card-title">筛选您的专属滩羊</text>
+                <text class="card-subtitle">按体征与性别智能匹配</text>
+            </view>
+            <view class="count-badge">
+                <text class="count-value">{{sheepCount}}</text>
+                <text class="count-label">只可选</text>
+            </view>
         </view>
         
         <!-- 性别选择 - 单选 -->
@@ -39,42 +46,44 @@
                 <view class="title-icon weight-icon"></view>
                 <text>体重</text>
             </view>
-            <view class="weight-grid">
-                <view class="weight-card {{selectedWeights[index] ? 'tag-active' : ''}}" 
+            <view class="option-grid">
+                <view class="option-card {{selectedWeights[index] ? 'tag-active' : ''}}" 
                       wx:for="{{weightOptions}}" wx:key="value"
                       bindtap="toggleWeight" data-index="{{index}}">
-                    <text class="weight-value">{{item.label}}</text>
-                    <text class="weight-desc">{{item.desc}}</text>
+                    <text class="option-value">{{item.label}}</text>
+                    <text class="option-desc">{{item.desc}}</text>
                 </view>
             </view>
         </view>
-        
-        <!-- 体高选择 - 胶囊流式布局，多选 -->
+
+        <!-- 体高选择 - 卡片网格，多选 -->
         <view class="filter-section">
             <view class="section-title">
                 <view class="title-icon height-icon"></view>
                 <text>体高</text>
             </view>
-            <view class="capsule-flow">
-                <view class="capsule {{selectedHeights[index] ? 'capsule-active' : ''}}" 
-                      wx:for="{{heightOptions}}" wx:key="*this"
+            <view class="option-grid">
+                <view class="option-card {{selectedHeights[index] ? 'tag-active' : ''}}" 
+                      wx:for="{{heightOptions}}" wx:key="value"
                       bindtap="toggleHeight" data-index="{{index}}">
-                    <text>{{item}}</text>
+                    <text class="option-value">{{item.label}}</text>
+                    <text class="option-desc">{{item.desc}}</text>
                 </view>
             </view>
         </view>
-        
-        <!-- 体长选择 - 胶囊流式布局，多选 -->
+
+        <!-- 体长选择 - 卡片网格，多选 -->
         <view class="filter-section">
             <view class="section-title">
                 <view class="title-icon length-icon"></view>
                 <text>体长</text>
             </view>
-            <view class="capsule-flow">
-                <view class="capsule {{selectedLengths[index] ? 'capsule-active' : ''}}" 
-                      wx:for="{{lengthOptions}}" wx:key="*this"
+            <view class="option-grid">
+                <view class="option-card {{selectedLengths[index] ? 'tag-active' : ''}}" 
+                      wx:for="{{lengthOptions}}" wx:key="value"
                       bindtap="toggleLength" data-index="{{index}}">
-                    <text>{{item}}</text>
+                    <text class="option-value">{{item.label}}</text>
+                    <text class="option-desc">{{item.desc}}</text>
                 </view>
             </view>
         </view>
@@ -90,7 +99,7 @@
                 <text>重置</text>
             </view>
             <view class="confirm-btn" bindtap="searchSheep">
-                <text>提交</text>
+                <text>提交筛选</text>
             </view>
         </view>
         <view class="safe-area-bottom"></view>
