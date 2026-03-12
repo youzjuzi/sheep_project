@@ -3,24 +3,24 @@
   <block wx:if="{{loading}}">
     <view class="empty-state">加载中...</view>
   </block>
-  
+
   <!-- 空记录 -->
   <block wx:elif="{{orders.length === 0}}">
     <view class="empty-state">
       <text>暂无购买历史</text>
     </view>
   </block>
-  
+
   <!-- 订单列表 -->
   <block wx:else>
     <view class="order-list">
-      <view wx:for="{{orders}}" wx:key="id" class="order-card">
+      <view wx:for="{{orders}}" wx:key="id" class="order-card" data-order="{{item}}" bindtap="onOrderTap">
         <!-- 订单头部 -->
         <view class="order-header">
           <text class="order-no">订单号: {{item.order_no}}</text>
           <text class="order-status {{item.status === 'paid' ? 'status-paid' : ''}}">{{item.status_display}}</text>
         </view>
-        
+
         <!-- 订单明细项 -->
         <view class="order-items">
           <view wx:for="{{item.items}}" wx:for-item="subItem" wx:key="sheep_id" class="order-sub-item">
@@ -32,11 +32,14 @@
             </view>
           </view>
         </view>
-        
+
         <!-- 订单底部 -->
         <view class="order-footer">
           <text class="order-time">{{item.created_at}}</text>
-          <text class="total-amount">实付款: ¥{{item.total_amount}}</text>
+          <view class="footer-right">
+            <text class="detail-link">查看详情 ></text>
+            <text class="total-amount">实付款: ¥{{item.total_amount}}</text>
+          </view>
         </view>
       </view>
     </view>

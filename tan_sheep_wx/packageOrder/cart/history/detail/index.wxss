@@ -1,0 +1,120 @@
+page {
+  background: #f6f7fb;
+}
+
+.detail-page {
+  padding: 20rpx;
+}
+
+.section {
+  background: #fff;
+  border-radius: 14rpx;
+  padding: 22rpx;
+  margin-bottom: 20rpx;
+}
+
+.header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14rpx;
+}
+
+.title {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #222;
+}
+
+.status {
+  font-size: 24rpx;
+  color: #888;
+}
+
+.status-paid {
+  color: #30a552;
+}
+
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14rpx 0;
+  border-bottom: 1rpx solid #f2f2f2;
+}
+
+.info-row:last-child {
+  border-bottom: 0;
+}
+
+.label {
+  font-size: 25rpx;
+  color: #777;
+}
+
+.value {
+  font-size: 25rpx;
+  color: #333;
+  max-width: 65%;
+  text-align: right;
+}
+
+.amount {
+  color: #e64340;
+  font-weight: 700;
+  font-size: 30rpx;
+}
+
+.item-card {
+  display: flex;
+  align-items: center;
+  border-bottom: 1rpx solid #f3f3f3;
+  padding: 18rpx 0;
+}
+
+.item-card:last-child {
+  border-bottom: 0;
+}
+
+.item-image {
+  width: 104rpx;
+  height: 104rpx;
+  border-radius: 10rpx;
+  margin-right: 16rpx;
+  background: #f0f0f0;
+}
+
+.item-main {
+  flex: 1;
+  min-width: 0;
+}
+
+.item-name {
+  display: block;
+  font-size: 28rpx;
+  color: #222;
+  font-weight: 600;
+}
+
+.item-attr {
+  display: block;
+  margin-top: 6rpx;
+  font-size: 23rpx;
+  color: #888;
+}
+
+.item-price {
+  font-size: 28rpx;
+  color: #e64340;
+  font-weight: 700;
+  margin-left: 10rpx;
+}
+
+.empty {
+  height: 60vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #999;
+  font-size: 28rpx;
+}

@@ -55,5 +55,18 @@ Page({
                     icon: 'none'
                 });
             });
+    },
+
+    onOrderTap: function (e) {
+        const order = e.currentTarget.dataset.order;
+        if (!order || !order.id) {
+            wx.showToast({ title: '订单数据异常', icon: 'none' });
+            return;
+        }
+
+        wx.setStorageSync('currentOrderDetail', order);
+        wx.navigateTo({
+            url: `/packageOrder/cart/history/detail/index?order_id=${order.id}`
+        });
     }
 });

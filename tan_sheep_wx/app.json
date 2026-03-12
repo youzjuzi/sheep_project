@@ -107,6 +107,7 @@
             "name": "packageOrder",
             "pages": [
                 "cart/history/index",
+                "cart/history/detail/index",
                 "cart/checkout"
             ]
         },
@@ -214,5 +215,6 @@
     "sitemapLocation": "sitemap.json",
     "lazyCodeLoading": "requiredComponents"
 }
+
 
 

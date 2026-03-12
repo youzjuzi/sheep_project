@@ -112,6 +112,18 @@ page {
   color: #aaa;
 }
 
+.footer-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8rpx;
+}
+
+.detail-link {
+  font-size: 24rpx;
+  color: #3f7ef7;
+}
+
 .total-amount {
   font-size: 32rpx;
   font-weight: bold;
