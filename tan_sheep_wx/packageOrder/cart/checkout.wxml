@@ -37,6 +37,41 @@
     </view>
   </view>
 
+  <!-- 优惠券 -->
+  <view class="section">
+    <view class="section-title">
+      <text class="section-icon"></text>
+      <text>优惠券</text>
+    </view>
+
+    <view class="coupon-loading" wx:if="{{couponLoading}}">正在加载优惠券...</view>
+
+    <block wx:elif="{{availableCoupons.length}}">
+      <view class="coupon-tools" wx:if="{{selectedCouponId}}">
+        <text class="coupon-tools-text">已选1张优惠券</text>
+        <text class="coupon-clear" bindtap="onClearCouponTap">取消选择</text>
+      </view>
+
+      <view class="coupon-card {{selectedCouponId===item.id ? 'coupon-card-active' : ''}}"
+            wx:for="{{availableCoupons}}"
+            wx:key="id"
+            data-id="{{item.id}}"
+            bindtap="onCouponTap">
+        <view class="coupon-left">
+          <text class="coupon-name">{{item.name}}</text>
+          <text class="coupon-rule">{{item.displayText}}</text>
+        </view>
+        <view class="coupon-right">
+          <text class="coupon-cut">可减</text>
+          <text class="coupon-money">¥{{item.previewDiscount}}</text>
+          <text class="coupon-state">{{selectedCouponId===item.id ? '已选' : '选择'}}</text>
+        </view>
+      </view>
+    </block>
+
+    <view class="coupon-empty" wx:else>当前订单暂无可用优惠券</view>
+  </view>
+
   <!-- 支付方式 -->
   <view class="section">
     <view class="section-title">
@@ -62,7 +97,7 @@
       <text class="amount-label">商品金额</text>
       <text class="amount-value">¥{{originalTotalPrice}}</text>
     </view>
-    <view class="amount-row" wx:if="{{userCouponId}}">
+    <view class="amount-row" wx:if="{{selectedCouponId}}">
       <text class="amount-label">优惠券抵扣</text>
       <text class="amount-discount">-¥{{discountAmount}}</text>
     </view>

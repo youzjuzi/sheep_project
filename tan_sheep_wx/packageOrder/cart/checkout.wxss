@@ -22,6 +22,7 @@
   border-bottom: 1rpx solid #f5f5f5;
   gap: 10rpx;
 }
+
 .section-icon { font-size: 30rpx; }
 .choose-addr-btn { margin-left: auto; font-size: 22rpx; }
 
@@ -31,19 +32,23 @@
   padding: 20rpx 0;
   border-bottom: 1rpx solid #f9f9f9;
 }
+
 .form-item:last-child { border-bottom: none; }
 .form-item-addr { align-items: flex-start; padding-top: 20rpx; }
+
 .form-label {
   width: 140rpx;
   flex-shrink: 0;
   font-size: 26rpx;
   color: #666;
 }
+
 .form-input {
   flex: 1;
   font-size: 26rpx;
   color: #333;
 }
+
 .form-textarea {
   flex: 1;
   font-size: 26rpx;
@@ -59,17 +64,114 @@
   border-bottom: 1rpx solid #f9f9f9;
   gap: 20rpx;
 }
+
 .goods-item:last-child { border-bottom: none; }
+
 .goods-img {
   width: 100rpx;
   height: 100rpx;
   border-radius: 12rpx;
   flex-shrink: 0;
 }
+
 .goods-info { flex: 1; }
 .goods-name { font-size: 26rpx; color: #333; display: block; margin-bottom: 6rpx; }
 .goods-attr { font-size: 22rpx; color: #999; }
 .goods-price { font-size: 28rpx; color: #e64340; font-weight: 600; }
+
+.coupon-loading,
+.coupon-empty {
+  padding: 24rpx 0 8rpx;
+  font-size: 24rpx;
+  color: #999;
+}
+
+.coupon-tools {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20rpx 0 6rpx;
+}
+
+.coupon-tools-text {
+  font-size: 24rpx;
+  color: #666;
+}
+
+.coupon-clear {
+  font-size: 24rpx;
+  color: #e64340;
+}
+
+.coupon-card {
+  margin-top: 14rpx;
+  padding: 18rpx 20rpx;
+  border-radius: 14rpx;
+  border: 1rpx solid #ececec;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #fafafa;
+}
+
+.coupon-card-active {
+  border-color: #e64340;
+  background: #fff4f3;
+}
+
+.coupon-left {
+  flex: 1;
+  min-width: 0;
+  padding-right: 16rpx;
+}
+
+.coupon-name {
+  display: block;
+  font-size: 26rpx;
+  color: #333;
+  font-weight: 600;
+}
+
+.coupon-rule {
+  display: block;
+  margin-top: 8rpx;
+  font-size: 22rpx;
+  color: #999;
+}
+
+.coupon-right {
+  width: 132rpx;
+  text-align: right;
+}
+
+.coupon-cut {
+  display: block;
+  font-size: 20rpx;
+  color: #999;
+}
+
+.coupon-money {
+  display: block;
+  margin-top: 2rpx;
+  font-size: 30rpx;
+  color: #e64340;
+  font-weight: bold;
+}
+
+.coupon-state {
+  display: inline-block;
+  margin-top: 8rpx;
+  font-size: 20rpx;
+  color: #666;
+  border: 1rpx solid #ddd;
+  border-radius: 999rpx;
+  padding: 2rpx 14rpx;
+}
+
+.coupon-card-active .coupon-state {
+  color: #e64340;
+  border-color: #e64340;
+}
 
 .pay-row {
   display: flex;
@@ -77,6 +179,7 @@
   justify-content: space-between;
   padding: 24rpx 0;
 }
+
 .pay-left { display: flex; align-items: center; gap: 12rpx; }
 .pay-label { font-size: 28rpx; color: #333; }
 .pay-balance { font-size: 24rpx; color: #999; }
@@ -88,33 +191,33 @@
   padding: 18rpx 0;
   border-bottom: 1rpx solid #f8f8f8;
 }
+
 .amount-row-final {
   border-bottom: none;
   padding-top: 22rpx;
 }
-.amount-label {
-  font-size: 26rpx;
-  color: #666;
-}
-.amount-value {
-  font-size: 26rpx;
-  color: #333;
-}
+
+.amount-label { font-size: 26rpx; color: #666; }
+.amount-value { font-size: 26rpx; color: #333; }
+
 .amount-discount {
   font-size: 28rpx;
   color: #e64340;
   font-weight: 600;
 }
+
 .amount-label-final {
   font-size: 28rpx;
   color: #333;
   font-weight: 600;
 }
+
 .amount-payable {
   font-size: 34rpx;
   color: #e64340;
   font-weight: bold;
 }
+
 .coupon-tip {
   display: block;
   margin-top: 4rpx;
@@ -128,13 +231,14 @@
   left: 0;
   width: 100%;
   background: #fff;
-  box-shadow: 0 -2rpx 12rpx rgba(0,0,0,0.06);
+  box-shadow: 0 -2rpx 12rpx rgba(0, 0, 0, 0.06);
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 20rpx 32rpx calc(20rpx + env(safe-area-inset-bottom));
   box-sizing: border-box;
 }
+
 .footer-total { display: flex; align-items: baseline; gap: 6rpx; }
 .total-label { font-size: 26rpx; color: #666; }
 .total-price { font-size: 36rpx; font-weight: bold; color: #e64340; }

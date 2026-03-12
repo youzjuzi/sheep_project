@@ -8,7 +8,10 @@ Page({
     discountAmount: '0.00',
     payableAmount: '0.00',
     couponTip: '',
-    userCouponId: null, // 优惠券ID
+    userCouponId: null, // 提交给后端的用户优惠券ID
+    selectedCouponId: null, // 前端当前选中的优惠券ID
+    availableCoupons: [],
+    couponLoading: false,
 
     // 收货信息
     receiverName: '',
@@ -22,24 +25,20 @@ Page({
   },
 
   async onLoad(options) {
-    // 读取购物车传过来的选中商品
     const items = wx.getStorageSync('checkoutItems') || [];
     const totalPrice = this.calculateItemsTotal(items);
-    const userCouponId = options.user_coupon_id ? Number(options.user_coupon_id) : null;
+    const preferredCouponId = options.user_coupon_id ? Number(options.user_coupon_id) : null;
 
     this.setData({
       checkoutItems: items,
-      userCouponId,
       originalTotalPrice: totalPrice.toFixed(2),
       payableAmount: totalPrice.toFixed(2),
       totalPrice: totalPrice.toFixed(2),
       discountAmount: '0.00',
-      couponTip: userCouponId ? '正在计算优惠券抵扣...' : ''
+      couponTip: ''
     });
 
-    if (userCouponId) {
-      await this.loadCouponPreview(userCouponId, items, totalPrice);
-    }
+    await this.loadAvailableCoupons(preferredCouponId);
 
     // 读取上次填写的收货信息
     const lastAddress = wx.getStorageSync('lastShippingInfo') || {};
@@ -56,7 +55,7 @@ Page({
         if (res.code === 0) {
           this.setData({ balance: parseFloat(res.data.balance).toFixed(2) });
         }
-      }).catch(() => {});
+      }).catch(() => { });
     }
   },
 
@@ -71,35 +70,73 @@ Page({
     return (items || []).reduce((sum, item) => sum + this.getItemAmount(item), 0);
   },
 
-  async loadCouponPreview(userCouponId, items, orderTotal) {
+  getCouponDisplayText(coupon) {
+    if (coupon.coupon_type === 'discount') {
+      return `满${coupon.min_purchase_amount}减${coupon.discount_amount}`;
+    }
+    if (coupon.coupon_type === 'percentage') {
+      const rate = Math.round((parseFloat(coupon.discount_rate) || 0) * 100);
+      return `${rate}折优惠`;
+    }
+    if (coupon.coupon_type === 'cash') {
+      return `${coupon.discount_amount}元现金券`;
+    }
+    return coupon.name || '优惠券';
+  },
+
+  async loadAvailableCoupons(preferredCouponId = null) {
     const token = wx.getStorageSync('token');
     if (!token) {
-      this.setData({ couponTip: '登录后可校验优惠券抵扣金额' });
+      this.setData({ couponTip: '登录后可使用优惠券' });
       return;
     }
+
+    const orderTotal = parseFloat(this.data.originalTotalPrice || 0);
+    this.setData({ couponLoading: true, couponTip: '正在加载可用优惠券...' });
 
     try {
       const res = await API.getUserCoupons(token);
       if (res.code !== 0 || !Array.isArray(res.data)) {
-        this.setData({ couponTip: '优惠券信息加载失败，下单后由系统自动校验' });
+        this.setData({ availableCoupons: [], couponLoading: false, couponTip: '优惠券加载失败，请稍后重试' });
         return;
       }
 
-      const coupon = res.data.find(c => String(c.id) === String(userCouponId) && c.status === 'unused');
-      if (!coupon) {
-        this.setData({ couponTip: '未找到可用优惠券，下单时将不抵扣' });
-        return;
-      }
+      const usableCoupons = res.data
+        .filter(coupon => coupon.status === 'unused')
+        .map(coupon => {
+          const preview = this.calculateCouponDiscount(coupon, this.data.checkoutItems, orderTotal);
+          return {
+            ...coupon,
+            displayText: this.getCouponDisplayText(coupon),
+            previewDiscount: Number(preview.discount.toFixed(2)),
+            previewTip: preview.tip
+          };
+        })
+        .filter(coupon => coupon.previewDiscount > 0)
+        .sort((a, b) => b.previewDiscount - a.previewDiscount);
 
-      const preview = this.calculateCouponDiscount(coupon, items, orderTotal);
       this.setData({
-        discountAmount: preview.discount.toFixed(2),
-        payableAmount: preview.payable.toFixed(2),
-        totalPrice: preview.payable.toFixed(2),
-        couponTip: preview.tip
+        availableCoupons: usableCoupons,
+        couponLoading: false,
+        couponTip: usableCoupons.length ? '请选择一张优惠券' : '当前订单暂无可用优惠券'
       });
+
+      if (usableCoupons.length === 0) {
+        this.clearCouponSelection(false);
+        return;
+      }
+
+      const defaultCoupon = preferredCouponId
+        ? usableCoupons.find(c => Number(c.id) === Number(preferredCouponId))
+        : null;
+
+      if (defaultCoupon) {
+        this.applyCouponSelection(defaultCoupon.id, false);
+      } else {
+        this.clearCouponSelection(false);
+      }
     } catch (err) {
-      this.setData({ couponTip: '优惠券预估失败，下单后由系统自动校验' });
+      this.setData({ availableCoupons: [], couponLoading: false, couponTip: '优惠券加载失败，请稍后重试' });
     }
   },
 
@@ -111,9 +148,11 @@ Page({
 
     const eligibleAmount = this.calculateItemsTotal(eligibleItems);
     const minPurchase = parseFloat(coupon.min_purchase_amount) || 0;
+
     if (eligibleAmount <= 0) {
-      return { discount: 0, payable: orderTotal, tip: '当前商品不符合该优惠券的使用范围' };
+      return { discount: 0, payable: orderTotal, tip: '当前商品不符合该优惠券使用范围' };
     }
+
     if (eligibleAmount < minPurchase) {
       return { discount: 0, payable: orderTotal, tip: `未满足优惠门槛（满${minPurchase}元可用）` };
     }
@@ -126,6 +165,7 @@ Page({
       if (Number.isFinite(rate) && rate > 0 && rate < 1) {
         discount = eligibleAmount * (1 - rate);
       }
+
       const maxDiscount = parseFloat(coupon.max_discount_amount);
       if (Number.isFinite(maxDiscount) && maxDiscount > 0) {
         discount = Math.min(discount, maxDiscount);
@@ -136,6 +176,61 @@ Page({
     const payable = Math.max(0, orderTotal - discount);
     const tip = discount > 0 ? `预计可优惠 ¥${discount.toFixed(2)}` : '该优惠券本单未产生抵扣';
     return { discount, payable, tip };
+  },
+
+  applyCouponSelection(couponId, showToast = false) {
+    const coupon = this.data.availableCoupons.find(c => Number(c.id) === Number(couponId));
+    if (!coupon) {
+      return;
+    }
+
+    const orderTotal = parseFloat(this.data.originalTotalPrice || 0);
+    const preview = this.calculateCouponDiscount(coupon, this.data.checkoutItems, orderTotal);
+
+    this.setData({
+      selectedCouponId: coupon.id,
+      userCouponId: coupon.id,
+      discountAmount: preview.discount.toFixed(2),
+      payableAmount: preview.payable.toFixed(2),
+      totalPrice: preview.payable.toFixed(2),
+      couponTip: `已选「${coupon.name}」，优惠 ¥${preview.discount.toFixed(2)}`
+    });
+
+    if (showToast) {
+      wx.showToast({ title: `已优惠¥${preview.discount.toFixed(2)}`, icon: 'none' });
+    }
+  },
+
+  clearCouponSelection(showToast = true) {
+    const orderTotal = parseFloat(this.data.originalTotalPrice || 0);
+    this.setData({
+      selectedCouponId: null,
+      userCouponId: null,
+      discountAmount: '0.00',
+      payableAmount: orderTotal.toFixed(2),
+      totalPrice: orderTotal.toFixed(2),
+      couponTip: this.data.availableCoupons.length ? '未使用优惠券' : '当前订单暂无可用优惠券'
+    });
+
+    if (showToast) {
+      wx.showToast({ title: '已取消优惠券', icon: 'none' });
+    }
+  },
+
+  onCouponTap(e) {
+    const couponId = Number(e.currentTarget.dataset.id);
+    if (!couponId) return;
+
+    if (Number(this.data.selectedCouponId) === couponId) {
+      this.clearCouponSelection(true);
+      return;
+    }
+
+    this.applyCouponSelection(couponId, true);
+  },
+
+  onClearCouponTap() {
+    this.clearCouponSelection(true);
   },
 
   // 使用微信选择地址
@@ -149,7 +244,7 @@ Page({
           shippingAddress: addr,
         });
       },
-      fail: () => {}
+      fail: () => { }
     });
   },
 
@@ -192,14 +287,12 @@ Page({
             receiver_name: receiverName.trim(),
             receiver_phone: receiverPhone.trim(),
             shipping_address: shippingAddress.trim(),
-          }, userCouponId); // 传递优惠券ID
+          }, userCouponId);
 
           if (res.code === 0) {
-            // 保存收货信息方便下次使用
             wx.setStorageSync('lastShippingInfo', {
               receiverName, receiverPhone, shippingAddress
             });
-            // 更新余额缓存
             if (res.data && res.data.user_balance !== undefined) {
               wx.setStorageSync('balance', parseFloat(res.data.user_balance).toFixed(2));
             }
