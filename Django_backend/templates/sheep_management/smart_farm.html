@@ -225,6 +225,47 @@
         padding: 42px 20px;
         background: linear-gradient(180deg, #fff, #f8fcfb);
     }
+    .pager {
+        margin-top: 14px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+    .pager-info {
+        font-size: 13px;
+        color: var(--muted);
+    }
+    .pager-actions {
+        display: flex;
+        gap: 6px;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+    .pager-btn {
+        border: 1px solid var(--line);
+        background: #fff;
+        color: #333;
+        border-radius: 6px;
+        padding: 6px 12px;
+        font-size: 12px;
+        cursor: pointer;
+    }
+    .pager-btn:hover {
+        border-color: var(--brand);
+        color: var(--brand);
+    }
+    .pager-btn.active {
+        border-color: var(--brand);
+        background: var(--brand);
+        color: #fff;
+        cursor: default;
+    }
+    .pager-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
     .modal-mask {
         position: fixed;
         inset: 0;
@@ -302,6 +343,10 @@
         <div class="empty-box" id="emptyBox" style="display:none;">
             当前暂无监控设备，点击“新增监控”创建第一路监控。
         </div>
+        <div class="pager" id="paginationBar" style="display:none;">
+            <div class="pager-info" id="paginationInfo"></div>
+            <div class="pager-actions" id="paginationActions"></div>
+        </div>
     </section>
 </div>
 
@@ -363,6 +408,9 @@
     const countChipEl = document.getElementById('countChip');
     const deviceGridEl = document.getElementById('deviceGrid');
     const emptyBoxEl = document.getElementById('emptyBox');
+    const paginationBarEl = document.getElementById('paginationBar');
+    const paginationInfoEl = document.getElementById('paginationInfo');
+    const paginationActionsEl = document.getElementById('paginationActions');
     const refreshBtn = document.getElementById('refreshBtn');
     const createBtn = document.getElementById('createBtn');
 
@@ -379,6 +427,8 @@
         selectedBreederId: initialBreederId ? Number(initialBreederId) : null,
         selectedBreederName: '',
         editingDevice: null,
+        currentPage: 1,
+        pageSize: 10,
     };
 
     function getCookie(name) {
@@ -521,13 +571,84 @@
         });
     }
 
+    function buildPagerButton(label, disabled, onClick, active = false) {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = `pager-btn${active ? ' active' : ''}`;
+        btn.textContent = label;
+        btn.disabled = !!disabled;
+        if (!disabled && !active) {
+            btn.addEventListener('click', onClick);
+        }
+        return btn;
+    }
+
+    function renderPagination(total, totalPages) {
+        if (!paginationBarEl || !paginationInfoEl || !paginationActionsEl) return;
+        if (total === 0) {
+            paginationBarEl.style.display = 'none';
+            return;
+        }
+
+        paginationBarEl.style.display = 'flex';
+        paginationInfoEl.textContent = `共 ${total} 路设备，当前第 ${state.currentPage}/${totalPages} 页`;
+        paginationActionsEl.innerHTML = '';
+
+        if (totalPages <= 1) return;
+
+        paginationActionsEl.appendChild(
+            buildPagerButton('首页', state.currentPage === 1, () => {
+                state.currentPage = 1;
+                renderDevices();
+            })
+        );
+        paginationActionsEl.appendChild(
+            buildPagerButton('上一页', state.currentPage === 1, () => {
+                state.currentPage -= 1;
+                renderDevices();
+            })
+        );
+
+        const startPage = Math.max(1, state.currentPage - 2);
+        const endPage = Math.min(totalPages, state.currentPage + 2);
+        for (let page = startPage; page <= endPage; page += 1) {
+            paginationActionsEl.appendChild(
+                buildPagerButton(String(page), false, () => {
+                    state.currentPage = page;
+                    renderDevices();
+                }, page === state.currentPage)
+            );
+        }
+
+        paginationActionsEl.appendChild(
+            buildPagerButton('下一页', state.currentPage === totalPages, () => {
+                state.currentPage += 1;
+                renderDevices();
+            })
+        );
+        paginationActionsEl.appendChild(
+            buildPagerButton('尾页', state.currentPage === totalPages, () => {
+                state.currentPage = totalPages;
+                renderDevices();
+            })
+        );
+    }
+
     function renderDevices() {
         const total = state.devices.length;
+        const totalPages = Math.max(1, Math.ceil(total / state.pageSize));
+        if (state.currentPage > totalPages) {
+            state.currentPage = totalPages;
+        }
+        const start = (state.currentPage - 1) * state.pageSize;
+        const end = start + state.pageSize;
+        const currentDevices = state.devices.slice(start, end);
+
         countChipEl.textContent = `设备数 ${total}`;
         emptyBoxEl.style.display = total ? 'none' : 'block';
         deviceGridEl.innerHTML = '';
 
-        state.devices.forEach((device) => {
+        currentDevices.forEach((device) => {
             const online = device.status === 'online';
             const card = document.createElement('article');
             card.className = 'card-monitor';
@@ -556,6 +677,7 @@
             deviceGridEl.appendChild(card);
             bindStreamProbe(card, device);
         });
+        renderPagination(total, totalPages);
     }
 
     function showMessage(msg, isError = false) {
@@ -578,6 +700,7 @@
         const query = isAdmin && state.selectedBreederId ? `?breeder_id=${state.selectedBreederId}` : '';
         const list = await request(`/api/monitor/devices${query}`);
         state.devices = list || [];
+        state.currentPage = 1;
         const scopeText = isAdmin
             ? `当前查看：${state.selectedBreederName || '未选择养殖户'}`
             : '当前查看：我的监控';

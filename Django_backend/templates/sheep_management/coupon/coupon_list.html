@@ -281,4 +281,54 @@
     </div>
     {% endif %}
 </div>
+
+{% if page_obj and page_obj.paginator.num_pages > 1 %}
+<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-top:16px;">
+    <div style="font-size:13px;color:#777;">
+        共 {{ page_obj.paginator.count }} 条，当前第 {{ page_obj.number }}/{{ page_obj.paginator.num_pages }} 页
+    </div>
+    <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
+        {% if page_obj.number > 1 %}
+        <a class="btn" style="padding:6px 12px;font-size:12px;background:#95a5a6;"
+           href="?page=1{{ extra_query }}">
+            首页
+        </a>
+        {% endif %}
+
+        {% if page_obj.has_previous %}
+        <a class="btn" style="padding:6px 12px;font-size:12px;background:#95a5a6;"
+           href="?page={{ page_obj.previous_page_number }}{{ extra_query }}">
+            上一页
+        </a>
+        {% endif %}
+
+        {% for num in page_obj.paginator.page_range %}
+            {% if num >= page_obj.number|add:'-2' and num <= page_obj.number|add:'2' %}
+                {% if num == page_obj.number %}
+                <span class="btn" style="padding:6px 12px;font-size:12px;background:#5b6ee8;">{{ num }}</span>
+                {% else %}
+                <a class="btn" style="padding:6px 12px;font-size:12px;background:#ecf0f1;color:#333;"
+                   href="?page={{ num }}{{ extra_query }}">
+                    {{ num }}
+                </a>
+                {% endif %}
+            {% endif %}
+        {% endfor %}
+
+        {% if page_obj.has_next %}
+        <a class="btn" style="padding:6px 12px;font-size:12px;"
+           href="?page={{ page_obj.next_page_number }}{{ extra_query }}">
+            下一页
+        </a>
+        {% endif %}
+
+        {% if page_obj.number < page_obj.paginator.num_pages %}
+        <a class="btn" style="padding:6px 12px;font-size:12px;background:#95a5a6;"
+           href="?page={{ page_obj.paginator.num_pages }}{{ extra_query }}">
+            尾页
+        </a>
+        {% endif %}
+    </div>
+</div>
+{% endif %}
 {% endblock %}

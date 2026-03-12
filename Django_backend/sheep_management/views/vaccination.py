@@ -2,6 +2,7 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.core.paginator import Paginator
 import datetime
 from ..models import Sheep, VaccinationHistory, VaccineType
 from ..permissions import ROLE_ADMIN
@@ -14,6 +15,7 @@ def vaccination_list(request):
     search = request.GET.get('search', '').strip()       # 耳标号搜索
     vaccine_id = request.GET.get('vaccine_id', '').strip()  # 疫苗类型筛选
     view_mode = request.GET.get('view', 'sheep')          # sheep / vaccine
+    page_number = request.GET.get('page', 1)
     today = datetime.date.today()
 
     # 基础 queryset
@@ -42,11 +44,16 @@ def vaccination_list(request):
                 seen[sid]['has_expired'] = True
         sheep_groups = list(seen.values())
 
+    paginator = Paginator(sheep_groups, 10)
+    page_obj = paginator.get_page(page_number)
+    current_groups = list(page_obj.object_list)
+
     # --- 所有疫苗类型（用于筛选下拉）---
     all_vaccines = VaccineType.objects.all().order_by('name')
 
     context = {
-        'sheep_groups': sheep_groups,
+        'sheep_groups': current_groups,
+        'page_obj': page_obj,
         'all_vaccines': all_vaccines,
         'search': search,
         'vaccine_id': vaccine_id,

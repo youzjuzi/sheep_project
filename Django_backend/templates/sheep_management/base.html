@@ -49,27 +49,6 @@
             gap: 20px;
         }
         
-        /* 通知铃铛 */
-        .notification {
-            position: relative;
-            cursor: pointer;
-            padding: 8px;
-        }
-        .notification svg {
-            width: 20px;
-            height: 20px;
-            fill: #666;
-        }
-        .notification-badge {
-            position: absolute;
-            top: 0;
-            right: 0;
-            width: 8px;
-            height: 8px;
-            background: #e74c3c;
-            border-radius: 50%;
-        }
-        
         /* 用户下拉菜单 */
         .user-menu {
             display: flex;
@@ -497,14 +476,6 @@
             <h1>{% block page_title %}羊只管理系统{% endblock %}</h1>
         </div>
         <div class="header-right">
-            <!-- 通知铃铛 -->
-            <div class="notification" onclick="toggleNotifications()">
-                <svg viewBox="0 0 24 24">
-                    <path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2zm-2 1H8v-6c0-2.48 1.51-4.5 4-4.5s4 2.02 4 4.5v6z"/>
-                </svg>
-                <div class="notification-badge"></div>
-            </div>
-            
             <!-- 用户菜单 -->
             <div class="user-menu" onclick="toggleUserMenu()">
                 <div class="user-avatar">
@@ -551,10 +522,6 @@
         function toggleUserMenu() {
             var dropdown = document.getElementById('userDropdown');
             dropdown.classList.toggle('show');
-        }
-        
-        function toggleNotifications() {
-            alert('暂无新通知');
         }
         
         // 点击其他地方关闭下拉菜单

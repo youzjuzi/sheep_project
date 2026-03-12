@@ -2,6 +2,7 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
 from django.db.models import Q
+from django.core.paginator import Paginator
 from ..models import Order, OrderItem
 from ..permissions import login_required, ROLE_ADMIN, ROLE_BREEDER
 
@@ -12,6 +13,7 @@ def order_list(request):
     user = request.user
     status_filter = request.GET.get('status', '')
     search = request.GET.get('search', '').strip()
+    page_number = request.GET.get('page', 1)
 
     if user.role == ROLE_ADMIN:
         orders = Order.objects.all()
@@ -31,6 +33,12 @@ def order_list(request):
         )
 
     orders = orders.order_by('-created_at')
+    paginator = Paginator(orders, 10)
+    page_obj = paginator.get_page(page_number)
+
+    query_params = request.GET.copy()
+    query_params.pop('page', None)
+    query_string = query_params.urlencode()
 
     # 各状态计数
     if user.role == ROLE_ADMIN:
@@ -48,7 +56,9 @@ def order_list(request):
     }
 
     context = {
-        'orders': orders,
+        'orders': page_obj.object_list,
+        'page_obj': page_obj,
+        'query_string': query_string,
         'stats': stats,
         'status_filter': status_filter,
         'search': search,

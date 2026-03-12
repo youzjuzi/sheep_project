@@ -11,6 +11,7 @@ from django.contrib.auth.decorators import login_required
 from django.utils import timezone
 from django.views.decorators.http import require_http_methods
 from django.db.models import Q, Count
+from django.core.paginator import Paginator
 
 from ..models import Coupon, UserCoupon, PromotionActivity, User
 from ..permissions import ROLE_ADMIN, ROLE_BREEDER
@@ -20,6 +21,7 @@ from ..permissions import ROLE_ADMIN, ROLE_BREEDER
 def coupon_list(request):
     """优惠券列表 — 管理员看全部，养殖户只看自己的"""
     is_admin = request.user.role == ROLE_ADMIN
+    page_number = request.GET.get('page', 1)
     
     status_filter = request.GET.get('status', '')
     coupon_type_filter = request.GET.get('coupon_type', '')
@@ -42,6 +44,9 @@ def coupon_list(request):
         coupons = coupons.filter(owner_id=int(owner_filter))
 
     coupons = coupons.order_by('-created_at')
+    paginator = Paginator(coupons, 10)
+    page_obj = paginator.get_page(page_number)
+    current_coupons = list(page_obj.object_list)
 
     # 自动标记过期优惠券
     now = timezone.now()
@@ -62,7 +67,7 @@ def coupon_list(request):
     }
 
     # 为每个优惠券添加领取统计
-    for coupon in coupons:
+    for coupon in current_coupons:
         coupon.claimed_count = UserCoupon.objects.filter(coupon=coupon).count()
         coupon.actual_used_count = UserCoupon.objects.filter(coupon=coupon, status='used').count()
         if coupon.total_count:
@@ -70,13 +75,20 @@ def coupon_list(request):
         else:
             coupon.remaining = '不限'
 
+    query_params = request.GET.copy()
+    query_params.pop('page', None)
+    extra_query = query_params.urlencode()
+    extra_query = f'&{extra_query}' if extra_query else ''
+
     # 管理员需要养殖户列表
     breeders = []
     if is_admin:
         breeders = User.objects.filter(role=ROLE_BREEDER, is_verified=True).order_by('id')
 
     context = {
-        'coupons': coupons,
+        'coupons': current_coupons,
+        'page_obj': page_obj,
+        'extra_query': extra_query,
         'stats': stats,
         'status_filter': status_filter,
         'coupon_type_filter': coupon_type_filter,

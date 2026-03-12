@@ -4,6 +4,7 @@ from django.contrib import messages
 from django.db.models import Q
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
+from django.core.paginator import Paginator
 from ..models import Sheep, GrowthRecord, FeedingRecord, VaccinationHistory, VaccineType, EnvironmentAlert, User, OrderItem
 from ..permissions import ROLE_ADMIN, ROLE_BREEDER
 
@@ -12,6 +13,7 @@ from ..permissions import ROLE_ADMIN, ROLE_BREEDER
 def sheep_list(request):
     """羊只列表 - 带多条件筛选"""
     is_admin = request.user.role == ROLE_ADMIN
+    page_number = request.GET.get('page', 1)
     
     # 获取筛选参数
     search = request.GET.get('search', '')
@@ -43,8 +45,14 @@ def sheep_list(request):
     if gender:
         sheep_list = sheep_list.filter(gender=int(gender))
 
-    # 批量查询每只羊的领养人（已支付/配送中/完成的订单）
-    sheep_ids = [s.id for s in sheep_list]
+    # 默认按最新羊只排序，并做分页
+    sheep_queryset = sheep_list.order_by('-id')
+    paginator = Paginator(sheep_queryset, 10)
+    page_obj = paginator.get_page(page_number)
+    current_sheep_list = list(page_obj.object_list)
+
+    # 批量查询当前页每只羊的领养人（已支付/配送中/完成的订单）
+    sheep_ids = [s.id for s in current_sheep_list]
     adopter_map = {}
     for oi in OrderItem.objects.filter(
         sheep_id__in=sheep_ids,
@@ -52,7 +60,7 @@ def sheep_list(request):
     ).select_related('order__user'):
         adopter_map[oi.sheep_id] = oi.order.user
 
-    for s in sheep_list:
+    for s in current_sheep_list:
         s.adopter = adopter_map.get(s.id)  # None 表示未领养
 
     # 获取筛选选项
@@ -65,7 +73,8 @@ def sheep_list(request):
         breeders = User.objects.filter(role=ROLE_BREEDER, is_verified=True).order_by('id')
     
     context = {
-        'sheep_list': sheep_list,
+        'sheep_list': current_sheep_list,
+        'page_obj': page_obj,
         'search': search,
         'health_status': health_status,
         'gender': gender,
