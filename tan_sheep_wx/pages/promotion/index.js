@@ -54,11 +54,23 @@ Page({
             });
     },
 
+    // 统一处理领券失败文案
+    getClaimErrorText(msg) {
+        const text = msg || '';
+        if (text.indexOf('已领取过') !== -1 || text.indexOf('领取上限') !== -1 || text.indexOf('仅可领取一次') !== -1) {
+            return '每位用户仅可领取一次';
+        }
+        if (text.indexOf('已领完') !== -1) {
+            return '该优惠券已领完';
+        }
+        return text || '暂时无法领取，请稍后重试';
+    },
+
     // 领取优惠券
     claimCoupon(e) {
         const couponId = e.currentTarget.dataset.id;
         const coupon = this.data.coupons.find(c => c.id === couponId);
-        
+
         if (!coupon) return;
         if (coupon.remaining_count === 0) return; // 已领完
 
@@ -93,7 +105,7 @@ Page({
                     this.loadCoupons();
                 } else {
                     wx.showToast({
-                        title: res.msg || '领取失败',
+                        title: this.getClaimErrorText(res.msg),
                         icon: 'none',
                         duration: 2000
                     });
@@ -103,8 +115,9 @@ Page({
                 wx.hideLoading();
                 console.error('领取优惠券失败:', error);
                 wx.showToast({
-                    title: '领取失败',
-                    icon: 'none'
+                    title: this.getClaimErrorText(error && error.message),
+                    icon: 'none',
+                    duration: 2000
                 });
             });
     },

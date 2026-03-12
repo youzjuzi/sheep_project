@@ -336,10 +336,12 @@ def api_claim_coupon(request):
         
         # 检查用户是否已领取
         user_coupon_count = UserCoupon.objects.filter(user=user, coupon=coupon).count()
-        if user_coupon_count >= coupon.user_limit:
+        # 养殖户发放的优惠券，每位用户仅可领取一次
+        effective_user_limit = 1 if coupon.owner_id else coupon.user_limit
+        if user_coupon_count >= effective_user_limit:
             return JsonResponse({
                 'code': 400,
-                'msg': f'您已达到领取上限（{coupon.user_limit}张）',
+                'msg': '每位用户仅可领取一次',
                 'data': None
             }, status=400)
         
@@ -353,7 +355,7 @@ def api_claim_coupon(request):
         if not created:
             return JsonResponse({
                 'code': 400,
-                'msg': '您已领取过该优惠券',
+                'msg': '每位用户仅可领取一次',
                 'data': None
             }, status=400)
         
@@ -384,4 +386,5 @@ def api_claim_coupon(request):
             'msg': f'服务器错误: {str(e)}',
             'data': None
         }, status=500)
+
 
