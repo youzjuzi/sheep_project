@@ -3,6 +3,7 @@
     min-height: 100vh;
     background-color: #F7F8FA;
     padding: 30rpx;
+    box-sizing: border-box;
 }
 
 .result-header {
@@ -85,6 +86,83 @@
     font-size: 36rpx;
     color: #CCCCCC;
     font-weight: 300;
+}
+
+.pagination {
+    margin-top: 12rpx;
+    padding: 20rpx 0 8rpx;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12rpx;
+}
+
+.page-btn {
+    min-width: 120rpx;
+    height: 64rpx;
+    padding: 0 20rpx;
+    border-radius: 12rpx;
+    background: #FFFFFF;
+    border: 1rpx solid #DCE2E8;
+    color: #333333;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+}
+
+.page-btn-disabled {
+    color: #B7BFC8;
+    background: #F2F4F7;
+    border-color: #E7EBF0;
+}
+
+.page-info {
+    font-size: 24rpx;
+    color: #667085;
+    min-width: 180rpx;
+    text-align: center;
+}
+
+.jump-row {
+    margin-top: 8rpx;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 12rpx;
+}
+
+.jump-label {
+    font-size: 24rpx;
+    color: #667085;
+}
+
+.jump-input {
+    width: 130rpx;
+    height: 60rpx;
+    background: #FFFFFF;
+    border: 1rpx solid #DCE2E8;
+    border-radius: 10rpx;
+    padding: 0 16rpx;
+    box-sizing: border-box;
+    font-size: 24rpx;
+}
+
+.jump-btn {
+    height: 60rpx;
+    min-width: 96rpx;
+    padding: 0 18rpx;
+    background: #238E23;
+    border-radius: 10rpx;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.jump-btn text {
+    color: #FFFFFF;
+    font-size: 24rpx;
 }
 
 .empty-state {

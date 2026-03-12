@@ -3,10 +3,10 @@
     <view class="result-header">
         <text class="result-title">找到 {{sheepList.length}} 只符合条件的羊只</text>
     </view>
-    
+
     <!-- 搜索结果列表 -->
     <view class="sheep-list" wx:if="{{sheepList.length > 0}}">
-        <view class="sheep-item" wx:for="{{sheepList}}" wx:key="id" bindtap="viewSheepDetail" data-id="{{item.id}}">
+        <view class="sheep-item" wx:for="{{pagedSheepList}}" wx:key="id" bindtap="viewSheepDetail" data-id="{{item.id}}">
             <view class="sheep-avatar">
                 <image wx:if="{{item.image}}" src="{{item.image}}" class="avatar-img" mode="aspectFill"></image>
                 <text wx:else class="avatar-icon">🐑</text>
@@ -24,8 +24,32 @@
                 <text class="action-arrow">›</text>
             </view>
         </view>
+
+        <view class="pagination" wx:if="{{totalPages > 1}}">
+            <view class="page-btn {{currentPage <= 1 ? 'page-btn-disabled' : ''}}" bindtap="goFirstPage">
+                <text>首页</text>
+            </view>
+            <view class="page-btn {{currentPage <= 1 ? 'page-btn-disabled' : ''}}" bindtap="goPrevPage">
+                <text>上一页</text>
+            </view>
+            <text class="page-info">第 {{currentPage}} / {{totalPages}} 页</text>
+            <view class="page-btn {{currentPage >= totalPages ? 'page-btn-disabled' : ''}}" bindtap="goNextPage">
+                <text>下一页</text>
+            </view>
+            <view class="page-btn {{currentPage >= totalPages ? 'page-btn-disabled' : ''}}" bindtap="goLastPage">
+                <text>末页</text>
+            </view>
+        </view>
+
+        <view class="jump-row" wx:if="{{totalPages > 1}}">
+            <text class="jump-label">跳转到</text>
+            <input class="jump-input" type="number" placeholder="页码" value="{{jumpPageInput}}" bindinput="onJumpInput" />
+            <view class="jump-btn" bindtap="jumpToPage">
+                <text>确定</text>
+            </view>
+        </view>
     </view>
-    
+
     <!-- 空状态 -->
     <view class="empty-state" wx:if="{{sheepList.length === 0}}">
         <view class="empty-icon">🐑</view>
