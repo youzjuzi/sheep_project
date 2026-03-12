@@ -11,7 +11,7 @@
       bindregionchange="onRegionChange"
       style="width: 100%; height: 100vh;"
     ></map>
-    
+
     <!-- 加载提示 -->
     <view class="loading-overlay" wx:if="{{loading}}">
         <view class="loading-content">
@@ -38,15 +38,15 @@
                 <text class="modal-label">地址：</text>{{selectedFarmer.address}}
             </view>
             <view class="modal-buttons">
-                <button class="nav-button" bindtap="navigateToLocation">🗺️ 导航到这里</button>
+                <button class="nav-button" bindtap="navigateToLocation">🗺️ 打开地图</button>
                 <button class="close-button" bindtap="closeModal">关闭</button>
             </view>
         </view>
     </view>
 
-    <!-- 导航入口按钮（浮动） -->
+    <!-- 地图应用入口按钮（浮动） -->
     <view class="nav-fab" bindtap="openNavigation">
         <text class="nav-fab-icon">🧭</text>
-        <text class="nav-fab-text">导航</text>
+        <text class="nav-fab-text">地图</text>
     </view>
 </view>
