@@ -176,6 +176,18 @@
 </div>
 
 <!-- 腾讯地图 JS API -->
+<script>
+// 先拦截地图 SDK 可能触发的“鉴权失败”弹窗，避免加载期提示打断用户。
+(function() {
+    if (typeof window === 'undefined' || typeof window.alert !== 'function') return;
+    var nativeAlert = window.alert;
+    window.alert = function(message) {
+        var text = String(message || '');
+        if (text.indexOf('鉴权失败') !== -1 || text.indexOf('鉴权') !== -1) return;
+        return nativeAlert.call(window, message);
+    };
+})();
+</script>
 <script src="https://map.qq.com/api/gljs?v=1.exp&key=IXHBZ-BHHKU-DHWVZ-BMAHF-BSXU3-YNBA3"></script>
 <script>
 var pickerMap = null;
@@ -328,6 +340,12 @@ function getCookie(name) {
     var v = document.cookie.match('(^|;) ?' + name + '=([^;]*)(;|$)');
     return v ? v[2] : null;
 }
+
 </script>
 {% endblock %}
+
+
+
+
+
 
